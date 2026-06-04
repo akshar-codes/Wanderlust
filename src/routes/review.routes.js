@@ -1,27 +1,28 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 
-const wrapAsync = require("../utils/wrapAsync.js");
-const reviewCtrl = require("../controllers/review.controller.js");
+const asyncHandler = require("../utils/asyncHandler");
+const reviewCtrl = require("../controllers/review.controller");
 
-const isLoggedIn = require("../middlewares/isLoggedIn.js");
-const isReviewAuthor = require("../middlewares/isReviewAuthor.js");
-const validateReview = require("../middlewares/validateReview.js");
+const isLoggedIn = require("../middlewares/isLoggedIn");
+const isReviewAuthor = require("../middlewares/isReviewAuthor");
+const validate = require("../middlewares/validate");
+const { reviewBodySchema } = require("../validators/schemas");
 
-// POST /listings/:id/reviews
+// ── POST /listings/:id/reviews ────────────────────────────────────────────────
 router.post(
   "/",
   isLoggedIn,
-  validateReview,
-  wrapAsync(reviewCtrl.createReview),
+  validate(reviewBodySchema),
+  asyncHandler(reviewCtrl.createReview),
 );
 
-// DELETE /listings/:id/reviews/:reviewID
+// ── DELETE /listings/:id/reviews/:reviewID ────────────────────────────────────
 router.delete(
   "/:reviewID",
   isLoggedIn,
-  wrapAsync(isReviewAuthor),
-  wrapAsync(reviewCtrl.destroyReview),
+  isReviewAuthor, // self-wrapping asyncHandler
+  asyncHandler(reviewCtrl.destroyReview),
 );
 
 module.exports = router;

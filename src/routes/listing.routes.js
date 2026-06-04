@@ -1,52 +1,49 @@
 const express = require("express");
 const router = express.Router();
 
-const wrapAsync = require("../utils/wrapAsync.js");
-const listingCtrl = require("../controllers/listing.controller.js");
+const asyncHandler = require("../utils/asyncHandler");
+const listingCtrl = require("../controllers/listing.controller");
 
-const isLoggedIn = require("../middlewares/isLoggedIn.js");
-const isOwner = require("../middlewares/isOwner.js");
-const validateListing = require("../middlewares/validateListing.js");
-const upload = require("../middlewares/upload.js");
+const isLoggedIn = require("../middlewares/isLoggedIn");
+const isOwner = require("../middlewares/isOwner");
+const upload = require("../middlewares/upload");
+const validate = require("../middlewares/validate");
+const { listingBodySchema } = require("../validators/schemas");
 
-// ─── /listings ────────────────────────────────────────────────────────────────
+// ── GET|POST /listings ────────────────────────────────────────────────────────
 router
   .route("/")
-  .get(wrapAsync(listingCtrl.index))
+  .get(asyncHandler(listingCtrl.index))
   .post(
     isLoggedIn,
     upload.single("listing[image]"),
-    validateListing,
-    wrapAsync(listingCtrl.createListing),
+    validate(listingBodySchema),
+    asyncHandler(listingCtrl.createListing),
   );
 
-// ─── /listings/new ────────────────────────────────────────────────────────────
-// Must be defined BEFORE /:id so Express doesn't treat "new" as an id
+// ── GET /listings/new ─────────────────────────────────────────────────────────
+// Must be defined BEFORE /:id so "new" is not treated as an ObjectId
 router.get("/new", isLoggedIn, listingCtrl.renderNewForm);
 
-// ─── /listings/:id ────────────────────────────────────────────────────────────
+// ── GET|PUT|DELETE /listings/:id ──────────────────────────────────────────────
 router
   .route("/:id")
-  .get(wrapAsync(listingCtrl.showListing))
+  .get(asyncHandler(listingCtrl.showListing))
   .put(
     isLoggedIn,
-    wrapAsync(isOwner),
+    isOwner, // self-wrapping asyncHandler
     upload.single("listing[image]"),
-    validateListing,
-    wrapAsync(listingCtrl.updateListing),
+    validate(listingBodySchema),
+    asyncHandler(listingCtrl.updateListing),
   )
-  .delete(
-    isLoggedIn,
-    wrapAsync(isOwner),
-    wrapAsync(listingCtrl.destroyListing),
-  );
+  .delete(isLoggedIn, isOwner, asyncHandler(listingCtrl.destroyListing));
 
-// ─── /listings/:id/edit ───────────────────────────────────────────────────────
+// ── GET /listings/:id/edit ────────────────────────────────────────────────────
 router.get(
   "/:id/edit",
   isLoggedIn,
-  wrapAsync(isOwner),
-  wrapAsync(listingCtrl.renderEditForm),
+  isOwner,
+  asyncHandler(listingCtrl.renderEditForm),
 );
 
 module.exports = router;

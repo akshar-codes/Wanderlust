@@ -6,13 +6,14 @@ const session = require("express-session");
 const passport = require("passport");
 const ejsMate = require("ejs-mate");
 
-const ExpressError = require("./utils/ExpressError.js");
+const AppError = require("./utils/AppError");
+const errorHandler = require("./middlewares/errorHandler");
 
-// ── Routers ──────────────────────────────────────────────────────────────────
-const listingRouter = require("./routes/listing.routes.js");
-const reviewsRouter = require("./routes/review.routes.js");
-const userRouter = require("./routes/user.routes.js");
-const legalRouter = require("./routes/legal.routes.js");
+// ── Routers ───────────────────────────────────────────────────────────────────
+const listingRouter = require("./routes/listing.routes");
+const reviewsRouter = require("./routes/review.routes");
+const userRouter = require("./routes/user.routes");
+const legalRouter = require("./routes/legal.routes");
 
 const app = express();
 
@@ -30,7 +31,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // ── Session (basic fallback — server.js replaces this with MongoStore) ────────
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "fallback-dev-secret",
+    secret: process.env.SESSION_SECRET ?? "fallback-dev-secret",
     resave: false,
     saveUninitialized: false,
   }),
@@ -42,7 +43,7 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ── Locals ────────────────────────────────────────────────────────────────────
+// ── Template Locals ───────────────────────────────────────────────────────────
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
@@ -51,22 +52,16 @@ app.use((req, res, next) => {
 });
 
 // ── Routes ────────────────────────────────────────────────────────────────────
-app.get("/", (req, res) => res.redirect("/listings"));
+app.get("/", (_req, res) => res.redirect("/listings"));
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", userRouter);
 app.use("/", legalRouter);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
-app.use((req, res, next) => {
-  next(new ExpressError(404, "Page Not Found"));
-});
+app.use((_req, _res, next) => next(AppError.notFound("Page Not Found")));
 
-// ── Central Error Handler ─────────────────────────────────────────────────────
-
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message = "Something went wrong" } = err;
-  res.status(statusCode).render("error", { message });
-});
+// ── Global Error Handler (must be last) ──────────────────────────────────────
+app.use(errorHandler);
 
 module.exports = app;
