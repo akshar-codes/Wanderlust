@@ -1,12 +1,14 @@
 const multer = require("multer");
-const { storage } = require("../config/cloudConfig.js");
-const ExpressError = require("../utils/ExpressError.js");
+const { storage } = require("../config/cloudConfig");
+const AppError = require("../utils/AppError");
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-  if (!allowedTypes.includes(file.mimetype)) {
+const fileFilter = (_req, file, cb) => {
+  const allowed = ["image/jpeg", "image/png", "image/jpg"];
+  if (!allowed.includes(file.mimetype)) {
     return cb(
-      new ExpressError(400, "Only JPG, JPEG, and PNG images are allowed"),
+      new AppError(400, "Only JPG, JPEG, and PNG images are allowed", {
+        code: "BAD_REQUEST",
+      }),
       false,
     );
   }

@@ -1,10 +1,17 @@
-module.exports = (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    // Store original URL so user can be redirected back after login
-    req.session.redirectUrl = req.originalUrl;
+const AppError = require("../utils/AppError");
 
-    req.flash("error", "You must be logged in first");
-    return res.redirect("/login");
-  }
-  next();
+module.exports = (req, res, next) => {
+  if (req.isAuthenticated()) return next();
+
+  // Stash the original URL so the login controller can redirect back
+  req.session.redirectUrl = req.originalUrl;
+
+  // Flash for the EJS template (preserves UX for browser clients)
+  req.flash("error", "You must be logged in first");
+
+  // Redirect browser requests; return a 401 for API / non-browser clients
+  const acceptsHtml = req.accepts("html");
+  if (acceptsHtml) return res.redirect("/login");
+
+  return next(AppError.unauthorized());
 };
