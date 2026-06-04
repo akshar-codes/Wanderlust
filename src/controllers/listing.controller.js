@@ -1,71 +1,84 @@
-const listingService = require("../services/listing.service.js");
+const listingService = require("../services/listing.service");
+const AppError = require("../utils/AppError");
+const { sendSuccess } = require("../utils/apiResponse");
 
-// ─── GET /listings ────────────────────────────────────────────────────────────
+// ── GET /listings ─────────────────────────────────────────────────────────────
 
 const index = async (req, res) => {
   const { category } = req.query;
   const allListings = await listingService.getAllListings(category);
-  res.render("listings/index.ejs", { allListings, category });
+
+  // Browser → render view  |  API client → JSON
+  if (req.accepts("html")) {
+    return res.render("listings/index.ejs", { allListings, category });
+  }
+  return sendSuccess(res, { listings: allListings });
 };
 
-// ─── GET /listings/new ────────────────────────────────────────────────────────
+// ── GET /listings/new ─────────────────────────────────────────────────────────
 
-const renderNewForm = (req, res) => {
-  res.render("listings/new.ejs");
-};
+const renderNewForm = (_req, res) => res.render("listings/new.ejs");
 
-// ─── GET /listings/:id ────────────────────────────────────────────────────────
+// ── GET /listings/:id ─────────────────────────────────────────────────────────
 
-const showListing = async (req, res) => {
+const showListing = async (req, res, next) => {
   const listing = await listingService.getListingById(req.params.id);
-  if (!listing) {
-    req.flash("error", "Listing Does Not Exist!");
-    return res.redirect("/listings");
-  }
-  res.render("listings/show.ejs", { listing });
+  if (!listing) return next(AppError.notFound("Listing does not exist"));
+
+  if (req.accepts("html")) return res.render("listings/show.ejs", { listing });
+  return sendSuccess(res, { listing });
 };
 
-// ─── POST /listings ───────────────────────────────────────────────────────────
+// ── POST /listings ────────────────────────────────────────────────────────────
 
-const createListing = async (req, res) => {
-  if (!req.file) {
-    req.flash("error", "Image upload failed");
-    return res.redirect("/listings/new");
-  }
+const createListing = async (req, res, next) => {
+  if (!req.file) return next(AppError.badRequest("Image upload is required"));
 
-  await listingService.createListing(req.body.listing, req.file, req.user._id);
+  const listing = await listingService.createListing(
+    req.body.listing,
+    req.file,
+    req.user._id,
+  );
 
   req.flash("success", "New Listing Created");
-  res.redirect("/listings");
+  if (req.accepts("html")) return res.redirect("/listings");
+  return sendSuccess(res, { listing }, 201);
 };
 
-// ─── GET /listings/:id/edit ───────────────────────────────────────────────────
+// ── GET /listings/:id/edit ────────────────────────────────────────────────────
 
-const renderEditForm = async (req, res) => {
-  const { listing, originalImageUrl } = await listingService.getListingForEdit(
-    req.params.id,
-  );
-  if (!listing) {
-    req.flash("error", "Listing Does Not Exist!");
-    return res.redirect("/listings");
-  }
-  res.render("listings/edit.ejs", { listing, originalImageUrl });
+const renderEditForm = async (req, res, next) => {
+  const result = await listingService.getListingForEdit(req.params.id);
+  if (!result) return next(AppError.notFound("Listing does not exist"));
+
+  return res.render("listings/edit.ejs", {
+    listing: result.listing,
+    originalImageUrl: result.originalImageUrl,
+  });
 };
 
-// ─── PUT /listings/:id ────────────────────────────────────────────────────────
+// ── PUT /listings/:id ─────────────────────────────────────────────────────────
 
 const updateListing = async (req, res) => {
-  await listingService.updateListing(req.params.id, req.body.listing, req.file);
+  const listing = await listingService.updateListing(
+    req.params.id,
+    req.body.listing,
+    req.file,
+  );
+
   req.flash("success", "Listing Updated");
-  res.redirect(`/listings/${req.params.id}`);
+  if (req.accepts("html")) return res.redirect(`/listings/${req.params.id}`);
+  return sendSuccess(res, { listing });
 };
 
-// ─── DELETE /listings/:id ─────────────────────────────────────────────────────
+// ── DELETE /listings/:id ──────────────────────────────────────────────────────
 
 const destroyListing = async (req, res) => {
   await listingService.deleteListing(req.params.id);
+
   req.flash("success", "Listing Deleted");
-  res.redirect("/listings");
+  if (req.accepts("html")) return res.redirect("/listings");
+  return sendSuccess(res, { deleted: true });
 };
 
 module.exports = {

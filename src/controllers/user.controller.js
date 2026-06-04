@@ -1,12 +1,11 @@
-const userService = require("../services/user.service.js");
+const userService = require("../services/user.service");
+const { sendSuccess } = require("../utils/apiResponse");
 
-// ─── GET /signup ──────────────────────────────────────────────────────────────
+// ── GET /signup ───────────────────────────────────────────────────────────────
 
-const renderSignupForm = (req, res) => {
-  res.render("users/signup.ejs");
-};
+const renderSignupForm = (_req, res) => res.render("users/signup.ejs");
 
-// ─── POST /signup ─────────────────────────────────────────────────────────────
+// ── POST /signup ──────────────────────────────────────────────────────────────
 
 const signup = async (req, res, next) => {
   try {
@@ -17,46 +16,49 @@ const signup = async (req, res, next) => {
       password,
     );
 
-    // Passport's req.login establishes the session — must stay in controller
+    // Passport's req.login must stay in the controller (it touches the session)
     req.login(registeredUser, (err) => {
       if (err) return next(err);
       req.flash("success", "Welcome to Wanderlust!");
-      return res.redirect("/listings");
+
+      if (req.accepts("html")) return res.redirect("/listings");
+      return sendSuccess(
+        res,
+        { user: { username: registeredUser.username } },
+        201,
+      );
     });
   } catch (err) {
+    // passport-local-mongoose throws a plain Error on duplicate username, etc.
     req.flash("error", err.message);
-    return res.redirect("/signup");
+    if (req.accepts("html")) return res.redirect("/signup");
+    return next(err);
   }
 };
 
-// ─── GET /login ───────────────────────────────────────────────────────────────
+// ── GET /login ────────────────────────────────────────────────────────────────
 
-const renderLoginForm = (req, res) => {
-  res.render("users/login.ejs");
-};
+const renderLoginForm = (_req, res) => res.render("users/login.ejs");
 
-// ─── POST /login  (called AFTER passport.authenticate succeeds) ───────────────
+// ── POST /login  (called AFTER passport.authenticate succeeds) ────────────────
 
 const login = (req, res) => {
   req.flash("success", "Welcome back to Wanderlust!");
-  const redirectUrl = res.locals.redirectUrl || "/listings";
-  return res.redirect(redirectUrl);
+  const redirectUrl = res.locals.redirectUrl ?? "/listings";
+
+  if (req.accepts("html")) return res.redirect(redirectUrl);
+  return sendSuccess(res, { redirectUrl });
 };
 
-// ─── GET /logout ──────────────────────────────────────────────────────────────
+// ── GET /logout ───────────────────────────────────────────────────────────────
 
 const logout = (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
     req.flash("success", "You are logged out!");
-    return res.redirect("/listings");
+    if (req.accepts("html")) return res.redirect("/listings");
+    return sendSuccess(res, { loggedOut: true });
   });
 };
 
-module.exports = {
-  renderSignupForm,
-  signup,
-  renderLoginForm,
-  login,
-  logout,
-};
+module.exports = { renderSignupForm, signup, renderLoginForm, login, logout };
