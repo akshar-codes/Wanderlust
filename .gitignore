@@ -39,3 +39,5 @@ src/public/uploads/
 # Misc
 *.log
 *.cache
+clone-db.js
+Notes.txt
