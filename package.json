@@ -1,13 +1,16 @@
 {
   "engines": {
-    "node": "22.20.0"
+    "node": "24.16.0"
   },
   "name": "wander-lust",
-  "version": "1.0.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Wanderlust — refactored with controllers / services / repositories",
   "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node src/seeds/index.js",
+    "test": "echo \"No tests configured yet\" && exit 0"
   },
   "author": "Akshar Gupta",
   "license": "ISC",
@@ -29,5 +32,8 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
   }
 }
