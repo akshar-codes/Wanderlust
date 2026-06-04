@@ -37,6 +37,7 @@ src/public/uploads/
 *.pem
 
 # Misc
+/logs/
 *.log
 *.cache
 clone-db.js
