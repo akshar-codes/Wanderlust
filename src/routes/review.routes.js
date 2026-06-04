@@ -1,26 +1,27 @@
 const express = require("express");
-const router = express.Router({ mergeParams: true }); // mergeParams to access :id from listings
+const router = express.Router({ mergeParams: true });
+
 const wrapAsync = require("../utils/wrapAsync.js");
-const reviewController = require("../controllers/reviews.js");
+const reviewCtrl = require("../controllers/review.controller.js");
 
 const isLoggedIn = require("../middlewares/isLoggedIn.js");
 const isReviewAuthor = require("../middlewares/isReviewAuthor.js");
 const validateReview = require("../middlewares/validateReview.js");
 
-// POST new review for a listing
+// POST /listings/:id/reviews
 router.post(
   "/",
   isLoggedIn,
   validateReview,
-  wrapAsync(reviewController.createReview)
+  wrapAsync(reviewCtrl.createReview),
 );
 
-// DELETE a review by its author
+// DELETE /listings/:id/reviews/:reviewID
 router.delete(
   "/:reviewID",
   isLoggedIn,
-  isReviewAuthor,
-  wrapAsync(reviewController.destroyReview)
+  wrapAsync(isReviewAuthor),
+  wrapAsync(reviewCtrl.destroyReview),
 );
 
 module.exports = router;
