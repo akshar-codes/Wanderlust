@@ -11,8 +11,11 @@ export default function ListingsPage() {
   const [showTax, setShowTax] = useState(false);
 
   // Shared search/filter state from AppLayout
-  const { searchQuery = "", selectedCountry = "", setAvailableCountries } =
-    useOutletContext() || {};
+  const {
+    searchQuery = "",
+    selectedCountry = "",
+    setAvailableCountries,
+  } = useOutletContext() || {};
 
   const { data, isLoading, isError, error } = useListings({ category });
   const listings = data?.listings || [];
@@ -34,8 +37,7 @@ export default function ListingsPage() {
         l.title.toLowerCase().includes(q) ||
         l.location.toLowerCase().includes(q) ||
         l.country.toLowerCase().includes(q);
-      const matchesCountry =
-        !selectedCountry || l.country === selectedCountry;
+      const matchesCountry = !selectedCountry || l.country === selectedCountry;
       return matchesSearch && matchesCountry;
     });
   }, [listings, searchQuery, selectedCountry]);
@@ -67,7 +69,11 @@ export default function ListingsPage() {
       ) : (
         <div className="listings-grid">
           {filtered.map((listing) => (
-            <ListingCard key={listing._id} listing={listing} showTax={showTax} />
+            <ListingCard
+              key={listing._id}
+              listing={listing}
+              showTax={showTax}
+            />
           ))}
         </div>
       )}
