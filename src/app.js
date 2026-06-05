@@ -18,6 +18,7 @@ const compressionMiddleware = require("./middlewares/compression");
 const requestLogger = require("./middlewares/requestLogger");
 
 // ── Routers ───────────────────────────────────────────────────────────────────
+const apiRouter = require("./api");
 const listingRouter = require("./routes/listing.routes");
 const reviewsRouter = require("./routes/review.routes");
 const userRouter = require("./routes/user.routes");
@@ -81,6 +82,7 @@ app.use((req, res, next) => {
 
 // ── 13. Routes ────────────────────────────────────────────────────────────────
 app.get("/", (_req, res) => res.redirect("/listings"));
+app.use("/api", apiRouter);
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", userRouter);

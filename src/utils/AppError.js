@@ -26,8 +26,8 @@ class AppError extends Error {
     return new AppError(403, message, { code: "FORBIDDEN" });
   }
 
-  static validationError(details) {
-    return new AppError(422, "Validation failed", {
+  static validationError(details, summary = "Validation failed") {
+    return new AppError(422, summary, {
       code: "VALIDATION_ERROR",
       details,
     });
