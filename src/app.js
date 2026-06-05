@@ -16,6 +16,7 @@ const { globalLimiter } = require("./config/rateLimiter.config");
 const hppProtection = require("./middlewares/hpp");
 const compressionMiddleware = require("./middlewares/compression");
 const requestLogger = require("./middlewares/requestLogger");
+const setupSwagger = require("./config/swagger.config");
 
 // ── Routers ───────────────────────────────────────────────────────────────────
 const apiRouter = require("./api");
@@ -82,6 +83,7 @@ app.use((req, res, next) => {
 
 // ── 13. Routes ────────────────────────────────────────────────────────────────
 app.get("/", (_req, res) => res.redirect("/listings"));
+setupSwagger(app);
 app.use("/api", apiRouter);
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewsRouter);

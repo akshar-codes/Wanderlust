@@ -1,0 +1,1214 @@
+openapi: 3.0.3
+
+info:
+  title: Wanderlust API
+  description: |
+    REST API for the Wanderlust travel-listing platform.
+
+    ## Authentication
+    All write operations (create, update, delete) require an active session.
+    Log in via `POST /api/auth/login` — the server sets a **session cookie**
+    (`connect.sid`) which must be included in every subsequent request.
+
+    Browser clients handle this automatically.  
+    API / curl clients should use `--cookie-jar` / `credentials: "include"`.
+
+    ## Rate Limits
+    | Scope | Window | Max requests |
+    |---|---|---|
+    | Global (all routes) | 15 min | 200 |
+    | Auth (`/signup`, `/login`) | 15 min | 20 |
+    | Create listings / reviews | 1 hour | 30 |
+
+    Exceeded limits return **429 Too Many Requests**.
+
+  version: "2.0.0"
+  contact:
+    name: Akshar Gupta
+  license:
+    name: ISC
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+  - url: https://your-production-domain.com
+    description: Production (replace with your actual domain)
+
+tags:
+  - name: Health
+    description: Service liveness check
+  - name: Auth
+    description: Session-based authentication
+  - name: Listings
+    description: Travel listing CRUD
+  - name: Reviews
+    description: Reviews nested under listings
+  - name: Users
+    description: Public user profiles
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Reusable components
+# ─────────────────────────────────────────────────────────────────────────────
+components:
+  # ── Security ──────────────────────────────────────────────────────────────
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: connect.sid
+      description: |
+        Session cookie set by `POST /api/auth/login`.  
+        Swagger UI will send it automatically after a successful login when
+        `withCredentials` is enabled.
+
+  # ── Shared parameters ─────────────────────────────────────────────────────
+  parameters:
+    listingId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-f0-9]{24}$"
+      description: MongoDB ObjectId of the listing
+      example: "6648a1f2c3d4e5f6a7b8c9d0"
+
+    listingIdNested:
+      name: listingId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-f0-9]{24}$"
+      description: MongoDB ObjectId of the parent listing
+      example: "6648a1f2c3d4e5f6a7b8c9d0"
+
+    reviewId:
+      name: reviewId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-f0-9]{24}$"
+      description: MongoDB ObjectId of the review
+      example: "6648b2e3d4f5a6b7c8d9e0f1"
+
+    username:
+      name: username
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 30
+      description: Username of the target user
+      example: "alice"
+
+  # ── Schemas ───────────────────────────────────────────────────────────────
+  schemas:
+    # Primitives / building blocks
+    ObjectId:
+      type: string
+      pattern: "^[a-f0-9]{24}$"
+      example: "6648a1f2c3d4e5f6a7b8c9d0"
+
+    ListingCategory:
+      type: string
+      enum:
+        - trending
+        - rooms
+        - iconic
+        - mountains
+        - castles
+        - pools
+        - camping
+        - farms
+        - arctic
+        - domes
+        - boats
+      example: mountains
+
+    GeoPoint:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type:
+          type: string
+          enum: [Point]
+        coordinates:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+          description: "[longitude, latitude]"
+          example: [-106.8175, 39.1911]
+
+    Image:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          example: "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+        filename:
+          type: string
+          example: "wanderlust_DEV/xkcd1234"
+
+    # ── User ────────────────────────────────────────────────────────────────
+    UserPublic:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/ObjectId"
+        username:
+          type: string
+          example: alice
+        email:
+          type: string
+          format: email
+          example: alice@example.com
+
+    # ── Listing ─────────────────────────────────────────────────────────────
+    Listing:
+      type: object
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        title:
+          type: string
+          example: "Mountain Retreat"
+        description:
+          type: string
+          example: "Peaceful cabin surrounded by pines."
+        image:
+          $ref: "#/components/schemas/Image"
+        price:
+          type: number
+          minimum: 0
+          example: 1000
+        location:
+          type: string
+          example: "Aspen"
+        country:
+          type: string
+          example: "United States"
+        category:
+          $ref: "#/components/schemas/ListingCategory"
+        geometry:
+          $ref: "#/components/schemas/GeoPoint"
+        owner:
+          $ref: "#/components/schemas/UserPublic"
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+
+    ListingInput:
+      type: object
+      required: [title, description, location, country, price, category]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          example: "Mountain Retreat"
+        description:
+          type: string
+          minLength: 1
+          example: "Peaceful cabin surrounded by pines."
+        location:
+          type: string
+          minLength: 1
+          example: "Aspen"
+        country:
+          type: string
+          minLength: 1
+          example: "United States"
+        price:
+          type: number
+          minimum: 0
+          example: 1000
+        category:
+          $ref: "#/components/schemas/ListingCategory"
+
+    ListingPatchInput:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+        location:
+          type: string
+          minLength: 1
+        country:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minimum: 0
+        category:
+          $ref: "#/components/schemas/ListingCategory"
+
+    # ── Review ───────────────────────────────────────────────────────────────
+    Review:
+      type: object
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+        comment:
+          type: string
+          example: "Absolutely stunning views!"
+        createdAt:
+          type: string
+          format: date-time
+        author:
+          $ref: "#/components/schemas/UserPublic"
+
+    ReviewInput:
+      type: object
+      required: [rating, comment]
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+        comment:
+          type: string
+          minLength: 1
+          example: "Absolutely stunning views!"
+
+    ReviewPatchInput:
+      type: object
+      minProperties: 1
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          minLength: 1
+
+    # ── Auth request bodies ──────────────────────────────────────────────────
+    SignupBody:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+          maxLength: 30
+          minLength: 1
+          example: alice
+        email:
+          type: string
+          format: email
+          example: alice@example.com
+        password:
+          type: string
+          format: password
+          minLength: 6
+          example: "s3cr3tP@ss"
+
+    LoginBody:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+          example: alice
+        password:
+          type: string
+          format: password
+          minLength: 1
+          example: "s3cr3tP@ss"
+
+    # ── Pagination ───────────────────────────────────────────────────────────
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 29
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 2
+
+    # ── Response envelopes ───────────────────────────────────────────────────
+    SuccessEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Resource not found"
+        code:
+          type: string
+          example: "NOT_FOUND"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+  # ── Reusable responses ─────────────────────────────────────────────────────
+  responses:
+    Unauthorized:
+      description: Not authenticated — session cookie missing or expired
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+          example:
+            success: false
+            message: "Authentication required"
+            code: "UNAUTHORIZED"
+
+    Forbidden:
+      description: Authenticated but not authorised for this resource
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+          example:
+            success: false
+            message: "You do not have permission"
+            code: "FORBIDDEN"
+
+    NotFound:
+      description: Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+          example:
+            success: false
+            message: "Resource not found"
+            code: "NOT_FOUND"
+
+    ValidationError:
+      description: Request body failed schema validation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+          example:
+            success: false
+            message: "Validation failed"
+            code: "VALIDATION_ERROR"
+            details:
+              - field: "listing.title"
+                message: "Title cannot be empty"
+
+    BadRequest:
+      description: Malformed request (e.g. missing image, bad ObjectId)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        RateLimit-Limit:
+          schema:
+            type: integer
+        RateLimit-Remaining:
+          schema:
+            type: integer
+        RateLimit-Reset:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+          example:
+            success: false
+            message: "Too many requests — please try again later."
+            code: "RATE_LIMIT_EXCEEDED"
+
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+          example:
+            success: false
+            message: "Something went wrong"
+            code: "INTERNAL_ERROR"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Paths
+# ─────────────────────────────────────────────────────────────────────────────
+paths:
+  # ════════════════════════════════ HEALTH ════════════════════════════════════
+  /api/health:
+    get:
+      tags: [Health]
+      summary: Service liveness check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: ok
+                      ts:
+                        type: string
+                        format: date-time
+
+  # ════════════════════════════════ AUTH ══════════════════════════════════════
+  /api/auth/signup:
+    post:
+      tags: [Auth]
+      summary: Register a new account
+      operationId: authSignup
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupBody"
+      responses:
+        "201":
+          description: Account created; session cookie set
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "connect.sid=s%3A...; Path=/; HttpOnly; SameSite=Lax"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "Account created successfully"
+                          user:
+                            $ref: "#/components/schemas/UserPublic"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in with username and password
+      operationId: authLogin
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in; session cookie set
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "Logged in successfully"
+                          user:
+                            $ref: "#/components/schemas/UserPublic"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: End the current session
+      operationId: authLogout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "Logged out successfully"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Return the currently authenticated user
+      operationId: authMe
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/UserPublic"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ══════════════════════════════ LISTINGS ════════════════════════════════════
+  /api/listings:
+    get:
+      tags: [Listings]
+      summary: List all listings (paginated, filterable)
+      operationId: listingsIndex
+      security: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            $ref: "#/components/schemas/ListingCategory"
+          description: Filter by category
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Results per page
+        - name: sort
+          in: query
+          schema:
+            type: string
+            default: createdAt
+          description: Sort field (future use)
+      responses:
+        "200":
+          description: Paginated listing array
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listings:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Listing"
+                          pagination:
+                            $ref: "#/components/schemas/Pagination"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+    post:
+      tags: [Listings]
+      summary: Create a new listing
+      operationId: listingsCreate
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - "listing[title]"
+                - "listing[description]"
+                - "listing[location]"
+                - "listing[country]"
+                - "listing[price]"
+                - "listing[category]"
+                - "listing[image]"
+              properties:
+                "listing[title]":
+                  type: string
+                  minLength: 1
+                  example: "Alpine Hideaway"
+                "listing[description]":
+                  type: string
+                  minLength: 1
+                  example: "Cosy chalet with panoramic views."
+                "listing[location]":
+                  type: string
+                  minLength: 1
+                  example: "Zermatt"
+                "listing[country]":
+                  type: string
+                  minLength: 1
+                  example: "Switzerland"
+                "listing[price]":
+                  type: number
+                  minimum: 0
+                  example: 3200
+                "listing[category]":
+                  $ref: "#/components/schemas/ListingCategory"
+                "listing[image]":
+                  type: string
+                  format: binary
+                  description: JPEG, JPG, or PNG only (≤ 10 MB recommended)
+      responses:
+        "201":
+          description: Listing created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing:
+                            $ref: "#/components/schemas/Listing"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/listings/{id}:
+    parameters:
+      - $ref: "#/components/parameters/listingId"
+
+    get:
+      tags: [Listings]
+      summary: Get a single listing (with reviews and owner)
+      operationId: listingsShow
+      security: []
+      responses:
+        "200":
+          description: Listing detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing:
+                            $ref: "#/components/schemas/Listing"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags: [Listings]
+      summary: Full-replace a listing (owner only)
+      operationId: listingsUpdate
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - "listing[title]"
+                - "listing[description]"
+                - "listing[location]"
+                - "listing[country]"
+                - "listing[price]"
+                - "listing[category]"
+              properties:
+                "listing[title]":
+                  type: string
+                  minLength: 1
+                "listing[description]":
+                  type: string
+                  minLength: 1
+                "listing[location]":
+                  type: string
+                  minLength: 1
+                "listing[country]":
+                  type: string
+                  minLength: 1
+                "listing[price]":
+                  type: number
+                  minimum: 0
+                "listing[category]":
+                  $ref: "#/components/schemas/ListingCategory"
+                "listing[image]":
+                  type: string
+                  format: binary
+                  description: Optional — omit to keep the existing image
+      responses:
+        "200":
+          description: Listing updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing:
+                            $ref: "#/components/schemas/Listing"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    patch:
+      tags: [Listings]
+      summary: Partially update a listing (owner only)
+      operationId: listingsPartialUpdate
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                listing:
+                  $ref: "#/components/schemas/ListingPatchInput"
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                "listing[title]":
+                  type: string
+                  minLength: 1
+                "listing[description]":
+                  type: string
+                  minLength: 1
+                "listing[location]":
+                  type: string
+                  minLength: 1
+                "listing[country]":
+                  type: string
+                  minLength: 1
+                "listing[price]":
+                  type: number
+                  minimum: 0
+                "listing[category]":
+                  $ref: "#/components/schemas/ListingCategory"
+                "listing[image]":
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Listing patched
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing:
+                            $ref: "#/components/schemas/Listing"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Listings]
+      summary: Delete a listing (owner only)
+      operationId: listingsDestroy
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Listing deleted
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "Listing deleted successfully"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ════════════════════════════════ REVIEWS ═══════════════════════════════════
+  /api/listings/{listingId}/reviews:
+    parameters:
+      - $ref: "#/components/parameters/listingIdNested"
+
+    get:
+      tags: [Reviews]
+      summary: List all reviews for a listing
+      operationId: reviewsIndex
+      security: []
+      responses:
+        "200":
+          description: Review array
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          reviews:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Review"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags: [Reviews]
+      summary: Add a review to a listing (auth required)
+      operationId: reviewsCreate
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [review]
+              properties:
+                review:
+                  $ref: "#/components/schemas/ReviewInput"
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                "review[rating]":
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                "review[comment]":
+                  type: string
+                  minLength: 1
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          review:
+                            $ref: "#/components/schemas/Review"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/listings/{listingId}/reviews/{reviewId}:
+    parameters:
+      - $ref: "#/components/parameters/listingIdNested"
+      - $ref: "#/components/parameters/reviewId"
+
+    get:
+      tags: [Reviews]
+      summary: Get a single review
+      operationId: reviewsShow
+      security: []
+      responses:
+        "200":
+          description: Review detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          review:
+                            $ref: "#/components/schemas/Review"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Reviews]
+      summary: Update a review (author only)
+      operationId: reviewsUpdate
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review:
+                  $ref: "#/components/schemas/ReviewPatchInput"
+      responses:
+        "200":
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          review:
+                            $ref: "#/components/schemas/Review"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    delete:
+      tags: [Reviews]
+      summary: Delete a review (author only)
+      operationId: reviewsDestroy
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Review deleted
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "Review deleted successfully"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ═════════════════════════════════ USERS ════════════════════════════════════
+  /api/users/{username}:
+    parameters:
+      - $ref: "#/components/parameters/username"
+
+    get:
+      tags: [Users]
+      summary: Get a user's public profile
+      operationId: usersProfile
+      security: []
+      responses:
+        "200":
+          description: User profile
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: "#/components/schemas/UserPublic"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Users]
+      summary: Delete own account (auth required — own account only)
+      operationId: usersDestroy
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Account deleted
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "Account deleted successfully"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/users/{username}/listings:
+    parameters:
+      - $ref: "#/components/parameters/username"
+
+    get:
+      tags: [Users]
+      summary: Get all listings owned by a user
+      operationId: usersListings
+      security: []
+      responses:
+        "200":
+          description: User's listings
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listings:
+                            type: array
+                            items:
+                              $ref: "#/components/schemas/Listing"
+        "404":
+          $ref: "#/components/responses/NotFound"
