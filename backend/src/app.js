@@ -37,7 +37,6 @@ app.use(globalLimiter);
 app.use(requestLogger);
 
 // ── 6. View Engine ───────────────────────────────────────────────────────────
-app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -61,19 +60,9 @@ app.use(
   }),
 );
 
-app.use(flash());
-
 // ── 11. Passport ──────────────────────────────────────────────────────────────
 app.use(passport.initialize());
 app.use(passport.session());
-
-// ── 12. Template locals ───────────────────────────────────────────────────────
-app.use((req, res, next) => {
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
-  res.locals.currUser = req.user;
-  next();
-});
 
 // ── 13. Routes ────────────────────────────────────────────────────────────────
 setupSwagger(app);
