@@ -70,7 +70,7 @@ async function initDB() {
 
     // Randomly assign up to 4 reviews to each listing
     const shuffledReviews = [...reviewData.data].sort(
-      () => 0.5 - Math.random()
+      () => 0.5 - Math.random(),
     );
     const selectedReviews = shuffledReviews.slice(0, 4);
 
