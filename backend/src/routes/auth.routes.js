@@ -1,16 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-const asyncHandler = require("../../utils/asyncHandler");
+const asyncHandler = require("../utils/asyncHandler");
 const authCtrl = require("../controllers/auth.controller");
-const validate = require("../../middlewares/validate");
-const {
-  signupBodySchema,
-  loginBodySchema,
-} = require("../../validators/schemas");
-const { authLimiter } = require("../../config/rateLimiter.config");
-const saveRedirectUrl = require("../../middlewares/saveRedirectUrl");
-const authFailureLogger = require("../../middlewares/authFailureLogger");
+const validate = require("../middlewares/validate");
+const { signupBodySchema, loginBodySchema } = require("../validators/schemas");
+const { authLimiter } = require("../config/rateLimiter.config");
+const saveRedirectUrl = require("../middlewares/saveRedirectUrl");
+const authFailureLogger = require("../middlewares/authFailureLogger");
 
 /**
  * POST /api/auth/signup

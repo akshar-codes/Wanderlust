@@ -1,7 +1,7 @@
-const userService = require("../../services/user.service");
-const AppError = require("../../utils/AppError");
-const { sendSuccess } = require("../../utils/apiResponse");
-const User = require("../../models/user");
+const userService = require("../services/user.service");
+const AppError = require("../utils/AppError");
+const { sendSuccess } = require("../utils/apiResponse");
+const User = require("../models/user");
 
 // ── POST /api/auth/signup ─────────────────────────────────────────────────────
 const signup = async (req, res, next) => {

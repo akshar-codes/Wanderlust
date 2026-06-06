@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const asyncHandler = require("../../utils/asyncHandler");
+const asyncHandler = require("../utils/asyncHandler");
 const userCtrl = require("../controllers/user.controller");
-const isLoggedIn = require("../middlewares/isLoggedIn.api");
+const isLoggedIn = require("../middlewares/isLoggedIn");
 
 /**
  * GET  /api/users/:username   → public profile

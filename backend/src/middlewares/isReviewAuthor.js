@@ -1,8 +1,8 @@
 "use strict";
 
-const asyncHandler = require("../../utils/asyncHandler");
-const AppError = require("../../utils/AppError");
-const reviewRepo = require("../../repositories/review.repository");
+const asyncHandler = require("../utils/asyncHandler");
+const AppError = require("../utils/AppError");
+const reviewRepo = require("../repositories/review.repository");
 
 module.exports = asyncHandler(async (req, _res, next) => {
   const review = await reviewRepo.findById(req.params.reviewId);

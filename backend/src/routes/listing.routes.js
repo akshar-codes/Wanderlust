@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-const asyncHandler = require("../../utils/asyncHandler");
+const asyncHandler = require("../utils/asyncHandler");
 const listingCtrl = require("../controllers/listing.controller");
-const isLoggedIn = require("../middlewares/isLoggedIn.api");
-const isOwner = require("../middlewares/isOwner.api");
-const upload = require("../../middlewares/upload");
-const validate = require("../../middlewares/validate");
-const { listingBodySchema } = require("../../validators/schemas");
-const { createLimiter } = require("../../config/rateLimiter.config");
+const isLoggedIn = require("../middlewares/isLoggedIn");
+const isOwner = require("../middlewares/isOwner");
+const upload = require("../middlewares/upload");
+const validate = require("../middlewares/validate");
+const { listingBodySchema } = require("../validators/schemas");
+const { createLimiter } = require("../config/rateLimiter.config");
 
 /**
  * GET  /api/listings          → list all (filter: ?category=mountains)

@@ -18,7 +18,7 @@ const requestLogger = require("./middlewares/requestLogger");
 const setupSwagger = require("./config/swagger.config");
 
 // ── Routers ───────────────────────────────────────────────────────────────────
-const apiRouter = require("./api");
+const apiRouter = require("./routes");
 
 function createApp(sessionMiddleware) {
   const app = express();

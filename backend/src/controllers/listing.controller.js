@@ -1,6 +1,6 @@
-const listingService = require("../../services/listing.service");
-const AppError = require("../../utils/AppError");
-const { sendSuccess } = require("../../utils/apiResponse");
+const listingService = require("../services/listing.service");
+const AppError = require("../utils/AppError");
+const { sendSuccess } = require("../utils/apiResponse");
 
 // ── GET /api/listings ─────────────────────────────────────────────────────────
 const index = async (req, res) => {

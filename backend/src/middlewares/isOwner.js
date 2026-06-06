@@ -1,6 +1,6 @@
-const asyncHandler = require("../../utils/asyncHandler");
-const AppError = require("../../utils/AppError");
-const listingRepo = require("../../repositories/listing.repository");
+const asyncHandler = require("../utils/asyncHandler");
+const AppError = require("../utils/AppError");
+const listingRepo = require("../repositories/listing.repository");
 
 module.exports = asyncHandler(async (req, _res, next) => {
   const listing = await listingRepo.findById(req.params.id);

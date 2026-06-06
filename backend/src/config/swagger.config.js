@@ -20,7 +20,7 @@ function setupSwagger(app) {
   }
 
   // ── Load spec from disk (supports hot-reload in dev) ─────────────────────
-  const specPath = path.resolve(__dirname, "../../docs/openapi.yaml");
+  const specPath = path.resolve(__dirname, "../../../docs/openapi.yaml");
 
   let spec;
   try {

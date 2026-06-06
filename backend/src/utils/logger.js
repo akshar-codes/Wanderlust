@@ -6,7 +6,7 @@ const path = require("path");
 const { combine, timestamp, errors, json, colorize, printf } = format;
 
 // ── Log directory (project root /logs) ────────────────────────────────────────
-const LOG_DIR = path.resolve(__dirname, "../../../logs");
+const LOG_DIR = path.resolve(__dirname, "../../logs");
 const IS_PROD = process.env.NODE_ENV === "production";
 
 // ── Human-readable format for the console (dev only) ─────────────────────────

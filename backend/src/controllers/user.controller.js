@@ -1,7 +1,7 @@
-const userRepo = require("../../repositories/user.repository");
-const listingRepo = require("../../repositories/listing.repository");
-const AppError = require("../../utils/AppError");
-const { sendSuccess } = require("../../utils/apiResponse");
+const userRepo = require("../repositories/user.repository");
+const listingRepo = require("../repositories/listing.repository");
+const AppError = require("../utils/AppError");
+const { sendSuccess } = require("../utils/apiResponse");
 
 // ── GET /api/users/:username ──────────────────────────────────────────────────
 const profile = async (req, res, next) => {

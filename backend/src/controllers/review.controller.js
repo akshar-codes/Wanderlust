@@ -1,10 +1,10 @@
 "use strict";
 
-const reviewService = require("../../services/review.service");
-const reviewRepo = require("../../repositories/review.repository");
-const listingRepo = require("../../repositories/listing.repository");
-const AppError = require("../../utils/AppError");
-const { sendSuccess } = require("../../utils/apiResponse");
+const reviewService = require("../services/review.service");
+const reviewRepo = require("../repositories/review.repository");
+const listingRepo = require("../repositories/listing.repository");
+const AppError = require("../utils/AppError");
+const { sendSuccess } = require("../utils/apiResponse");
 
 // ── GET /api/listings/:listingId/reviews ──────────────────────────────────────
 const index = async (req, res) => {
