@@ -1,10 +1,8 @@
 const express = require("express");
 const path = require("path");
 const methodOverride = require("method-override");
-const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
-const ejsMate = require("ejs-mate");
 
 const AppError = require("./utils/AppError");
 const errorHandler = require("./middlewares/errorHandler");
@@ -20,10 +18,6 @@ const setupSwagger = require("./config/swagger.config");
 
 // ── Routers ───────────────────────────────────────────────────────────────────
 const apiRouter = require("./api");
-const listingRouter = require("./routes/listing.routes");
-const reviewsRouter = require("./routes/review.routes");
-const userRouter = require("./routes/user.routes");
-const legalRouter = require("./routes/legal.routes");
 
 const app = express();
 
@@ -82,13 +76,8 @@ app.use((req, res, next) => {
 });
 
 // ── 13. Routes ────────────────────────────────────────────────────────────────
-app.get("/", (_req, res) => res.redirect("/listings"));
 setupSwagger(app);
 app.use("/api", apiRouter);
-app.use("/listings", listingRouter);
-app.use("/listings/:id/reviews", reviewsRouter);
-app.use("/", userRouter);
-app.use("/", legalRouter);
 
 // ── 14. 404 ───────────────────────────────────────────────────────────────────
 app.use((_req, _res, next) => next(AppError.notFound("Page Not Found")));
