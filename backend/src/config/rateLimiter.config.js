@@ -1,14 +1,17 @@
+"use strict";
+
 const rateLimit = require("express-rate-limit");
 const logger = require("../utils/logger");
 
 // ── Shared handler: log every rate-limit hit ──────────────────────────────────
+
 function onLimitReached(req, _res, options) {
   logger.warn("Rate limit exceeded", {
     ip: req.ip,
     method: req.method,
     path: req.path,
     userAgent: req.get("user-agent"),
-    limit: options.max,
+    limit: options.limit, // v7: use `limit`, not the deprecated `max`
     window: options.windowMs,
   });
 }
@@ -17,7 +20,7 @@ function onLimitReached(req, _res, options) {
 // 200 requests per 15 minutes per IP
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 200,
+  limit: 200, // v7 canonical field (replaces deprecated `max`)
   standardHeaders: true, // RateLimit-* headers (RFC 6585)
   legacyHeaders: false, // drop X-RateLimit-* headers
   message: {
@@ -35,10 +38,9 @@ const globalLimiter = rateLimit({
 // 20 attempts per 15 minutes per IP (brute-force protection)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  limit: 20, // v7 canonical field
   standardHeaders: true,
   legacyHeaders: false,
-
   skipSuccessfulRequests: true,
   message: {
     success: false,
@@ -51,6 +53,7 @@ const authLimiter = rateLimit({
       ip: req.ip,
       path: req.path,
       userAgent: req.get("user-agent"),
+      limit: options.limit,
     });
     res.status(options.statusCode).json(options.message);
   },
@@ -60,7 +63,7 @@ const authLimiter = rateLimit({
 // 30 creates per hour per IP
 const createLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 30,
+  limit: 30, // v7 canonical field
   standardHeaders: true,
   legacyHeaders: false,
   message: {

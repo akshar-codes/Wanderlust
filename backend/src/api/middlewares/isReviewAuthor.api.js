@@ -1,3 +1,5 @@
+"use strict";
+
 const asyncHandler = require("../../utils/asyncHandler");
 const AppError = require("../../utils/AppError");
 const reviewRepo = require("../../repositories/review.repository");
@@ -10,5 +12,7 @@ module.exports = asyncHandler(async (req, _res, next) => {
     return next(AppError.forbidden("You are not the author of this review"));
   }
 
+  // Attach for downstream reuse
+  req.review = review;
   next();
 });

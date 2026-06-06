@@ -1,20 +1,21 @@
+"use strict";
+
 const reviewService = require("../../services/review.service");
 const reviewRepo = require("../../repositories/review.repository");
+const listingRepo = require("../../repositories/listing.repository");
 const AppError = require("../../utils/AppError");
 const { sendSuccess } = require("../../utils/apiResponse");
 
 // ── GET /api/listings/:listingId/reviews ──────────────────────────────────────
 const index = async (req, res) => {
   const { listingId } = req.params;
-  const listing =
-    await require("../../repositories/listing.repository").findByIdWithDetails(
-      listingId,
-    );
+  const listing = await listingRepo.findByIdWithDetails(listingId);
 
-  if (!listing)
+  if (!listing) {
     return res
       .status(404)
       .json({ success: false, message: "Listing not found" });
+  }
 
   return sendSuccess(res, { reviews: listing.reviews });
 };
@@ -39,12 +40,12 @@ const create = async (req, res) => {
 
 // ── PATCH /api/listings/:listingId/reviews/:reviewId ──────────────────────────
 const update = async (req, res, next) => {
-  const review = await reviewRepo.findById(req.params.reviewId);
+  const review = req.review ?? (await reviewRepo.findById(req.params.reviewId));
   if (!review) return next(AppError.notFound("Review not found"));
 
-  const { rating, comment } = req.body.review ?? req.body;
-  if (rating !== undefined) review.rating = rating;
-  if (comment !== undefined) review.comment = comment;
+  const updates = req.body.review ?? req.body;
+  if (updates.rating !== undefined) review.rating = updates.rating;
+  if (updates.comment !== undefined) review.comment = updates.comment;
 
   await review.save();
   return sendSuccess(res, { review });

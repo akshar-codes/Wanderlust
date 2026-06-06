@@ -1,3 +1,5 @@
+"use strict";
+
 const { createLogger, format, transports } = require("winston");
 const path = require("path");
 
@@ -42,9 +44,10 @@ const loggerTransports = [
     maxFiles: 7,
     tailable: true,
   }),
+
   new transports.File({
     filename: path.join(LOG_DIR, "auth.log"),
-    level: "warn", // auth failures are logged at warn or above
+    level: "info",
     format: fileFormat,
     maxsize: 5 * 1024 * 1024,
     maxFiles: 5,
