@@ -18,6 +18,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import NotFoundPage from "./pages/NotFoundPage";
+import HomePage from "./pages/HomePage";
 
 import DesignSystemPage from "./pages/DesignSystemPage";
 
@@ -48,7 +49,8 @@ export default function App() {
             <AuthInit>
               <Routes>
                 <Route path="/" element={<AppLayout />}>
-                  <Route index element={<Navigate to="/listings" replace />} />
+                  <Route index element={<HomePage />} />
+                  <Route path="listings" element={<ListingsPage />} />
                   <Route path="listings" element={<ListingsPage />} />
 
                   <Route
