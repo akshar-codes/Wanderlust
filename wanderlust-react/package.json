@@ -1,6 +1,7 @@
 {
   "name": "wanderlust-react",
   "version": "1.0.0",
+  "type": "module",
   "description": "Wanderlust React frontend (Vite)",
   "private": true,
   "scripts": {
