@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// ── NEW: MUI theme ────────────────────────────────────────────────────────────
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { wanderlustTheme } from "./theme";
 
@@ -20,6 +19,8 @@ import SignupPage from "./pages/SignupPage";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import NotFoundPage from "./pages/NotFoundPage";
 
+import DesignSystemPage from "./pages/DesignSystemPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, refetchOnWindowFocus: false },
@@ -35,8 +36,9 @@ function AuthInit({ children }) {
 }
 
 export default function App() {
+  const isDev = import.meta.env.DEV;
+
   return (
-    // ── ThemeProvider wraps everything ─────────────────────────────────────
     <ThemeProvider theme={wanderlustTheme}>
       <CssBaseline />
 
@@ -71,6 +73,15 @@ export default function App() {
                   <Route path="signup" element={<SignupPage />} />
                   <Route path="privacy" element={<PrivacyPage />} />
                   <Route path="terms" element={<TermsPage />} />
+
+                  {/* Dev-only design system explorer */}
+                  {isDev && (
+                    <Route
+                      path="design-system"
+                      element={<DesignSystemPage />}
+                    />
+                  )}
+
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>
               </Routes>
