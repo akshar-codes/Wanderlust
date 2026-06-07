@@ -8,15 +8,10 @@ import {
 } from "@mui/material";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import StarRating from "../common/StarRating";
-import { colors, shadows, radii, transitions } from "../../theme/tokens";
+import { colors, shadows, radii, motion } from "../../theme/tokens";
 
 // ── Base Card ─────────────────────────────────────────────────────────────────
-/**
- * @param {"flat"|"raised"|"hover"} variant
- *   flat  — border only, no shadow
- *   raised — visible shadow, static
- *   hover  — flat by default, elevates on hover
- */
+
 export function Card({
   variant = "flat",
   children,
@@ -31,9 +26,9 @@ export function Card({
       raised: { boxShadow: shadows.md },
       hover: {
         boxShadow: "none",
-        transition: `box-shadow ${transitions.base}, transform ${transitions.base}`,
+        transition: `box-shadow ${motion.duration.base}ms ${motion.easing.easeOut}, transform ${motion.duration.base}ms ${motion.easing.easeOut}`,
         "&:hover": {
-          boxShadow: shadows.lg,
+          boxShadow: shadows.cardHover,
           transform: "translateY(-2px)",
         },
       },
@@ -89,7 +84,7 @@ export function ListingCard({ listing, showTax = false, loading = false }) {
           border: "none",
           borderRadius: 0,
           background: "transparent",
-          transition: `transform ${transitions.base}`,
+          transition: motion.transition.base,
           "&:hover": { transform: "translateY(-2px)" },
           "&:hover .listing-card-img": { transform: "scale(1.04)" },
           "&:hover .listing-card-overlay": { background: "rgba(0,0,0,0.04)" },
@@ -211,7 +206,7 @@ export function StatsCard({ label, value, icon, trend, trendValue }) {
         display: "flex",
         flexDirection: "column",
         gap: 1,
-        transition: `box-shadow ${transitions.base}`,
+        transition: `box-shadow ${motion.duration.base}ms ${motion.easing.easeOut}`,
         "&:hover": { boxShadow: shadows.md },
       }}
     >

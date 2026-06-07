@@ -3,8 +3,11 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { wanderlustTheme } from "./theme";
-
+import {
+  wanderlustTheme,
+  getWanderlustTheme,
+  injectCSSVariables,
+} from "./theme";
 import { useAuthStore } from "./store/auth.store";
 import AppLayout from "./components/layout/AppLayout";
 import ProtectedRoute from "./components/common/ProtectedRoute";
@@ -22,6 +25,8 @@ import HomePage from "./pages/HomePage";
 
 import DesignSystemPage from "./pages/DesignSystemPage";
 
+const theme = getWanderlustTheme("dark");
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, refetchOnWindowFocus: false },
@@ -32,6 +37,7 @@ function AuthInit({ children }) {
   const init = useAuthStore((s) => s.init);
   useEffect(() => {
     init();
+    injectCSSVariables();
   }, [init]);
   return children;
 }

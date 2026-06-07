@@ -9,7 +9,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Search } from "lucide-react";
-import { colors, radii } from "../../theme/tokens";
+import { colors, radii, motion } from "../../theme/tokens";
 
 // ── Helper: shared sx for all inputs ─────────────────────────────────────────
 function inputSx(error) {
@@ -17,6 +17,7 @@ function inputSx(error) {
     "& .MuiOutlinedInput-root": {
       borderRadius: radii.lg,
       backgroundColor: colors.neutral[0],
+      transition: motion.transition.fast,
       "& fieldset": {
         borderColor: error ? colors.error.main : colors.neutral[200],
       },
@@ -29,8 +30,8 @@ function inputSx(error) {
       },
       "&.Mui-focused": {
         boxShadow: error
-          ? `0 0 0 3px rgba(239,68,68,0.12)`
-          : `0 0 0 3px rgba(254,66,77,0.12)`,
+          ? `0 0 0 3px rgba(239,68,68,0.20)`
+          : `0 0 0 3px rgba(255,90,95,0.20)`,
       },
     },
     "& .MuiInputLabel-root": {

@@ -5,7 +5,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { colors } from "../../theme/tokens";
+import { colors, motion } from "../../theme/tokens";
 
 // ── Variant → MUI prop mapping ────────────────────────────────────────────────
 const VARIANT_MAP = {
@@ -53,10 +53,10 @@ export const Button = forwardRef(function Button(
   const dangerSx =
     variant === "danger"
       ? {
-          background: `linear-gradient(135deg, ${colors.error.main}, ${colors.error.dark})`,
+          background: `linear-gradient(135deg, ${colors.error.base}, ${colors.error.strong})`,
           "&:hover": {
-            background: colors.error.dark,
-            boxShadow: `0 4px 16px ${alpha(colors.error.main, 0.4)}`,
+            background: colors.error.strong,
+            boxShadow: `0 4px 16px ${alpha(colors.error.base, 0.4)}`,
           },
         }
       : {};
@@ -103,13 +103,6 @@ export const LoadingButton = forwardRef(function LoadingButton(
   );
 });
 
-/**
- * IconButton
- * Wraps MUI IconButton with project colour tokens.
- *
- * @param {"default"|"primary"|"danger"} color
- * @param {string} label — accessible aria-label (required)
- */
 export const IconButton = forwardRef(function IconButton(
   { color = "default", label, children, size = "md", sx, ...props },
   ref,
@@ -117,12 +110,12 @@ export const IconButton = forwardRef(function IconButton(
   const colorMap = {
     default: {},
     primary: {
-      color: colors.brand[500],
-      "&:hover": { background: colors.brand[50] },
+      color: colors.primary[500],
+      "&:hover": { background: colors.primary[50] },
     },
     danger: {
       color: colors.neutral[400],
-      "&:hover": { color: colors.error.main, background: colors.error.light },
+      "&:hover": { color: colors.error.base, background: colors.error.light },
     },
   };
 

@@ -10,7 +10,7 @@ import {
 import { X } from "lucide-react";
 import { forwardRef } from "react";
 import { Button, LoadingButton } from "./Button";
-import { colors, radii } from "../../theme/tokens";
+import { colors, radii, shadows } from "../../theme/tokens";
 
 // Slide-up transition for the dialog
 const SlideUp = forwardRef(function SlideUp(props, ref) {
@@ -18,17 +18,7 @@ const SlideUp = forwardRef(function SlideUp(props, ref) {
 });
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
-/**
- * @param {boolean}       open
- * @param {Function}      onClose
- * @param {string}        title
- * @param {React.ReactNode} children
- * @param {React.ReactNode} actions    — rendered in DialogActions
- * @param {"xs"|"sm"|"md"|"lg"|"xl"} maxWidth
- * @param {boolean}       fullWidth
- * @param {boolean}       hideClose    — hides the ✕ button in the header
- * @param {boolean}       noPadding    — removes content padding
- */
+
 export function Modal({
   open,
   onClose,
@@ -68,7 +58,10 @@ export function Modal({
               size="small"
               sx={{
                 color: colors.neutral[500],
-                "&:hover": { background: colors.neutral[100] },
+                "&:hover": {
+                  background: colors.neutral[100],
+                  color: colors.neutral[700],
+                },
               }}
             >
               <X size={18} />
@@ -95,16 +88,7 @@ export function Modal({
 }
 
 // ── Confirm Modal ─────────────────────────────────────────────────────────────
-/**
- * @param {string}   title
- * @param {string}   message
- * @param {string}   confirmLabel
- * @param {"primary"|"danger"} confirmVariant
- * @param {string}   cancelLabel
- * @param {boolean}  loading
- * @param {Function} onConfirm
- * @param {Function} onClose
- */
+
 export function ConfirmModal({
   open,
   onClose,
@@ -157,12 +141,7 @@ export function ConfirmModal({
 }
 
 // ── Alert Modal ───────────────────────────────────────────────────────────────
-/**
- * @param {"success"|"info"|"warning"|"error"} severity
- * @param {string}  title
- * @param {string}  message
- * @param {string}  actionLabel
- */
+
 export function AlertModal({
   open,
   onClose,
@@ -185,6 +164,7 @@ export function AlertModal({
           sx={{
             borderRadius: radii.lg,
             fontSize: "0.875rem",
+            border: "1px solid transparent",
             "& .MuiAlert-message": { width: "100%" },
           }}
         >
