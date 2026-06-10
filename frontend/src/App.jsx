@@ -18,7 +18,7 @@ import ListingShowPage from "./pages/ListingShowPage";
 import NewListingPage from "./pages/NewListingPage";
 import EditListingPage from "./pages/EditListingPage";
 import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
+import { SignupPage } from "./pages/AuthPages";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import NotFoundPage from "./pages/NotFoundPage";
 import HomePage from "./pages/HomePage";
