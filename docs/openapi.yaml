@@ -22,7 +22,7 @@ info:
 
     Exceeded limits return **429 Too Many Requests**.
 
-  version: "2.0.0"
+  version: "3.0.0"
   contact:
     name: Akshar Gupta
   license:
@@ -44,7 +44,7 @@ tags:
   - name: Reviews
     description: Reviews nested under listings
   - name: Users
-    description: Public user profiles
+    description: User profiles, settings, avatar, notifications
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Reusable components
@@ -105,7 +105,7 @@ components:
 
   # ── Schemas ───────────────────────────────────────────────────────────────
   schemas:
-    # Primitives / building blocks
+    # Primitives
     ObjectId:
       type: string
       pattern: "^[a-f0-9]{24}$"
@@ -154,7 +154,73 @@ components:
           type: string
           example: "wanderlust_DEV/xkcd1234"
 
-    # ── User ────────────────────────────────────────────────────────────────
+    # ── Avatar ───────────────────────────────────────────────────────────────
+    Avatar:
+      type: object
+      nullable: true
+      properties:
+        url:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://res.cloudinary.com/demo/image/upload/avatar.jpg"
+        filename:
+          type: string
+          nullable: true
+          example: "wanderlust_DEV/avatars/abc123"
+
+    # ── Notification Preferences ─────────────────────────────────────────────
+    NotificationPreferences:
+      type: object
+      properties:
+        email:
+          type: object
+          properties:
+            bookingRequests: { type: boolean, example: true }
+            bookingUpdates: { type: boolean, example: true }
+            newReviews: { type: boolean, example: true }
+            promotions: { type: boolean, example: false }
+            newsletter: { type: boolean, example: false }
+        push:
+          type: object
+          properties:
+            bookingRequests: { type: boolean, example: true }
+            bookingUpdates: { type: boolean, example: true }
+            newReviews: { type: boolean, example: true }
+        sms:
+          type: object
+          properties:
+            bookingRequests: { type: boolean, example: false }
+            bookingUpdates: { type: boolean, example: true }
+
+    # ── User Settings ─────────────────────────────────────────────────────────
+    UserSettings:
+      type: object
+      properties:
+        language:
+          type: string
+          enum: [en, hi, es, fr, de, ja, zh, ar]
+          example: en
+        currency:
+          type: string
+          enum: [INR, USD, EUR, GBP, JPY, AUD, CAD, SGD]
+          example: INR
+        timezone:
+          type: string
+          example: "Asia/Kolkata"
+        theme:
+          type: string
+          enum: [light, dark, system]
+          example: system
+        twoFactorEnabled:
+          type: boolean
+          example: false
+        profileVisibility:
+          type: string
+          enum: [public, private, hosts_only]
+          example: public
+
+    # ── User (public shape — visible to everyone) ─────────────────────────────
     UserPublic:
       type: object
       properties:
@@ -163,10 +229,78 @@ components:
         username:
           type: string
           example: alice
-        email:
+        firstName:
           type: string
-          format: email
-          example: alice@example.com
+          nullable: true
+          example: Alice
+        lastName:
+          type: string
+          nullable: true
+          example: Smith
+        displayName:
+          type: string
+          nullable: true
+          example: "Alice Smith"
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://res.cloudinary.com/demo/image/upload/avatar.jpg"
+        bio:
+          type: string
+          nullable: true
+          example: "Avid traveller and amateur photographer."
+        role:
+          type: string
+          enum: [user, host, admin]
+          example: host
+        emailVerified:
+          type: boolean
+          example: true
+        profileCompletion:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 83
+        isHost:
+          type: boolean
+          example: true
+        totalListings:
+          type: integer
+          example: 5
+        totalReviews:
+          type: integer
+          example: 42
+        createdAt:
+          type: string
+          format: date-time
+
+    # ── User (full shape — returned to the authenticated owner) ───────────────
+    UserFull:
+      allOf:
+        - $ref: "#/components/schemas/UserPublic"
+        - type: object
+          properties:
+            email:
+              type: string
+              format: email
+              example: alice@example.com
+            phoneNumber:
+              type: string
+              nullable: true
+              example: "+919876543210"
+            provider:
+              type: string
+              enum: [local, google, github]
+              example: local
+            notificationPreferences:
+              $ref: "#/components/schemas/NotificationPreferences"
+            settings:
+              $ref: "#/components/schemas/UserSettings"
+            lastLoginAt:
+              type: string
+              format: date-time
+              nullable: true
 
     # ── Listing ─────────────────────────────────────────────────────────────
     Listing:
@@ -234,23 +368,12 @@ components:
       type: object
       minProperties: 1
       properties:
-        title:
-          type: string
-          minLength: 1
-        description:
-          type: string
-          minLength: 1
-        location:
-          type: string
-          minLength: 1
-        country:
-          type: string
-          minLength: 1
-        price:
-          type: number
-          minimum: 0
-        category:
-          $ref: "#/components/schemas/ListingCategory"
+        title: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        location: { type: string, minLength: 1 }
+        country: { type: string, minLength: 1 }
+        price: { type: number, minimum: 0 }
+        category: { $ref: "#/components/schemas/ListingCategory" }
 
     # ── Review ───────────────────────────────────────────────────────────────
     Review:
@@ -290,13 +413,8 @@ components:
       type: object
       minProperties: 1
       properties:
-        rating:
-          type: integer
-          minimum: 1
-          maximum: 5
-        comment:
-          type: string
-          minLength: 1
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        comment: { type: string, minLength: 1 }
 
     # ── Auth request bodies ──────────────────────────────────────────────────
     SignupBody:
@@ -317,6 +435,14 @@ components:
           format: password
           minLength: 6
           example: "s3cr3tP@ss"
+        firstName:
+          type: string
+          maxLength: 50
+          example: Alice
+        lastName:
+          type: string
+          maxLength: 50
+          example: Smith
 
     LoginBody:
       type: object
@@ -332,54 +458,116 @@ components:
           minLength: 1
           example: "s3cr3tP@ss"
 
+    # ── User update request bodies ───────────────────────────────────────────
+    UpdateProfileBody:
+      type: object
+      minProperties: 1
+      properties:
+        firstName:
+          type: string
+          maxLength: 50
+          nullable: true
+          example: Alice
+        lastName:
+          type: string
+          maxLength: 50
+          nullable: true
+          example: Smith
+        bio:
+          type: string
+          maxLength: 500
+          nullable: true
+          example: "Avid traveller and amateur photographer."
+        phoneNumber:
+          type: string
+          nullable: true
+          example: "+919876543210"
+          description: "E.164 format preferred: +[country][number]"
+
+    UpdateSettingsBody:
+      type: object
+      minProperties: 1
+      properties:
+        language:
+          type: string
+          enum: [en, hi, es, fr, de, ja, zh, ar]
+        currency:
+          type: string
+          enum: [INR, USD, EUR, GBP, JPY, AUD, CAD, SGD]
+        timezone:
+          type: string
+          example: "Asia/Kolkata"
+        theme:
+          type: string
+          enum: [light, dark, system]
+        twoFactorEnabled:
+          type: boolean
+        profileVisibility:
+          type: string
+          enum: [public, private, hosts_only]
+
+    UpdateNotificationsBody:
+      type: object
+      minProperties: 1
+      properties:
+        email:
+          type: object
+          properties:
+            bookingRequests: { type: boolean }
+            bookingUpdates: { type: boolean }
+            newReviews: { type: boolean }
+            promotions: { type: boolean }
+            newsletter: { type: boolean }
+        push:
+          type: object
+          properties:
+            bookingRequests: { type: boolean }
+            bookingUpdates: { type: boolean }
+            newReviews: { type: boolean }
+        sms:
+          type: object
+          properties:
+            bookingRequests: { type: boolean }
+            bookingUpdates: { type: boolean }
+
+    ChangeRoleBody:
+      type: object
+      required: [role]
+      properties:
+        role:
+          type: string
+          enum: [user, host, admin]
+          example: host
+
     # ── Pagination ───────────────────────────────────────────────────────────
     Pagination:
       type: object
       properties:
-        total:
-          type: integer
-          example: 29
-        page:
-          type: integer
-          example: 1
-        limit:
-          type: integer
-          example: 20
-        totalPages:
-          type: integer
-          example: 2
+        total: { type: integer, example: 29 }
+        page: { type: integer, example: 1 }
+        limit: { type: integer, example: 20 }
+        totalPages: { type: integer, example: 2 }
 
     # ── Response envelopes ───────────────────────────────────────────────────
     SuccessEnvelope:
       type: object
       properties:
-        success:
-          type: boolean
-          example: true
-        data:
-          type: object
+        success: { type: boolean, example: true }
+        data: { type: object }
 
     ErrorEnvelope:
       type: object
       properties:
-        success:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: "Resource not found"
-        code:
-          type: string
-          example: "NOT_FOUND"
+        success: { type: boolean, example: false }
+        message: { type: string, example: "Resource not found" }
+        code: { type: string, example: "NOT_FOUND" }
         details:
           type: array
           items:
             type: object
             properties:
-              field:
-                type: string
-              message:
-                type: string
+              field: { type: string }
+              message: { type: string }
 
   # ── Reusable responses ─────────────────────────────────────────────────────
   responses:
@@ -387,8 +575,7 @@ components:
       description: Not authenticated — session cookie missing or expired
       content:
         application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorEnvelope"
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
           example:
             success: false
             message: "Authentication required"
@@ -398,8 +585,7 @@ components:
       description: Authenticated but not authorised for this resource
       content:
         application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorEnvelope"
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
           example:
             success: false
             message: "You do not have permission"
@@ -409,8 +595,7 @@ components:
       description: Resource does not exist
       content:
         application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorEnvelope"
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
           example:
             success: false
             message: "Resource not found"
@@ -420,8 +605,7 @@ components:
       description: Request body failed schema validation
       content:
         application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorEnvelope"
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
           example:
             success: false
             message: "Validation failed"
@@ -431,28 +615,20 @@ components:
                 message: "Title cannot be empty"
 
     BadRequest:
-      description: Malformed request (e.g. missing image, bad ObjectId)
+      description: Malformed request
       content:
         application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorEnvelope"
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
 
     TooManyRequests:
       description: Rate limit exceeded
       headers:
-        RateLimit-Limit:
-          schema:
-            type: integer
-        RateLimit-Remaining:
-          schema:
-            type: integer
-        RateLimit-Reset:
-          schema:
-            type: integer
+        RateLimit-Limit: { schema: { type: integer } }
+        RateLimit-Remaining: { schema: { type: integer } }
+        RateLimit-Reset: { schema: { type: integer } }
       content:
         application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorEnvelope"
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
           example:
             success: false
             message: "Too many requests — please try again later."
@@ -462,8 +638,7 @@ components:
       description: Unexpected server error
       content:
         application/json:
-          schema:
-            $ref: "#/components/schemas/ErrorEnvelope"
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
           example:
             success: false
             message: "Something went wrong"
@@ -487,18 +662,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                    example: true
+                  success: { type: boolean, example: true }
                   data:
                     type: object
                     properties:
-                      status:
-                        type: string
-                        example: ok
-                      ts:
-                        type: string
-                        format: date-time
+                      status: { type: string, example: ok }
+                      ts: { type: string, format: date-time }
 
   # ════════════════════════════════ AUTH ══════════════════════════════════════
   /api/auth/signup:
@@ -511,16 +680,17 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/SignupBody"
+            schema: { $ref: "#/components/schemas/SignupBody" }
       responses:
         "201":
           description: Account created; session cookie set
           headers:
             Set-Cookie:
               schema:
-                type: string
-                example: "connect.sid=s%3A...; Path=/; HttpOnly; SameSite=Lax"
+                {
+                  type: string,
+                  example: "connect.sid=s%3A...; Path=/; HttpOnly; SameSite=Lax",
+                }
           content:
             application/json:
               schema:
@@ -532,16 +702,14 @@ paths:
                         type: object
                         properties:
                           message:
-                            type: string
-                            example: "Account created successfully"
-                          user:
-                            $ref: "#/components/schemas/UserPublic"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-        "429":
-          $ref: "#/components/responses/TooManyRequests"
+                            {
+                              type: string,
+                              example: "Account created successfully",
+                            }
+                          user: { $ref: "#/components/schemas/UserFull" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
 
   /api/auth/login:
     post:
@@ -553,15 +721,12 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: "#/components/schemas/LoginBody"
+            schema: { $ref: "#/components/schemas/LoginBody" }
       responses:
         "200":
           description: Logged in; session cookie set
           headers:
-            Set-Cookie:
-              schema:
-                type: string
+            Set-Cookie: { schema: { type: string } }
           content:
             application/json:
               schema:
@@ -573,16 +738,11 @@ paths:
                         type: object
                         properties:
                           message:
-                            type: string
-                            example: "Logged in successfully"
-                          user:
-                            $ref: "#/components/schemas/UserPublic"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-        "429":
-          $ref: "#/components/responses/TooManyRequests"
+                            { type: string, example: "Logged in successfully" }
+                          user: { $ref: "#/components/schemas/UserFull" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
 
   /api/auth/logout:
     post:
@@ -603,15 +763,13 @@ paths:
                         type: object
                         properties:
                           message:
-                            type: string
-                            example: "Logged out successfully"
-        "500":
-          $ref: "#/components/responses/InternalError"
+                            { type: string, example: "Logged out successfully" }
+        "500": { $ref: "#/components/responses/InternalError" }
 
   /api/auth/me:
     get:
       tags: [Auth]
-      summary: Return the currently authenticated user
+      summary: Return the currently authenticated user (full profile)
       operationId: authMe
       security:
         - cookieAuth: []
@@ -628,10 +786,8 @@ paths:
                       data:
                         type: object
                         properties:
-                          user:
-                            $ref: "#/components/schemas/UserPublic"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                          user: { $ref: "#/components/schemas/UserFull" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
 
   # ══════════════════════════════ LISTINGS ════════════════════════════════════
   /api/listings:
@@ -643,30 +799,17 @@ paths:
       parameters:
         - name: category
           in: query
-          schema:
-            $ref: "#/components/schemas/ListingCategory"
+          schema: { $ref: "#/components/schemas/ListingCategory" }
           description: Filter by category
         - name: page
           in: query
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-          description: Page number
+          schema: { type: integer, minimum: 1, default: 1 }
         - name: limit
           in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 20
-          description: Results per page
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
         - name: sort
           in: query
-          schema:
-            type: string
-            default: createdAt
-          description: Sort field (future use)
+          schema: { type: string, default: createdAt }
       responses:
         "200":
           description: Paginated listing array
@@ -682,14 +825,11 @@ paths:
                         properties:
                           listings:
                             type: array
-                            items:
-                              $ref: "#/components/schemas/Listing"
+                            items: { $ref: "#/components/schemas/Listing" }
                           pagination:
-                            $ref: "#/components/schemas/Pagination"
-        "429":
-          $ref: "#/components/responses/TooManyRequests"
-        "500":
-          $ref: "#/components/responses/InternalError"
+                            { $ref: "#/components/schemas/Pagination" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "500": { $ref: "#/components/responses/InternalError" }
 
     post:
       tags: [Listings]
@@ -713,27 +853,15 @@ paths:
                 - "listing[image]"
               properties:
                 "listing[title]":
-                  type: string
-                  minLength: 1
-                  example: "Alpine Hideaway"
-                "listing[description]":
-                  type: string
-                  minLength: 1
-                  example: "Cosy chalet with panoramic views."
+                  { type: string, minLength: 1, example: "Alpine Hideaway" }
+                "listing[description]": { type: string, minLength: 1 }
                 "listing[location]":
-                  type: string
-                  minLength: 1
-                  example: "Zermatt"
+                  { type: string, minLength: 1, example: "Zermatt" }
                 "listing[country]":
-                  type: string
-                  minLength: 1
-                  example: "Switzerland"
-                "listing[price]":
-                  type: number
-                  minimum: 0
-                  example: 3200
+                  { type: string, minLength: 1, example: "Switzerland" }
+                "listing[price]": { type: number, minimum: 0, example: 3200 }
                 "listing[category]":
-                  $ref: "#/components/schemas/ListingCategory"
+                  { $ref: "#/components/schemas/ListingCategory" }
                 "listing[image]":
                   type: string
                   format: binary
@@ -751,18 +879,11 @@ paths:
                       data:
                         type: object
                         properties:
-                          listing:
-                            $ref: "#/components/schemas/Listing"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-        "429":
-          $ref: "#/components/responses/TooManyRequests"
-        "500":
-          $ref: "#/components/responses/InternalError"
+                          listing: { $ref: "#/components/schemas/Listing" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
 
   /api/listings/{id}:
     parameters:
@@ -786,12 +907,9 @@ paths:
                       data:
                         type: object
                         properties:
-                          listing:
-                            $ref: "#/components/schemas/Listing"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                          listing: { $ref: "#/components/schemas/Listing" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
     put:
       tags: [Listings]
@@ -813,27 +931,19 @@ paths:
                 - "listing[price]"
                 - "listing[category]"
               properties:
-                "listing[title]":
-                  type: string
-                  minLength: 1
-                "listing[description]":
-                  type: string
-                  minLength: 1
-                "listing[location]":
-                  type: string
-                  minLength: 1
-                "listing[country]":
-                  type: string
-                  minLength: 1
-                "listing[price]":
-                  type: number
-                  minimum: 0
+                "listing[title]": { type: string, minLength: 1 }
+                "listing[description]": { type: string, minLength: 1 }
+                "listing[location]": { type: string, minLength: 1 }
+                "listing[country]": { type: string, minLength: 1 }
+                "listing[price]": { type: number, minimum: 0 }
                 "listing[category]":
-                  $ref: "#/components/schemas/ListingCategory"
+                  { $ref: "#/components/schemas/ListingCategory" }
                 "listing[image]":
-                  type: string
-                  format: binary
-                  description: Optional — omit to keep the existing image
+                  {
+                    type: string,
+                    format: binary,
+                    description: "Optional — omit to keep existing",
+                  }
       responses:
         "200":
           description: Listing updated
@@ -847,18 +957,12 @@ paths:
                       data:
                         type: object
                         properties:
-                          listing:
-                            $ref: "#/components/schemas/Listing"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                          listing: { $ref: "#/components/schemas/Listing" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
 
     patch:
       tags: [Listings]
@@ -873,32 +977,19 @@ paths:
             schema:
               type: object
               properties:
-                listing:
-                  $ref: "#/components/schemas/ListingPatchInput"
+                listing: { $ref: "#/components/schemas/ListingPatchInput" }
           multipart/form-data:
             schema:
               type: object
               properties:
-                "listing[title]":
-                  type: string
-                  minLength: 1
-                "listing[description]":
-                  type: string
-                  minLength: 1
-                "listing[location]":
-                  type: string
-                  minLength: 1
-                "listing[country]":
-                  type: string
-                  minLength: 1
-                "listing[price]":
-                  type: number
-                  minimum: 0
+                "listing[title]": { type: string, minLength: 1 }
+                "listing[description]": { type: string, minLength: 1 }
+                "listing[location]": { type: string, minLength: 1 }
+                "listing[country]": { type: string, minLength: 1 }
+                "listing[price]": { type: number, minimum: 0 }
                 "listing[category]":
-                  $ref: "#/components/schemas/ListingCategory"
-                "listing[image]":
-                  type: string
-                  format: binary
+                  { $ref: "#/components/schemas/ListingCategory" }
+                "listing[image]": { type: string, format: binary }
       responses:
         "200":
           description: Listing patched
@@ -912,16 +1003,11 @@ paths:
                       data:
                         type: object
                         properties:
-                          listing:
-                            $ref: "#/components/schemas/Listing"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                          listing: { $ref: "#/components/schemas/Listing" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
     delete:
       tags: [Listings]
@@ -943,14 +1029,13 @@ paths:
                         type: object
                         properties:
                           message:
-                            type: string
-                            example: "Listing deleted successfully"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                            {
+                              type: string,
+                              example: "Listing deleted successfully",
+                            }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   # ════════════════════════════════ REVIEWS ═══════════════════════════════════
   /api/listings/{listingId}/reviews:
@@ -977,10 +1062,8 @@ paths:
                         properties:
                           reviews:
                             type: array
-                            items:
-                              $ref: "#/components/schemas/Review"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                            items: { $ref: "#/components/schemas/Review" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
     post:
       tags: [Reviews]
@@ -996,19 +1079,13 @@ paths:
               type: object
               required: [review]
               properties:
-                review:
-                  $ref: "#/components/schemas/ReviewInput"
+                review: { $ref: "#/components/schemas/ReviewInput" }
           application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
-                "review[rating]":
-                  type: integer
-                  minimum: 1
-                  maximum: 5
-                "review[comment]":
-                  type: string
-                  minLength: 1
+                "review[rating]": { type: integer, minimum: 1, maximum: 5 }
+                "review[comment]": { type: string, minLength: 1 }
       responses:
         "201":
           description: Review created
@@ -1022,14 +1099,10 @@ paths:
                       data:
                         type: object
                         properties:
-                          review:
-                            $ref: "#/components/schemas/Review"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                          review: { $ref: "#/components/schemas/Review" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
 
   /api/listings/{listingId}/reviews/{reviewId}:
     parameters:
@@ -1054,10 +1127,8 @@ paths:
                       data:
                         type: object
                         properties:
-                          review:
-                            $ref: "#/components/schemas/Review"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                          review: { $ref: "#/components/schemas/Review" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
     patch:
       tags: [Reviews]
@@ -1072,8 +1143,7 @@ paths:
             schema:
               type: object
               properties:
-                review:
-                  $ref: "#/components/schemas/ReviewPatchInput"
+                review: { $ref: "#/components/schemas/ReviewPatchInput" }
       responses:
         "200":
           description: Review updated
@@ -1087,16 +1157,11 @@ paths:
                       data:
                         type: object
                         properties:
-                          review:
-                            $ref: "#/components/schemas/Review"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "422":
-          $ref: "#/components/responses/ValidationError"
+                          review: { $ref: "#/components/schemas/Review" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
 
     delete:
       tags: [Reviews]
@@ -1118,14 +1183,13 @@ paths:
                         type: object
                         properties:
                           message:
-                            type: string
-                            example: "Review deleted successfully"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                            {
+                              type: string,
+                              example: "Review deleted successfully",
+                            }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   # ═════════════════════════════════ USERS ════════════════════════════════════
   /api/users/{username}:
@@ -1134,12 +1198,14 @@ paths:
 
     get:
       tags: [Users]
-      summary: Get a user's public profile
+      summary: Get a user's profile (public shape; full shape if self)
       operationId: usersProfile
       security: []
       responses:
         "200":
-          description: User profile
+          description: |
+            **Public** callers receive `UserPublic`.  
+            **Authenticated owner** receives `UserFull` (includes email, phone, settings, etc.).
           content:
             application/json:
               schema:
@@ -1151,13 +1217,14 @@ paths:
                         type: object
                         properties:
                           user:
-                            $ref: "#/components/schemas/UserPublic"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                            oneOf:
+                              - $ref: "#/components/schemas/UserPublic"
+                              - $ref: "#/components/schemas/UserFull"
+        "404": { $ref: "#/components/responses/NotFound" }
 
     delete:
       tags: [Users]
-      summary: Delete own account (auth required — own account only)
+      summary: Delete account (self or admin)
       operationId: usersDestroy
       security:
         - cookieAuth: []
@@ -1175,14 +1242,230 @@ paths:
                         type: object
                         properties:
                           message:
-                            type: string
-                            example: "Account deleted successfully"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                            {
+                              type: string,
+                              example: "Account deleted successfully",
+                            }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/users/{username}/profile:
+    parameters:
+      - $ref: "#/components/parameters/username"
+
+    patch:
+      tags: [Users]
+      summary: Update profile fields (self only)
+      operationId: usersUpdateProfile
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateProfileBody" }
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user: { $ref: "#/components/schemas/UserFull" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/users/{username}/avatar:
+    parameters:
+      - $ref: "#/components/parameters/username"
+
+    put:
+      tags: [Users]
+      summary: Upload or replace avatar (self only)
+      operationId: usersUpdateAvatar
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [avatar]
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: JPEG, JPG, or PNG only (≤ 10 MB)
+      responses:
+        "200":
+          description: Avatar updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user: { $ref: "#/components/schemas/UserFull" }
+                          message:
+                            {
+                              type: string,
+                              example: "Avatar updated successfully",
+                            }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+    delete:
+      tags: [Users]
+      summary: Remove avatar (self only)
+      operationId: usersRemoveAvatar
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Avatar removed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user: { $ref: "#/components/schemas/UserFull" }
+                          message: { type: string, example: "Avatar removed" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /api/users/{username}/settings:
+    parameters:
+      - $ref: "#/components/parameters/username"
+
+    patch:
+      tags: [Users]
+      summary: Update account settings (self only)
+      operationId: usersUpdateSettings
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateSettingsBody" }
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          settings:
+                            { $ref: "#/components/schemas/UserSettings" }
+                          message: { type: string, example: "Settings updated" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/users/{username}/notifications:
+    parameters:
+      - $ref: "#/components/parameters/username"
+
+    patch:
+      tags: [Users]
+      summary: Update notification preferences (self only)
+      operationId: usersUpdateNotifications
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateNotificationsBody" }
+      responses:
+        "200":
+          description: Notification preferences updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          notificationPreferences:
+                            {
+                              $ref: "#/components/schemas/NotificationPreferences",
+                            }
+                          message:
+                            {
+                              type: string,
+                              example: "Notification preferences updated",
+                            }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/users/{username}/role:
+    parameters:
+      - $ref: "#/components/parameters/username"
+
+    patch:
+      tags: [Users]
+      summary: Change a user's role (admin only)
+      operationId: usersChangeRole
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChangeRoleBody" }
+      responses:
+        "200":
+          description: Role changed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user: { $ref: "#/components/schemas/UserPublic" }
+                          message:
+                            { type: string, example: "Role changed to host" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
 
   /api/users/{username}/listings:
     parameters:
@@ -1208,7 +1491,5 @@ paths:
                         properties:
                           listings:
                             type: array
-                            items:
-                              $ref: "#/components/schemas/Listing"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                            items: { $ref: "#/components/schemas/Listing" }
+        "404": { $ref: "#/components/responses/NotFound" }
