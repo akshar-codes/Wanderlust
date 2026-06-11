@@ -13,9 +13,16 @@ const findByUsername = (username) => User.findOne({ username });
 const findByEmail = (email) =>
   User.findOne({ email: email.toLowerCase().trim() });
 
+// ── OAuth provider lookups ─────────────────────────────────────────────────────
+
 const findByGoogleId = (googleId) => User.findOne({ googleId });
 
 const findByGithubId = (githubId) => User.findOne({ githubId });
+
+const findByProviderId = (provider, providerId) => {
+  const field = `${provider}Id`;
+  return User.findOne({ [field]: providerId });
+};
 
 // ── Registration ──────────────────────────────────────────────────────────────
 
@@ -97,6 +104,55 @@ const touchLastLogin = (id) =>
 const incrementCounter = (id, field, amount = 1) =>
   User.findByIdAndUpdate(id, { $inc: { [field]: amount } }, { new: true });
 
+// ── OAuth helpers ─────────────────────────────────────────────────────────────
+
+const linkProvider = (id, provider, providerId, extras = {}) =>
+  User.findByIdAndUpdate(
+    id,
+    { $set: { [`${provider}Id`]: providerId, ...extras } },
+    { new: true, runValidators: true },
+  );
+
+/**
+ * Unlink an OAuth provider from a user account (sets field to null).
+ */
+const unlinkProvider = (id, provider) =>
+  User.findByIdAndUpdate(
+    id,
+    { $set: { [`${provider}Id`]: null } },
+    { new: true },
+  );
+
+/**
+ * Store a hashed password-reset token.
+ */
+const setPasswordResetToken = (id, tokenHash, expires) =>
+  User.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        emailVerificationToken: tokenHash,
+        emailVerificationExpires: expires,
+      },
+    },
+    { new: true },
+  );
+
+/**
+ * Clear the password-reset token after successful use.
+ */
+const clearPasswordResetToken = (id) =>
+  User.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        emailVerificationToken: null,
+        emailVerificationExpires: null,
+      },
+    },
+    { new: true },
+  );
+
 // ── Soft-delete ───────────────────────────────────────────────────────────────
 
 const softDelete = (id) =>
@@ -111,19 +167,21 @@ const hardDelete = (id) => User.findByIdAndDelete(id);
 
 // ── Listings owned by user ────────────────────────────────────────────────────
 
-/** Used by user.controller → usersListings */
 const findListingsByOwner = async (userId) => {
   const Listing = require("../models/listing.js");
   return Listing.find({ owner: userId });
 };
 
 module.exports = {
+  // Lookups
   findById,
   findByIdActive,
   findByUsername,
   findByEmail,
   findByGoogleId,
   findByGithubId,
+  findByProviderId,
+  // Write
   register,
   updateById,
   updateAvatar,
@@ -133,7 +191,14 @@ module.exports = {
   markEmailVerified,
   touchLastLogin,
   incrementCounter,
+  // OAuth
+  linkProvider,
+  unlinkProvider,
+  setPasswordResetToken,
+  clearPasswordResetToken,
+  // Account lifecycle
   softDelete,
   hardDelete,
+  // Relations
   findListingsByOwner,
 };
