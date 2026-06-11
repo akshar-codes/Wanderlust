@@ -350,6 +350,54 @@ const loginBodySchema = z.object({
   password: nonEmptyString("Password"),
 });
 
+// ── Forgot Password ───────────────────────────────────────────────────────────
+
+/**
+ * POST /api/auth/forgot-password
+ * Body: { email: string }
+ */
+const forgotPasswordBodySchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .trim()
+    .email("Must be a valid email address")
+    .toLowerCase(),
+});
+
+// ── Reset Password ────────────────────────────────────────────────────────────
+
+/**
+ * POST /api/auth/reset-password
+ * Body: { token: string, password: string, confirmPassword?: string }
+ */
+const resetPasswordBodySchema = z
+  .object({
+    token: z
+      .string({ required_error: "Reset token is required" })
+      .trim()
+      .min(1, "Reset token cannot be empty"),
+
+    password: z
+      .string({ required_error: "New password is required" })
+      .min(6, "Password must be at least 6 characters")
+      .max(128, "Password cannot exceed 128 characters"),
+
+    confirmPassword: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Validate confirmPassword only when it's supplied
+    if (
+      data.confirmPassword !== undefined &&
+      data.confirmPassword !== data.password
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["confirmPassword"],
+        message: "Passwords do not match",
+      });
+    }
+  });
+
 // ── User Profile Update ───────────────────────────────────────────────────────
 
 const updateProfileBodySchema = z.object({
@@ -431,6 +479,8 @@ module.exports = {
   // Auth
   signupBodySchema,
   loginBodySchema,
+  forgotPasswordBodySchema,
+  resetPasswordBodySchema,
   // User
   updateProfileBodySchema,
   updateSettingsBodySchema,

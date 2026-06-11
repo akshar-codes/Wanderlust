@@ -7,7 +7,12 @@ const passport = require("passport");
 const asyncHandler = require("../utils/asyncHandler");
 const authCtrl = require("../controllers/auth.controller");
 const validate = require("../middlewares/validate");
-const { signupBodySchema, loginBodySchema } = require("../validators/schemas");
+const {
+  signupBodySchema,
+  loginBodySchema,
+  forgotPasswordBodySchema,
+  resetPasswordBodySchema,
+} = require("../validators/schemas");
 const { authLimiter } = require("../config/rateLimiter.config");
 const saveRedirectUrl = require("../middlewares/saveRedirectUrl");
 const authFailureLogger = require("../middlewares/authFailureLogger");
@@ -53,11 +58,9 @@ function oauthCallbackHandler(provider) {
           return res.redirect(getFrontendRedirectUrl(req, reason));
         }
 
-        // Establish session
         req.logIn(user, async (loginErr) => {
           if (loginErr) return next(loginErr);
 
-          // Touch lastLoginAt
           const userRepo = require("../repositories/user.repository");
           userRepo.touchLastLogin(user._id).catch(() => {});
 
@@ -89,13 +92,29 @@ router.post("/logout", requireAuth(), asyncHandler(authCtrl.logout));
 
 router.get("/me", requireAuth(), asyncHandler(authCtrl.me));
 
+// ── Password recovery ──────────────────────────────────────────────────────────
+
+router.post(
+  "/forgot-password",
+  authLimiter,
+  validate(forgotPasswordBodySchema),
+  asyncHandler(authCtrl.forgotPassword),
+);
+
+router.post(
+  "/reset-password",
+  authLimiter,
+  validate(resetPasswordBodySchema),
+  asyncHandler(authCtrl.resetPassword),
+);
+
 // ── Google OAuth ───────────────────────────────────────────────────────────────
 
 router.get("/google", (req, res, next) => {
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    state: req.query.state, // forward opaque state to callback
-    prompt: "select_account", // always show account picker
+    state: req.query.state,
+    prompt: "select_account",
   })(req, res, next);
 });
 
@@ -147,20 +166,6 @@ router.delete(
   "/unlink/:provider",
   requireAuth(),
   asyncHandler(authCtrl.unlinkProvider),
-);
-
-// ── Password management (stubs — wire an email service before enabling) ────────
-
-router.post(
-  "/forgot-password",
-  authLimiter,
-  asyncHandler(authCtrl.forgotPassword),
-);
-
-router.post(
-  "/reset-password",
-  authLimiter,
-  asyncHandler(authCtrl.resetPassword),
 );
 
 module.exports = router;
