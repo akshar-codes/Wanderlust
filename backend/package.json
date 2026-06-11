@@ -10,8 +10,10 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "seed": "node src/seeds/index.js",
+    "migrate:001": "node src/migrations/001_user_profile_fields.js",
+    "migrate:002": "node src/migrations/002_listing_airbnb_fields.js",
     "test": "echo \"No tests configured yet\" && exit 0",
-    "validate:api": "node scripts/validate-openapi.js"
+    "validate:api": "node src/scripts/validate-openapi.js"
   },
   "author": "Akshar Gupta",
   "license": "ISC",
