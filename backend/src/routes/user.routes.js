@@ -5,8 +5,6 @@ const router = express.Router();
 
 const asyncHandler = require("../utils/asyncHandler");
 const userCtrl = require("../controllers/user.controller");
-const isLoggedIn = require("../middlewares/isLoggedIn");
-const isSelf = require("../middlewares/isSelf");
 const validate = require("../middlewares/validate");
 const upload = require("../middlewares/upload");
 const {
@@ -16,80 +14,75 @@ const {
   changeRoleBodySchema,
 } = require("../validators/schemas");
 
+const {
+  requireAuth,
+  requirePermission,
+  requireSelfOrAdmin,
+} = require("../middlewares/rbac");
+
 // ── Public ────────────────────────────────────────────────────────────────────
 
-/**
- * GET  /api/users/:username          → public profile
- * GET  /api/users/:username/listings → listings owned by this user
- */
 router.get("/:username", asyncHandler(userCtrl.profile));
 router.get("/:username/listings", asyncHandler(userCtrl.listings));
 
-// ── Authenticated — self-only operations ──────────────────────────────────────
+// ── Self-only profile mutations ───────────────────────────────────────────────
 
-/**
- * PATCH /api/users/:username/profile      → update bio, name, phone
- * PUT   /api/users/:username/avatar       → upload new avatar (multipart)
- * DELETE /api/users/:username/avatar      → remove avatar
- * PATCH /api/users/:username/settings     → update language, theme, etc.
- * PATCH /api/users/:username/notifications → update notification prefs
- */
 router.patch(
   "/:username/profile",
-  isLoggedIn,
-  isSelf,
+  requireAuth(),
+  requireSelfOrAdmin(),
   validate(updateProfileBodySchema),
   asyncHandler(userCtrl.updateProfile),
 );
 
 router.put(
   "/:username/avatar",
-  isLoggedIn,
-  isSelf,
+  requireAuth(),
+  requireSelfOrAdmin(),
   upload.single("avatar"),
   asyncHandler(userCtrl.updateAvatar),
 );
 
 router.delete(
   "/:username/avatar",
-  isLoggedIn,
-  isSelf,
+  requireAuth(),
+  requireSelfOrAdmin(),
   asyncHandler(userCtrl.removeAvatar),
 );
 
 router.patch(
   "/:username/settings",
-  isLoggedIn,
-  isSelf,
+  requireAuth(),
+  requireSelfOrAdmin(),
   validate(updateSettingsBodySchema),
   asyncHandler(userCtrl.updateSettings),
 );
 
 router.patch(
   "/:username/notifications",
-  isLoggedIn,
-  isSelf,
+  requireAuth(),
+  requireSelfOrAdmin(),
   validate(notificationPreferencesBodySchema),
   asyncHandler(userCtrl.updateNotificationPreferences),
 );
 
-// ── Admin-only ────────────────────────────────────────────────────────────────
+// ── Admin-only role management ────────────────────────────────────────────────
 
-/**
- * PATCH /api/users/:username/role  → change role (admin only)
- */
 router.patch(
   "/:username/role",
-  isLoggedIn,
+  requireAuth(),
+  requirePermission("user", "changeRole"),
   validate(changeRoleBodySchema),
   asyncHandler(userCtrl.changeRole),
 );
 
-// ── Account deletion ──────────────────────────────────────────────────────────
+// ── Account deletion (self or admin) ─────────────────────────────────────────
 
-/**
- * DELETE /api/users/:username  → delete account (self or admin)
- */
-router.delete("/:username", isLoggedIn, asyncHandler(userCtrl.destroy));
+router.delete(
+  "/:username",
+  requireAuth(),
+  requireSelfOrAdmin(),
+  asyncHandler(userCtrl.destroy),
+);
 
 module.exports = router;

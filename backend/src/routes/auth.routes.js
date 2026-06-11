@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 const router = express.Router();
 
@@ -8,9 +10,10 @@ const { signupBodySchema, loginBodySchema } = require("../validators/schemas");
 const { authLimiter } = require("../config/rateLimiter.config");
 const saveRedirectUrl = require("../middlewares/saveRedirectUrl");
 const authFailureLogger = require("../middlewares/authFailureLogger");
+const { requireAuth } = require("../middlewares/rbac");
 
 /**
- * POST /api/auth/signup
+ * POST /api/auth/signup  → public
  */
 router.post(
   "/signup",
@@ -20,24 +23,24 @@ router.post(
 );
 
 /**
- * POST /api/auth/login
+ * POST /api/auth/login  → public
  */
 router.post(
   "/login",
   authLimiter,
   saveRedirectUrl,
-  authFailureLogger, // sets req.user via req.logIn on success; calls next()
+  authFailureLogger,
   asyncHandler(authCtrl.login),
 );
 
 /**
- * POST /api/auth/logout
+ * POST /api/auth/logout  → authenticated users only
  */
-router.post("/logout", asyncHandler(authCtrl.logout));
+router.post("/logout", requireAuth(), asyncHandler(authCtrl.logout));
 
 /**
- * GET /api/auth/me
+ * GET /api/auth/me  → authenticated users only
  */
-router.get("/me", asyncHandler(authCtrl.me));
+router.get("/me", requireAuth(), asyncHandler(authCtrl.me));
 
 module.exports = router;
