@@ -1,9 +1,8 @@
 "use strict";
 
-const crypto = require("crypto");
-
 const userService = require("../services/user.service.js");
 const userRepo = require("../repositories/user.repository.js");
+const passwordResetService = require("../services/passwordReset.service.js");
 const AppError = require("../utils/AppError.js");
 const { sendSuccess, sendError } = require("../utils/apiResponse.js");
 const logger = require("../utils/logger.js");
@@ -89,7 +88,7 @@ const unlinkProvider = async (req, res, next) => {
   // Safety check — ensure the user won't be locked out
   const otherProviders = SUPPORTED.filter((p) => p !== provider);
   const hasOtherOAuth = otherProviders.some((p) => user[`${p}Id`]);
-  const hasLocalPassword = !!user.hash; // passport-local-mongoose stores hash field
+  const hasLocalPassword = !!user.hash;
 
   if (!hasOtherOAuth && !hasLocalPassword) {
     return next(
@@ -102,7 +101,7 @@ const unlinkProvider = async (req, res, next) => {
 
   await userRepo.updateById(user._id, { [providerIdField]: null });
 
-  logger.auth.info(`Provider unlinked`, {
+  logger.auth.info("Provider unlinked", {
     userId: user._id,
     username: user.username,
     provider,
@@ -117,92 +116,44 @@ const unlinkProvider = async (req, res, next) => {
 // ── POST /api/auth/forgot-password ───────────────────────────────────────────
 
 const forgotPassword = async (req, res, next) => {
-  const { email } = req.body;
+  const { email } = req.body; // validated by forgotPasswordBodySchema
 
-  if (!email) return next(AppError.badRequest("Email is required"));
+  const result = await passwordResetService.initiateForgotPassword({
+    email,
+    requestIp: req.ip,
+  });
 
-  // Always respond with 200 — never reveal whether an email exists
-  const user = await userRepo.findByEmail(email);
-  if (!user) {
-    return sendSuccess(res, {
-      message: "If that email is registered, a reset link has been sent.",
-    });
+  const responsePayload = {
+    message:
+      "If that email address is registered, you will receive a password reset link shortly.",
+  };
+
+  // Expose raw token in non-production for integration/e2e testing convenience
+  if (result._devToken) {
+    responsePayload._devToken = result._devToken;
   }
 
-  // OAuth-only accounts cannot reset a password they never set
-  if (user.provider !== "local" && !user.hash) {
-    logger.auth.warn("Forgot-password attempt on OAuth-only account", {
-      email,
-      provider: user.provider,
-    });
-    return sendSuccess(res, {
-      message: "If that email is registered, a reset link has been sent.",
-    });
-  }
-
-  // Generate a secure random token (hex, 32 bytes)
-  const rawToken = crypto.randomBytes(32).toString("hex");
-  const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
-  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-  await userRepo.updateById(user._id, {
-    emailVerificationToken: tokenHash, // re-using the field; rename in production
-    emailVerificationExpires: expires,
-  });
-
-  // ── TODO: Send the email ──────────────────────────────────────────────────
-
-  logger.auth.info("Password reset token generated", {
-    userId: user._id,
-    email: user.email,
-  });
-
-  return sendSuccess(res, {
-    message: "If that email is registered, a reset link has been sent.",
-    // Remove in production — only for development convenience:
-    ...(process.env.NODE_ENV !== "production" && { _devToken: rawToken }),
-  });
+  return sendSuccess(res, responsePayload);
 };
 
 // ── POST /api/auth/reset-password ────────────────────────────────────────────
 
 const resetPassword = async (req, res, next) => {
-  const { token, password } = req.body;
+  const { token, password } = req.body; // validated by resetPasswordBodySchema
 
-  if (!token || !password) {
-    return next(AppError.badRequest("Token and new password are required"));
+  try {
+    await passwordResetService.consumeResetToken({
+      token,
+      newPassword: password,
+      consumedByIp: req.ip,
+    });
+  } catch (err) {
+    return next(err); // AppError from service layer — passed straight through
   }
-
-  if (password.length < 6) {
-    return next(AppError.badRequest("Password must be at least 6 characters"));
-  }
-
-  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-
-  // Find user with matching token that hasn't expired
-  const User = require("../models/user");
-  const user = await User.findOne({
-    emailVerificationToken: tokenHash,
-    emailVerificationExpires: { $gt: new Date() },
-  });
-
-  if (!user) {
-    return next(AppError.badRequest("Reset token is invalid or has expired"));
-  }
-
-  // passport-local-mongoose's setPassword returns a promise
-  await user.setPassword(password);
-  user.emailVerificationToken = null;
-  user.emailVerificationExpires = null;
-  await user.save();
-
-  logger.auth.info("Password reset completed", {
-    userId: user._id,
-    username: user.username,
-  });
 
   return sendSuccess(res, {
-    message: "Password updated successfully. Please log in.",
+    message:
+      "Your password has been updated successfully. Please log in with your new password.",
   });
 };
 
@@ -224,11 +175,10 @@ function serializeUser(user) {
     profileCompletion: obj.profileCompletion,
     provider: obj.provider,
     isHost: obj.isHost ?? (obj.role === "host" || obj.role === "admin"),
-    // Expose which providers are linked so the frontend can render "connected" badges
     linkedProviders: {
       google: !!obj.googleId,
       github: !!obj.githubId,
-      local: !!obj.hash, // has a local password
+      local: !!obj.hash,
     },
     notificationPreferences: obj.notificationPreferences,
     settings: obj.settings,
