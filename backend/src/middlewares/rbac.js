@@ -25,6 +25,8 @@ function requireAuth() {
 
 // ── requireRole ───────────────────────────────────────────────────────────────
 
+requireRole("host", "admin");
+
 function requireRole(...roles) {
   if (roles.length === 0)
     throw new Error("requireRole: at least one role required");
@@ -181,7 +183,7 @@ function requireActiveAccount() {
   return function requireActiveAccountMiddleware(req, _res, next) {
     if (!req.isAuthenticated()) return next(); // unauthenticated requests pass through
 
-    if (req.user.isActive === false) {
+    if (req.user.isActive !== true) {
       req.logout((err) => {
         if (err) return next(err);
         return next(

@@ -19,12 +19,18 @@ function logError(err, req, level = "error") {
   });
 }
 
+function levelFor(err, statusCode) {
+  if (statusCode >= 500) return "error";
+  if (IS_PROD) return "warn";
+  if (statusCode === 404) return "info"; // dev-only: expected React-SPA 404s
+  return "warn";
+}
+
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   // ── 1. AppError (operational) ──────────────────────────────────────────────
   if (err instanceof AppError) {
-    // 4xx = warn, 5xx = error
-    logError(err, req, err.statusCode < 500 ? "warn" : "error");
+    logError(err, req, levelFor(err, err.statusCode));
     return sendError(res, err.message, err.statusCode, {
       code: err.code,
       details: err.details ?? undefined,
@@ -33,7 +39,11 @@ const errorHandler = (err, req, res, next) => {
 
   // ── 2. Mongoose CastError (bad ObjectId) ──────────────────────────────────
   if (err.name === "CastError" && err.kind === "ObjectId") {
-    logError({ ...err, statusCode: 400, code: "BAD_REQUEST" }, req, "warn");
+    logError(
+      { ...err, statusCode: 400, code: "BAD_REQUEST" },
+      req,
+      IS_PROD ? "warn" : "info",
+    );
     return sendError(res, "Invalid resource identifier", 400, {
       code: "BAD_REQUEST",
     });
