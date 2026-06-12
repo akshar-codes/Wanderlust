@@ -3,6 +3,7 @@
 const userService = require("../services/user.service.js");
 const userRepo = require("../repositories/user.repository.js");
 const passwordResetService = require("../services/passwordReset.service.js");
+const emailVerificationService = require("../services/emailVerification.service");
 const AppError = require("../utils/AppError.js");
 const { sendSuccess, sendError } = require("../utils/apiResponse.js");
 const logger = require("../utils/logger.js");
@@ -26,6 +27,10 @@ const signup = async (req, res, next) => {
     req.login(registeredUser, (err) => (err ? reject(err) : resolve()));
   });
 
+  emailVerificationService
+    .sendVerificationEmail(registeredUser, req.ip)
+    .catch(() => {}); // fire-and-forget
+
   return sendSuccess(
     res,
     {
@@ -44,6 +49,50 @@ const login = async (req, res) => {
     message: "Logged in successfully",
     user: serializeUser(req.user),
   });
+};
+
+// ── POST /api/auth/verify-email ───────────────────────────────────────────────
+
+const verifyEmail = async (req, res, next) => {
+  const { token } = req.body; // validated by verifyEmailBodySchema
+
+  const user = await emailVerificationService.verifyEmail({
+    token,
+    consumedByIp: req.ip,
+  });
+
+  // Refresh the session user object so req.user reflects emailVerified: true
+  // without requiring the user to log out and back in.
+  if (req.isAuthenticated()) {
+    await new Promise((resolve, reject) => {
+      req.login(user, (err) => (err ? reject(err) : resolve()));
+    });
+  }
+
+  return sendSuccess(res, {
+    message: "Email address verified successfully.",
+    user: serializeUser(user),
+  });
+};
+
+// ── POST /api/auth/resend-verification ───────────────────────────────────────
+
+const resendVerification = async (req, res, next) => {
+  const result = await emailVerificationService.resendVerificationEmail(
+    req.user,
+    req.ip,
+  );
+
+  const responsePayload = {
+    message: "A new verification email has been sent. Please check your inbox.",
+  };
+
+  // Expose raw token in non-production for integration / e2e testing
+  if (result._devToken) {
+    responsePayload._devToken = result._devToken;
+  }
+
+  return sendSuccess(res, responsePayload);
 };
 
 // ── POST /api/auth/logout ─────────────────────────────────────────────────────
@@ -190,6 +239,8 @@ function serializeUser(user) {
 module.exports = {
   signup,
   login,
+  verifyEmail,
+  resendVerification,
   logout,
   me,
   unlinkProvider,

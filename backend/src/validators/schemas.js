@@ -398,6 +398,19 @@ const resetPasswordBodySchema = z
     }
   });
 
+// ── Email Verification ────────────────────────────────────────────────────────
+
+/**
+ * POST /api/auth/verify-email
+ * Body: { token: string }
+ */
+const verifyEmailBodySchema = z.object({
+  token: z
+    .string({ required_error: "Verification token is required" })
+    .trim()
+    .min(1, "Verification token cannot be empty"),
+});
+
 // ── User Profile Update ───────────────────────────────────────────────────────
 
 const updateProfileBodySchema = z.object({
@@ -481,6 +494,7 @@ module.exports = {
   loginBodySchema,
   forgotPasswordBodySchema,
   resetPasswordBodySchema,
+  verifyEmailBodySchema,
   // User
   updateProfileBodySchema,
   updateSettingsBodySchema,

@@ -77,4 +77,28 @@ const createLimiter = rateLimit({
   },
 });
 
+// ── 4. Resend-verification limiter — POST /api/auth/resend-verification ───────
+// 5 resend requests per hour per IP (HTTP layer; DB layer enforces per-user
+const resendLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message:
+      "Too many verification email requests — please try again in an hour.",
+    code: "RESEND_RATE_LIMIT_EXCEEDED",
+  },
+  handler(req, res, next, options) {
+    logger.auth.warn("Resend-verification rate limit exceeded", {
+      ip: req.ip,
+      path: req.path,
+      userAgent: req.get("user-agent"),
+      limit: options.limit,
+    });
+    res.status(options.statusCode).json(options.message);
+  },
+});
+
 module.exports = { globalLimiter, authLimiter, createLimiter };

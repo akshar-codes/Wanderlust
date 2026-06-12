@@ -17,6 +17,8 @@ const { authLimiter } = require("../config/rateLimiter.config");
 const saveRedirectUrl = require("../middlewares/saveRedirectUrl");
 const authFailureLogger = require("../middlewares/authFailureLogger");
 const { requireAuth } = require("../middlewares/rbac");
+const { verifyEmailBodySchema } = require("../validators/schemas");
+const { resendLimiter } = require("../config/rateLimiter.config");
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -106,6 +108,21 @@ router.post(
   authLimiter,
   validate(resetPasswordBodySchema),
   asyncHandler(authCtrl.resetPassword),
+);
+
+// ── Email verification ─────────────────────────────────────────────────────────
+
+router.post(
+  "/verify-email",
+  validate(verifyEmailBodySchema),
+  asyncHandler(authCtrl.verifyEmail),
+);
+
+router.post(
+  "/resend-verification",
+  requireAuth(),
+  resendLimiter,
+  asyncHandler(authCtrl.resendVerification),
 );
 
 // ── Google OAuth ───────────────────────────────────────────────────────────────
