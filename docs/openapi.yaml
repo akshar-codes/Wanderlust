@@ -13,16 +13,28 @@ info:
     Browser clients handle this automatically.  
     API / curl clients should use `--cookie-jar` / `credentials: "include"`.
 
+    ## Email Verification
+    After signup, a verification email is sent automatically. Some actions
+    (e.g. creating a listing) require a verified email address. Use
+    `POST /api/auth/resend-verification` to request a new link.
+
+    ## OAuth
+    Google and GitHub OAuth are supported. Initiate via `GET /api/auth/google`
+    or `GET /api/auth/github`. Authenticated users can link/unlink additional
+    providers via the `/api/auth/link/*` and `DELETE /api/auth/unlink/:provider`
+    endpoints.
+
     ## Rate Limits
     | Scope | Window | Max requests |
     |---|---|---|
     | Global (all routes) | 15 min | 200 |
-    | Auth (`/signup`, `/login`) | 15 min | 20 |
+    | Auth (`/signup`, `/login`, `/forgot-password`) | 15 min | 20 |
     | Create listings / reviews | 1 hour | 30 |
+    | Resend verification email | 1 hour | 5 per IP; 5 min cooldown per user |
 
     Exceeded limits return **429 Too Many Requests**.
 
-  version: "3.0.0"
+  version: "3.1.0"
   contact:
     name: Akshar Gupta
   license:
@@ -38,9 +50,9 @@ tags:
   - name: Health
     description: Service liveness check
   - name: Auth
-    description: Session-based authentication
+    description: Session-based authentication, OAuth, password recovery, email verification
   - name: Listings
-    description: Travel listing CRUD
+    description: Travel listing CRUD, images, availability calendar
   - name: Reviews
     description: Reviews nested under listings
   - name: Users
@@ -57,8 +69,8 @@ components:
       in: cookie
       name: connect.sid
       description: |
-        Session cookie set by `POST /api/auth/login`.  
-        Swagger UI will send it automatically after a successful login when
+        Session cookie set by `POST /api/auth/login` or an OAuth callback.  
+        Swagger UI sends it automatically after a successful login when
         `withCredentials` is enabled.
 
   # ── Shared parameters ─────────────────────────────────────────────────────
@@ -103,6 +115,46 @@ components:
       description: Username of the target user
       example: "alice"
 
+    imageId:
+      name: imageId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-f0-9]{24}$"
+      description: MongoDB ObjectId of the image sub-document
+      example: "6648c3f4e5a6b7c8d9e0f1a2"
+
+    blockedDateId:
+      name: blockedDateId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-f0-9]{24}$"
+      description: MongoDB ObjectId of the blocked-date sub-document
+      example: "6648d4e5f6a7b8c9d0e1f2a3"
+
+    slug:
+      name: slug
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 80
+      description: URL-safe slug auto-generated from the listing title
+      example: "mountain-retreat"
+
+    provider:
+      name: provider
+      in: path
+      required: true
+      schema:
+        type: string
+        enum: [google, github]
+      description: OAuth provider to unlink
+      example: "google"
+
   # ── Schemas ───────────────────────────────────────────────────────────────
   schemas:
     # Primitives
@@ -127,6 +179,27 @@ components:
         - boats
       example: mountains
 
+    PropertyType:
+      type: string
+      enum:
+        - apartment
+        - house
+        - villa
+        - cottage
+        - cabin
+        - studio
+        - loft
+        - treehouse
+        - boat
+        - camper
+        - tent
+        - bungalow
+        - chalet
+        - castle
+        - farm
+        - other
+      example: cabin
+
     GeoPoint:
       type: object
       required: [type, coordinates]
@@ -143,8 +216,10 @@ components:
           description: "[longitude, latitude]"
           example: [-106.8175, 39.1911]
 
+    # ── Image sub-documents ───────────────────────────────────────────────────
     Image:
       type: object
+      description: Legacy single-image field (kept for backward compatibility)
       properties:
         url:
           type: string
@@ -153,6 +228,119 @@ components:
         filename:
           type: string
           example: "wanderlust_DEV/xkcd1234"
+
+    ListingImage:
+      type: object
+      description: Entry in the listing's images[] array
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        url:
+          type: string
+          format: uri
+          example: "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+        filename:
+          type: string
+          example: "wanderlust_DEV/xkcd1234"
+        caption:
+          type: string
+          nullable: true
+          example: "View from the balcony"
+        isPrimary:
+          type: boolean
+          example: true
+
+    # ── Pricing ───────────────────────────────────────────────────────────────
+    Pricing:
+      type: object
+      properties:
+        nightlyPrice:
+          type: number
+          minimum: 0
+          example: 1000
+        cleaningFee:
+          type: number
+          minimum: 0
+          example: 90
+        serviceFee:
+          type: number
+          minimum: 0
+          example: 50
+        taxes:
+          type: number
+          minimum: 0
+          example: 100
+
+    # ── House Rules ───────────────────────────────────────────────────────────
+    HouseRules:
+      type: object
+      properties:
+        checkInTime:
+          type: string
+          example: "15:00"
+        checkOutTime:
+          type: string
+          example: "11:00"
+        smokingAllowed:
+          type: boolean
+          example: false
+        petsAllowed:
+          type: boolean
+          example: true
+        partiesAllowed:
+          type: boolean
+          example: false
+        quietHoursStart:
+          type: string
+          nullable: true
+          example: "22:00"
+        quietHoursEnd:
+          type: string
+          nullable: true
+          example: "08:00"
+        additionalRules:
+          type: array
+          items:
+            type: string
+          example: ["No shoes inside"]
+
+    # ── Blocked Date (availability calendar entry) ────────────────────────────
+    BlockedDate:
+      type: object
+      required: [startDate, endDate]
+      properties:
+        _id:
+          $ref: "#/components/schemas/ObjectId"
+        startDate:
+          type: string
+          format: date-time
+          example: "2025-12-20T00:00:00.000Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2025-12-27T00:00:00.000Z"
+        reason:
+          type: string
+          enum: [booked, blocked, maintenance]
+          default: blocked
+          example: blocked
+
+    BlockedDateInput:
+      type: object
+      required: [startDate, endDate]
+      properties:
+        startDate:
+          type: string
+          format: date-time
+          example: "2025-12-20T00:00:00.000Z"
+        endDate:
+          type: string
+          format: date-time
+          example: "2025-12-27T00:00:00.000Z"
+        reason:
+          type: string
+          enum: [booked, blocked, maintenance]
+          default: blocked
 
     # ── Avatar ───────────────────────────────────────────────────────────────
     Avatar:
@@ -293,6 +481,13 @@ components:
               type: string
               enum: [local, google, github]
               example: local
+            linkedProviders:
+              type: object
+              description: Which login methods are active on this account
+              properties:
+                google: { type: boolean, example: false }
+                github: { type: boolean, example: false }
+                local: { type: boolean, example: true }
             notificationPreferences:
               $ref: "#/components/schemas/NotificationPreferences"
             settings:
@@ -311,15 +506,55 @@ components:
         title:
           type: string
           example: "Mountain Retreat"
+        slug:
+          type: string
+          example: "mountain-retreat"
         description:
           type: string
           example: "Peaceful cabin surrounded by pines."
+        shortDescription:
+          type: string
+          nullable: true
+          maxLength: 160
+          example: "Unplug in this peaceful mountain cabin surrounded by pristine nature."
+        propertyType:
+          $ref: "#/components/schemas/PropertyType"
         image:
           $ref: "#/components/schemas/Image"
+        images:
+          type: array
+          items:
+            $ref: "#/components/schemas/ListingImage"
         price:
           type: number
           minimum: 0
           example: 1000
+          description: Synced from pricing.nightlyPrice (legacy field kept for compatibility)
+        pricing:
+          $ref: "#/components/schemas/Pricing"
+        bedrooms:
+          type: integer
+          minimum: 0
+          example: 3
+        bathrooms:
+          type: number
+          minimum: 0
+          example: 2
+        beds:
+          type: integer
+          minimum: 0
+          example: 4
+        maxGuests:
+          type: integer
+          minimum: 1
+          example: 6
+        amenities:
+          type: array
+          items:
+            type: string
+          example: ["wifi", "kitchen", "heating", "mountain_view"]
+        houseRules:
+          $ref: "#/components/schemas/HouseRules"
         location:
           type: string
           example: "Aspen"
@@ -330,12 +565,57 @@ components:
           $ref: "#/components/schemas/ListingCategory"
         geometry:
           $ref: "#/components/schemas/GeoPoint"
+        averageRating:
+          type: number
+          minimum: 0
+          maximum: 5
+          example: 4.7
+        reviewCount:
+          type: integer
+          minimum: 0
+          example: 12
+        bookingCount:
+          type: integer
+          minimum: 0
+          example: 34
+        wishlistCount:
+          type: integer
+          minimum: 0
+          example: 8
+        status:
+          type: string
+          enum: [active, inactive, suspended, deleted]
+          example: active
+        draft:
+          type: boolean
+          example: false
+        featured:
+          type: boolean
+          example: true
+        minimumStay:
+          type: integer
+          minimum: 1
+          example: 2
+        maximumStay:
+          type: integer
+          nullable: true
+          example: 30
+        availabilityCalendar:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockedDate"
         owner:
           $ref: "#/components/schemas/UserPublic"
         reviews:
           type: array
           items:
             $ref: "#/components/schemas/Review"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     ListingInput:
       type: object
@@ -344,11 +624,17 @@ components:
         title:
           type: string
           minLength: 1
+          maxLength: 100
           example: "Mountain Retreat"
         description:
           type: string
           minLength: 1
           example: "Peaceful cabin surrounded by pines."
+        shortDescription:
+          type: string
+          maxLength: 160
+          nullable: true
+          example: "Unplug in this peaceful mountain cabin."
         location:
           type: string
           minLength: 1
@@ -363,17 +649,75 @@ components:
           example: 1000
         category:
           $ref: "#/components/schemas/ListingCategory"
+        propertyType:
+          $ref: "#/components/schemas/PropertyType"
+        bedrooms:
+          type: integer
+          minimum: 0
+          default: 1
+        bathrooms:
+          type: number
+          minimum: 0
+          default: 1
+        beds:
+          type: integer
+          minimum: 0
+          default: 1
+        maxGuests:
+          type: integer
+          minimum: 1
+          default: 2
+        amenities:
+          type: array
+          items:
+            type: string
+          default: []
+        houseRules:
+          $ref: "#/components/schemas/HouseRules"
+        pricing:
+          $ref: "#/components/schemas/Pricing"
+        status:
+          type: string
+          enum: [active, inactive, suspended, deleted]
+          default: active
+        draft:
+          type: boolean
+          default: false
+        minimumStay:
+          type: integer
+          minimum: 1
+          default: 1
+        maximumStay:
+          type: integer
+          minimum: 1
+          nullable: true
 
     ListingPatchInput:
       type: object
       minProperties: 1
       properties:
-        title: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1, maxLength: 100 }
         description: { type: string, minLength: 1 }
+        shortDescription: { type: string, maxLength: 160, nullable: true }
         location: { type: string, minLength: 1 }
         country: { type: string, minLength: 1 }
         price: { type: number, minimum: 0 }
         category: { $ref: "#/components/schemas/ListingCategory" }
+        propertyType: { $ref: "#/components/schemas/PropertyType" }
+        bedrooms: { type: integer, minimum: 0 }
+        bathrooms: { type: number, minimum: 0 }
+        beds: { type: integer, minimum: 0 }
+        maxGuests: { type: integer, minimum: 1 }
+        amenities:
+          type: array
+          items: { type: string }
+        houseRules: { $ref: "#/components/schemas/HouseRules" }
+        pricing: { $ref: "#/components/schemas/Pricing" }
+        status: { type: string, enum: [active, inactive, suspended, deleted] }
+        draft: { type: boolean }
+        featured: { type: boolean }
+        minimumStay: { type: integer, minimum: 1 }
+        maximumStay: { type: integer, minimum: 1, nullable: true }
 
     # ── Review ───────────────────────────────────────────────────────────────
     Review:
@@ -457,6 +801,46 @@ components:
           format: password
           minLength: 1
           example: "s3cr3tP@ss"
+
+    ForgotPasswordBody:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          example: alice@example.com
+
+    ResetPasswordBody:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+          minLength: 1
+          description: Raw 64-character hex token from the reset email link
+          example: "a3f9b2c1d4e5..."
+        password:
+          type: string
+          format: password
+          minLength: 6
+          maxLength: 128
+          example: "newS3cr3tP@ss"
+        confirmPassword:
+          type: string
+          format: password
+          description: "Optional — must match `password` if provided"
+          example: "newS3cr3tP@ss"
+
+    VerifyEmailBody:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          minLength: 1
+          description: Raw 64-character hex token from the verification email link
+          example: "b4e8c3d2e5f6..."
 
     # ── User update request bodies ───────────────────────────────────────────
     UpdateProfileBody:
@@ -591,6 +975,16 @@ components:
             message: "You do not have permission"
             code: "FORBIDDEN"
 
+    EmailNotVerified:
+      description: Account email has not been verified
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+          example:
+            success: false
+            message: "Please verify your email address to continue."
+            code: "EMAIL_NOT_VERIFIED"
+
     NotFound:
       description: Resource does not exist
       content:
@@ -654,6 +1048,7 @@ paths:
       tags: [Health]
       summary: Service liveness check
       operationId: healthCheck
+      security: []
       responses:
         "200":
           description: Service is up
@@ -674,6 +1069,11 @@ paths:
     post:
       tags: [Auth]
       summary: Register a new account
+      description: |
+        Creates a local account and establishes a session. A verification email
+        is sent automatically (fire-and-forget — signup succeeds even if email
+        delivery fails). The account is functional immediately, but some actions
+        require a verified email address.
       operationId: authSignup
       security: []
       requestBody:
@@ -749,6 +1149,8 @@ paths:
       tags: [Auth]
       summary: End the current session
       operationId: authLogout
+      security:
+        - cookieAuth: []
       responses:
         "200":
           description: Logged out
@@ -764,6 +1166,7 @@ paths:
                         properties:
                           message:
                             { type: string, example: "Logged out successfully" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
         "500": { $ref: "#/components/responses/InternalError" }
 
   /api/auth/me:
@@ -789,11 +1192,294 @@ paths:
                           user: { $ref: "#/components/schemas/UserFull" }
         "401": { $ref: "#/components/responses/Unauthorized" }
 
+  /api/auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request a password reset email
+      description: |
+        Sends a reset link to the email address if a matching active account
+        exists. Always returns 200 to prevent email enumeration — check `sent`
+        in the response body.
+
+        In non-production environments, the raw `_devToken` is included in the
+        response for integration testing.
+      operationId: authForgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ForgotPasswordBody" }
+      responses:
+        "200":
+          description: Request acknowledged (regardless of whether the email exists)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "If that email address is registered, you will receive a password reset link shortly."
+                          _devToken:
+                            type: string
+                            description: "Non-production only — raw token for testing"
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /api/auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Consume a reset token and set a new password
+      description: |
+        The token is single-use and expires after 1 hour. Invalidates all
+        other active reset tokens for the user on success.
+      operationId: authResetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ResetPasswordBody" }
+      responses:
+        "200":
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "Your password has been updated successfully. Please log in with your new password."
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /api/auth/verify-email:
+    post:
+      tags: [Auth]
+      summary: Verify email address using a token from the verification email
+      description: |
+        Marks the account's email as verified. The token is single-use and
+        expires after 24 hours. If the session user is authenticated, the
+        session is refreshed to reflect `emailVerified: true` immediately.
+      operationId: authVerifyEmail
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VerifyEmailBody" }
+      responses:
+        "200":
+          description: Email verified
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            {
+                              type: string,
+                              example: "Email address verified successfully.",
+                            }
+                          user: { $ref: "#/components/schemas/UserFull" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/auth/resend-verification:
+    post:
+      tags: [Auth]
+      summary: Resend the email verification link
+      description: |
+        Issues a new verification token and sends it to the user's email.
+
+        **Constraints:**
+        - Requires an authenticated session.
+        - Rejected if email is already verified.
+        - Per-user cooldown: 5 minutes between requests.
+        - Per-IP rate limit: 5 requests per hour (HTTP layer) + DB-level check.
+
+        In non-production environments, `_devToken` is included for testing.
+      operationId: authResendVerification
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Verification email sent
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "A new verification email has been sent. Please check your inbox."
+                          _devToken:
+                            type: string
+                            description: "Non-production only — raw token for testing"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /api/auth/unlink/{provider}:
+    delete:
+      tags: [Auth]
+      summary: Unlink an OAuth provider from the current account
+      description: |
+        Removes the stored provider ID so that OAuth login via that provider no
+        longer works for this account.
+
+        **Guard:** the request is rejected if the provider being unlinked is the
+        only login method (no local password and no other linked provider).
+      operationId: authUnlinkProvider
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/provider"
+      responses:
+        "200":
+          description: Provider unlinked
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: "google has been unlinked from your account"
+                          user: { $ref: "#/components/schemas/UserFull" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/auth/google:
+    get:
+      tags: [Auth]
+      summary: Initiate Google OAuth 2.0 login
+      description: |
+        Redirects to Google's consent screen. On success, Google redirects
+        back to `GET /api/auth/google/callback`.
+
+        Pass an optional `state` query parameter (base64-encoded JSON with a
+        `redirectTo` field) to control the post-login redirect destination.
+      operationId: authGoogleInit
+      security: []
+      parameters:
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Base64-encoded JSON, e.g. btoa(JSON.stringify({ redirectTo: "/dashboard" }))'
+      responses:
+        "302":
+          description: Redirect to Google consent page
+
+  /api/auth/google/callback:
+    get:
+      tags: [Auth]
+      summary: Google OAuth 2.0 callback
+      description: |
+        Google redirects here after the user grants (or denies) consent.
+        On success the session is established and the browser is redirected to
+        the frontend. On failure the browser is redirected to
+        `/login?auth_error=<reason>`.
+      operationId: authGoogleCallback
+      security: []
+      responses:
+        "302":
+          description: Redirect to frontend (success or failure)
+
+  /api/auth/github:
+    get:
+      tags: [Auth]
+      summary: Initiate GitHub OAuth 2.0 login
+      description: |
+        Redirects to GitHub's authorization page. On success, GitHub redirects
+        back to `GET /api/auth/github/callback`.
+      operationId: authGithubInit
+      security: []
+      parameters:
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Base64-encoded JSON, e.g. btoa(JSON.stringify({ redirectTo: "/dashboard" }))'
+      responses:
+        "302":
+          description: Redirect to GitHub authorization page
+
+  /api/auth/github/callback:
+    get:
+      tags: [Auth]
+      summary: GitHub OAuth 2.0 callback
+      operationId: authGithubCallback
+      security: []
+      responses:
+        "302":
+          description: Redirect to frontend (success or failure)
+
+  /api/auth/link/google:
+    get:
+      tags: [Auth]
+      summary: Link Google to an existing authenticated account
+      description: |
+        Initiates the Google OAuth flow in "link" mode. The user must already
+        be authenticated. The resulting `google/callback` will attach the
+        Google ID to the current account instead of creating a new session.
+      operationId: authLinkGoogle
+      security:
+        - cookieAuth: []
+      responses:
+        "302":
+          description: Redirect to Google consent page
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /api/auth/link/github:
+    get:
+      tags: [Auth]
+      summary: Link GitHub to an existing authenticated account
+      operationId: authLinkGithub
+      security:
+        - cookieAuth: []
+      responses:
+        "302":
+          description: Redirect to GitHub authorization page
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
   # ══════════════════════════════ LISTINGS ════════════════════════════════════
   /api/listings:
     get:
       tags: [Listings]
-      summary: List all listings (paginated, filterable)
+      summary: List all active listings (paginated, filterable)
       operationId: listingsIndex
       security: []
       parameters:
@@ -801,6 +1487,24 @@ paths:
           in: query
           schema: { $ref: "#/components/schemas/ListingCategory" }
           description: Filter by category
+        - name: propertyType
+          in: query
+          schema: { $ref: "#/components/schemas/PropertyType" }
+          description: Filter by property type
+        - name: featured
+          in: query
+          schema: { type: boolean }
+          description: Filter to featured listings only
+        - name: minPrice
+          in: query
+          schema: { type: number, minimum: 0 }
+        - name: maxPrice
+          in: query
+          schema: { type: number, minimum: 0 }
+        - name: minGuests
+          in: query
+          schema: { type: integer, minimum: 1 }
+          description: Filter by minimum guest capacity (maps to maxGuests ≥ minGuests)
         - name: page
           in: query
           schema: { type: integer, minimum: 1, default: 1 }
@@ -809,7 +1513,10 @@ paths:
           schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
         - name: sort
           in: query
-          schema: { type: string, default: createdAt }
+          schema:
+            type: string
+            enum: [createdAt, price_asc, price_desc, rating, popular]
+            default: createdAt
       responses:
         "200":
           description: Paginated listing array
@@ -834,6 +1541,9 @@ paths:
     post:
       tags: [Listings]
       summary: Create a new listing
+      description: |
+        Requires **host** or **admin** role and a **verified email address**.
+        Subject to the create rate limit (30/hr per IP).
       operationId: listingsCreate
       security:
         - cookieAuth: []
@@ -853,8 +1563,15 @@ paths:
                 - "listing[image]"
               properties:
                 "listing[title]":
-                  { type: string, minLength: 1, example: "Alpine Hideaway" }
+                  {
+                    type: string,
+                    minLength: 1,
+                    maxLength: 100,
+                    example: "Alpine Hideaway",
+                  }
                 "listing[description]": { type: string, minLength: 1 }
+                "listing[shortDescription]":
+                  { type: string, maxLength: 160, nullable: true }
                 "listing[location]":
                   { type: string, minLength: 1, example: "Zermatt" }
                 "listing[country]":
@@ -862,10 +1579,20 @@ paths:
                 "listing[price]": { type: number, minimum: 0, example: 3200 }
                 "listing[category]":
                   { $ref: "#/components/schemas/ListingCategory" }
+                "listing[propertyType]":
+                  { $ref: "#/components/schemas/PropertyType" }
+                "listing[bedrooms]": { type: integer, minimum: 0, default: 1 }
+                "listing[bathrooms]": { type: number, minimum: 0, default: 1 }
+                "listing[beds]": { type: integer, minimum: 0, default: 1 }
+                "listing[maxGuests]": { type: integer, minimum: 1, default: 2 }
+                "listing[minimumStay]":
+                  { type: integer, minimum: 1, default: 1 }
+                "listing[maximumStay]":
+                  { type: integer, minimum: 1, nullable: true }
                 "listing[image]":
                   type: string
                   format: binary
-                  description: JPEG, JPG, or PNG only (≤ 10 MB recommended)
+                  description: Primary image — JPEG, JPG, PNG, or WebP (≤ 10 MB)
       responses:
         "201":
           description: Listing created
@@ -882,8 +1609,66 @@ paths:
                           listing: { $ref: "#/components/schemas/Listing" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "403":
+          description: Forbidden — insufficient role or unverified email
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
         "422": { $ref: "#/components/responses/ValidationError" }
         "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /api/listings/featured:
+    get:
+      tags: [Listings]
+      summary: Get featured listings
+      description: "Returns listings where `featured: true`, sorted by `averageRating` descending."
+      operationId: listingsFeatured
+      security: []
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 10 }
+      responses:
+        "200":
+          description: Featured listings
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listings:
+                            type: array
+                            items: { $ref: "#/components/schemas/Listing" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+
+  /api/listings/slug/{slug}:
+    get:
+      tags: [Listings]
+      summary: Get a listing by its URL slug
+      operationId: listingsShowBySlug
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/slug"
+      responses:
+        "200":
+          description: Listing detail (with reviews and owner)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+        "404": { $ref: "#/components/responses/NotFound" }
 
   /api/listings/{id}:
     parameters:
@@ -913,7 +1698,7 @@ paths:
 
     put:
       tags: [Listings]
-      summary: Full-replace a listing (owner only)
+      summary: Full-replace a listing (owner or admin)
       operationId: listingsUpdate
       security:
         - cookieAuth: []
@@ -931,7 +1716,7 @@ paths:
                 - "listing[price]"
                 - "listing[category]"
               properties:
-                "listing[title]": { type: string, minLength: 1 }
+                "listing[title]": { type: string, minLength: 1, maxLength: 100 }
                 "listing[description]": { type: string, minLength: 1 }
                 "listing[location]": { type: string, minLength: 1 }
                 "listing[country]": { type: string, minLength: 1 }
@@ -942,7 +1727,7 @@ paths:
                   {
                     type: string,
                     format: binary,
-                    description: "Optional — omit to keep existing",
+                    description: "Optional — omit to keep existing primary image",
                   }
       responses:
         "200":
@@ -966,7 +1751,7 @@ paths:
 
     patch:
       tags: [Listings]
-      summary: Partially update a listing (owner only)
+      summary: Partially update a listing (owner or admin)
       operationId: listingsPartialUpdate
       security:
         - cookieAuth: []
@@ -1011,7 +1796,8 @@ paths:
 
     delete:
       tags: [Listings]
-      summary: Delete a listing (owner only)
+      summary: Delete a listing (owner or admin)
+      description: Cascades to delete all associated Cloudinary images.
       operationId: listingsDestroy
       security:
         - cookieAuth: []
@@ -1033,6 +1819,292 @@ paths:
                               type: string,
                               example: "Listing deleted successfully",
                             }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/listings/{id}/publish:
+    post:
+      tags: [Listings]
+      summary: Publish a draft listing (owner or admin)
+      description: "Sets `draft: false` and `status: active`."
+      operationId: listingsPublish
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "200":
+          description: Listing published
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message:
+                            { type: string, example: "Listing published" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/listings/{id}/unpublish:
+    post:
+      tags: [Listings]
+      summary: Move a listing back to draft (owner or admin)
+      description: "Sets `draft: true`. Hides the listing from public results."
+      operationId: listingsUnpublish
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      responses:
+        "200":
+          description: Listing moved to drafts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message:
+                            { type: string, example: "Listing moved to drafts" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/listings/{id}/featured:
+    patch:
+      tags: [Listings]
+      summary: Set or unset the featured flag (admin only)
+      operationId: listingsSetFeatured
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [featured]
+              properties:
+                featured:
+                  type: boolean
+                  example: true
+      responses:
+        "200":
+          description: Featured flag updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message: { type: string, example: "Listing featured" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/listings/{id}/images:
+    post:
+      tags: [Listings]
+      summary: Add one or more images to a listing (owner or admin)
+      description: Accepts up to 10 images per request. The first image is set as primary if no primary image exists.
+      operationId: listingsAddImages
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [images]
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 10
+                  description: JPEG, JPG, PNG, or WebP files (≤ 10 MB each)
+      responses:
+        "201":
+          description: Images added
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message:
+                            {
+                              type: string,
+                              example: "Images added successfully",
+                            }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/listings/{id}/images/{imageId}:
+    delete:
+      tags: [Listings]
+      summary: Remove an image from a listing (owner or admin)
+      description: Also deletes the image from Cloudinary. A listing must retain at least one image.
+      operationId: listingsRemoveImage
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+        - $ref: "#/components/parameters/imageId"
+      responses:
+        "200":
+          description: Image removed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message:
+                            {
+                              type: string,
+                              example: "Image removed successfully",
+                            }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/listings/{id}/images/{imageId}/primary:
+    patch:
+      tags: [Listings]
+      summary: Set an image as the primary image (owner or admin)
+      description: "Clears `isPrimary` on all other images and sets it on the specified image."
+      operationId: listingsSetPrimaryImage
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+        - $ref: "#/components/parameters/imageId"
+      responses:
+        "200":
+          description: Primary image updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message:
+                            { type: string, example: "Primary image updated" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /api/listings/{id}/availability:
+    post:
+      tags: [Listings]
+      summary: Block a date range on the availability calendar (owner or admin)
+      description: |
+        `startDate` must be before `endDate`. Validation is enforced by the
+        service layer in addition to Zod schema validation.
+      operationId: listingsAddBlockedDate
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BlockedDateInput" }
+      responses:
+        "201":
+          description: Dates blocked
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message:
+                            {
+                              type: string,
+                              example: "Dates blocked successfully",
+                            }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationError" }
+
+  /api/listings/{id}/availability/{blockedDateId}:
+    delete:
+      tags: [Listings]
+      summary: Remove a blocked date range (owner or admin)
+      operationId: listingsRemoveBlockedDate
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: "#/components/parameters/listingId"
+        - $ref: "#/components/parameters/blockedDateId"
+      responses:
+        "200":
+          description: Blocked date removed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/SuccessEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          listing: { $ref: "#/components/schemas/Listing" }
+                          message:
+                            { type: string, example: "Blocked date removed" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1068,6 +2140,7 @@ paths:
     post:
       tags: [Reviews]
       summary: Add a review to a listing (auth required)
+      description: Subject to the create rate limit (30/hr per IP).
       operationId: reviewsCreate
       security:
         - cookieAuth: []
@@ -1080,12 +2153,6 @@ paths:
               required: [review]
               properties:
                 review: { $ref: "#/components/schemas/ReviewInput" }
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                "review[rating]": { type: integer, minimum: 1, maximum: 5 }
-                "review[comment]": { type: string, minLength: 1 }
       responses:
         "201":
           description: Review created
@@ -1132,7 +2199,7 @@ paths:
 
     patch:
       tags: [Reviews]
-      summary: Update a review (author only)
+      summary: Update a review (author or admin)
       operationId: reviewsUpdate
       security:
         - cookieAuth: []
@@ -1165,7 +2232,7 @@ paths:
 
     delete:
       tags: [Reviews]
-      summary: Delete a review (author only)
+      summary: Delete a review (author or admin)
       operationId: reviewsDestroy
       security:
         - cookieAuth: []
@@ -1205,7 +2272,7 @@ paths:
         "200":
           description: |
             **Public** callers receive `UserPublic`.  
-            **Authenticated owner** receives `UserFull` (includes email, phone, settings, etc.).
+            **Authenticated owner** receives `UserFull` (includes email, phone, settings, linkedProviders, etc.).
           content:
             application/json:
               schema:
@@ -1225,6 +2292,7 @@ paths:
     delete:
       tags: [Users]
       summary: Delete account (self or admin)
+      description: Hard-deletes the account and cleans up the avatar from Cloudinary. Terminates the session.
       operationId: usersDestroy
       security:
         - cookieAuth: []
@@ -1257,6 +2325,7 @@ paths:
     patch:
       tags: [Users]
       summary: Update profile fields (self only)
+      description: "Allowed fields — `firstName`, `lastName`, `bio`, `phoneNumber`."
       operationId: usersUpdateProfile
       security:
         - cookieAuth: []
@@ -1291,6 +2360,7 @@ paths:
     put:
       tags: [Users]
       summary: Upload or replace avatar (self only)
+      description: Replaces any existing avatar and deletes the old file from Cloudinary.
       operationId: usersUpdateAvatar
       security:
         - cookieAuth: []
@@ -1305,7 +2375,7 @@ paths:
                 avatar:
                   type: string
                   format: binary
-                  description: JPEG, JPG, or PNG only (≤ 10 MB)
+                  description: JPEG, JPG, PNG, or WebP (≤ 10 MB)
       responses:
         "200":
           description: Avatar updated
@@ -1332,6 +2402,7 @@ paths:
     delete:
       tags: [Users]
       summary: Remove avatar (self only)
+      description: Sets avatar fields to null and deletes from Cloudinary.
       operationId: usersRemoveAvatar
       security:
         - cookieAuth: []
