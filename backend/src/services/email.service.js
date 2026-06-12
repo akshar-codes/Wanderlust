@@ -170,6 +170,90 @@ async function sendPasswordResetEmail({
   return sendMail({ to, subject, html, text });
 }
 
+// ── Verification email template ───────────────────────────────────────────────
+
+async function sendEmailVerificationEmail({
+  to,
+  username,
+  verificationToken,
+  expiresInHours = 24,
+}) {
+  const frontendBase = process.env.FRONTEND_URL ?? "http://localhost:5173";
+
+  // The React app's verify-email page must accept ?token=<raw>&email=<email>
+  const verifyUrl = `${frontendBase}/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(to)}`;
+
+  const subject = "Verify your Wanderlust email address";
+
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${subject}</title>
+  <style>
+    body { margin: 0; padding: 0; background: #faf8f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #261f1a; }
+    .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 16px rgba(38,31,26,0.08); }
+    .header { background: #ff5a5f; padding: 32px 40px; text-align: center; }
+    .header h1 { margin: 0; color: #ffffff; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .header p { margin: 6px 0 0; color: rgba(255,255,255,0.85); font-size: 14px; }
+    .body { padding: 40px; }
+    .body p { margin: 0 0 16px; font-size: 15px; line-height: 1.6; color: #4a3f38; }
+    .body p.greeting { font-size: 17px; font-weight: 600; color: #261f1a; }
+    .cta-wrapper { text-align: center; margin: 32px 0; }
+    .cta { display: inline-block; background: #ff5a5f; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
+    .cta:hover { background: #e04e53; }
+    .divider { border: none; border-top: 1px solid #f0ebe8; margin: 28px 0; }
+    .fallback { background: #faf8f6; border-radius: 8px; padding: 16px; word-break: break-all; }
+    .fallback code { font-size: 12px; color: #6b5f58; }
+    .footer { padding: 24px 40px; text-align: center; background: #f5f0ed; }
+    .footer p { margin: 0; font-size: 12px; color: #9c8f87; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>🌍 Wanderlust</h1>
+      <p>Your travel companion</p>
+    </div>
+    <div class="body">
+      <p class="greeting">Hi ${escapeHtml(username)},</p>
+      <p>Thanks for joining Wanderlust! Please verify your email address to unlock all features, including creating listings and booking stays.</p>
+ 
+      <div class="cta-wrapper">
+        <a href="${verifyUrl}" class="cta">Verify my email</a>
+      </div>
+ 
+      <p>This link will expire in <strong>${expiresInHours} hours</strong>. If you did not create a Wanderlust account, you can safely ignore this email.</p>
+ 
+      <hr class="divider" />
+ 
+      <p style="font-size:13px;color:#7a6f68;">If the button above doesn't work, copy and paste this URL into your browser:</p>
+      <div class="fallback">
+        <code>${verifyUrl}</code>
+      </div>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} Wanderlust. All rights reserved.<br />
+      This email was sent to ${escapeHtml(to)} because an account was created with this address.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  const text =
+    `Hi ${username},\n\n` +
+    `Thanks for joining Wanderlust! Please verify your email address:\n\n` +
+    `${verifyUrl}\n\n` +
+    `This link expires in ${expiresInHours} hours.\n\n` +
+    `If you didn't create this account, you can ignore this email.\n\n` +
+    `— The Wanderlust Team`;
+
+  return sendMail({ to, subject, html, text });
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function escapeHtml(str) {
