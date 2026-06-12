@@ -7,6 +7,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const listingCtrl = require("../controllers/listing.controller");
 const upload = require("../middlewares/upload");
 const validate = require("../middlewares/validate");
+const { requireVerifiedEmail } = require("../middlewares/requireVerifiedEmail");
 const {
   listingBodySchema,
   listingPatchSchema,
@@ -36,6 +37,7 @@ router
   .get(asyncHandler(listingCtrl.index))
   .post(
     requireAuth(),
+    requireVerifiedEmail(),
     requirePermission("listing", "create"),
     createLimiter,
     upload.single("listing[image]"),

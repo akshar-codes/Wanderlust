@@ -1,6 +1,7 @@
 "use strict";
 
 const AppError = require("../utils/AppError");
+const { requireVerifiedEmail } = require("./requireVerifiedEmail");
 const {
   ROLE_HIERARCHY,
   PERMISSIONS,
@@ -224,4 +225,5 @@ module.exports = {
   requireOwnerOrAdmin,
   requireActiveAccount,
   requireAuthAndPermission,
+  requireVerifiedEmail,
 };
