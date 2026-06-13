@@ -5,7 +5,7 @@ import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
-import { useForgotPassword } from "../hooks/useAuth";
+import { useForgotPassword } from "../../hooks/useAuth";
 import {
   AuthCard,
   AuthBrand,
@@ -14,7 +14,7 @@ import {
   SubmitButton,
   AuthFooter,
   AuthLink,
-} from "../components/auth/AuthShared";
+} from "../../components/auth/AuthShared";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email address"),

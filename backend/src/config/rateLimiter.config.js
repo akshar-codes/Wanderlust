@@ -101,4 +101,9 @@ const resendLimiter = rateLimit({
   },
 });
 
-module.exports = { globalLimiter, authLimiter, createLimiter };
+module.exports = {
+  globalLimiter,
+  authLimiter,
+  createLimiter,
+  resendLimiter,
+};

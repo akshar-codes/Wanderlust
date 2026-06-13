@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSignup } from "../hooks/useAuth";
-import { signupSchema } from "../schemas";
+import { useSignup } from "../../hooks/useAuth";
+import { signupSchema } from "../../schemas";
 import {
   AuthCard,
   AuthBrand,
@@ -13,7 +13,7 @@ import {
   AuthFooter,
   AuthLink,
   PasswordStrength,
-} from "../components/auth/AuthShared";
+} from "../../components/auth/AuthShared";
 import { Link } from "react-router-dom";
 import { useWatch } from "react-hook-form";
 

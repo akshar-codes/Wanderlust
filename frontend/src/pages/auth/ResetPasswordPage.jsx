@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShieldCheck, AlertTriangle } from "lucide-react";
-import { useResetPassword } from "../hooks/useAuth";
+import { useResetPassword } from "../../hooks/useAuth";
 import {
   AuthCard,
   AuthBrand,
@@ -15,7 +15,7 @@ import {
   PasswordStrength,
   AuthFooter,
   AuthLink,
-} from "../components/auth/AuthShared";
+} from "../../components/auth/AuthShared";
 
 const schema = z
   .object({

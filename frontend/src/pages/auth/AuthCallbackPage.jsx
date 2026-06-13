@@ -1,17 +1,10 @@
-/**
- * AuthCallbackPage.jsx
- * Landing page for OAuth callbacks.
- * The backend redirects here (e.g. GET /?auth_error=…) after Google/GitHub auth.
- * On success the session cookie is already set; we just hydrate the store.
- * On failure we display the error and redirect to login.
- */
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { useAuthStore } from "../store/auth.store";
-import { AuthCard, AuthBrand } from "../components/auth/AuthShared";
-import Spinner from "../components/common/Spinner";
+import { useAuthStore } from "../../store/auth.store";
+import { AuthCard, AuthBrand } from "../../components/auth/AuthShared";
+import Spinner from "../../components/common/Spinner";
 
 const ERROR_MESSAGES = {
   oauth_error: "An error occurred with the OAuth provider. Please try again.",

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLogin } from "../hooks/useAuth";
-import { loginSchema } from "../schemas";
+import { useLogin } from "../../hooks/useAuth";
+import { loginSchema } from "../../schemas";
 import {
   AuthCard,
   AuthBrand,
@@ -12,7 +12,7 @@ import {
   GoogleButton,
   AuthFooter,
   AuthLink,
-} from "../components/auth/AuthShared";
+} from "../../components/auth/AuthShared";
 import { Link } from "react-router-dom";
 
 export default function LoginPage() {

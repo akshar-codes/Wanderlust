@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
-import { useVerifyEmail, useResendVerification } from "../hooks/useAuth";
-import { useAuthStore } from "../store/auth.store";
-import { AuthCard, AuthBrand } from "../components/auth/AuthShared";
-import Spinner from "../components/common/Spinner";
+import { useVerifyEmail, useResendVerification } from "../../hooks/useAuth";
+import { useAuthStore } from "../../store/auth.store";
+import { AuthCard, AuthBrand } from "../../components/auth/AuthShared";
+import Spinner from "../../components/common/Spinner";
 
 // ─── Pending state (no token / just signed up) ────────────────────────────────
 function PendingVerification() {
