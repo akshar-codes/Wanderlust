@@ -1,4 +1,8 @@
-export default function Spinner({ size = 24, className = "" }) {
+export default function Spinner({
+  size = 24,
+  color = "#ff5a5f",
+  className = "",
+}) {
   return (
     <svg
       className={`spinner ${className}`}
@@ -8,18 +12,22 @@ export default function Spinner({ size = 24, className = "" }) {
       fill="none"
       aria-label="Loading"
       role="status"
+      style={{ animation: "spin 0.8s linear infinite" }}
     >
       <circle
         cx="12"
         cy="12"
         r="10"
-        stroke="currentColor"
-        strokeWidth="3"
+        stroke={color}
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeDasharray="31.416"
         strokeDashoffset="10"
-        style={{ animation: "spin 0.8s linear infinite", transformOrigin: "center" }}
       />
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { transform-origin: center; }
+      `}</style>
     </svg>
   );
 }
