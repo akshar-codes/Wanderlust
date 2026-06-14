@@ -1,77 +1,99 @@
 import { forwardRef } from "react";
 import {
   Button as MuiButton,
-  IconButton as MuiIconButton,
   CircularProgress,
+  IconButton as MuiIconButton,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { colors, motion } from "../../theme/tokens";
+import { brand, semantic, neutral } from "../../theme/tokens";
 
-// ── Variant → MUI prop mapping ────────────────────────────────────────────────
-const VARIANT_MAP = {
+// ── Variant→MUI mapping ───────────────────────────────────────────────────────
+const VARIANTS = {
   primary: { variant: "contained", color: "primary" },
-  secondary: { variant: "outlined", color: "secondary" },
-  ghost: { variant: "text", color: "secondary" },
-  danger: { variant: "contained", color: "error" },
+  secondary: { variant: "outlined", color: "inherit" },
   outline: { variant: "outlined", color: "primary" },
+  ghost: { variant: "text", color: "inherit" },
+  danger: { variant: "contained", color: "error" },
   link: { variant: "text", color: "primary" },
 };
 
-// ── Size → MUI size mapping ───────────────────────────────────────────────────
-const SIZE_MAP = {
-  sm: "small",
-  md: "medium",
-  lg: "large",
+const DANGER_SX = {
+  background: `linear-gradient(135deg, ${semantic.error.base}, ${semantic.error.strong})`,
+  color: "#fff",
+  "&:hover": {
+    background: semantic.error.strong,
+    boxShadow: `0 4px 16px ${alpha(semantic.error.base, 0.35)}`,
+    transform: "translateY(-1px)",
+  },
 };
 
-/**
- * Button
- * @param {"primary"|"secondary"|"ghost"|"danger"|"outline"|"link"} variant
- * @param {"sm"|"md"|"lg"} size
- * @param {boolean} fullWidth
- * @param {React.ReactNode} startIcon
- * @param {React.ReactNode} endIcon
- */
+const SECONDARY_SX = {
+  borderColor: neutral[300],
+  color: neutral[700],
+  borderWidth: "1.5px",
+  "&:hover": {
+    borderWidth: "1.5px",
+    borderColor: neutral[600],
+    background: neutral[50],
+  },
+};
+
+const GHOST_SX = {
+  color: neutral[600],
+  "&:hover": { background: neutral[100] },
+};
+
+const LINK_SX = {
+  textDecoration: "underline",
+  textUnderlineOffset: "3px",
+  textDecorationColor: alpha(brand[600], 0.4),
+  paddingX: 0,
+  "&:hover": { textDecorationColor: brand[600] },
+};
+
 export const Button = forwardRef(function Button(
   {
     variant = "primary",
     size = "md",
+    loading = false,
     fullWidth = false,
     startIcon,
     endIcon,
     children,
-    className = "",
+    disabled,
     sx,
     ...props
   },
   ref,
 ) {
-  const { variant: muiVariant, color: muiColor } =
-    VARIANT_MAP[variant] ?? VARIANT_MAP.primary;
+  const { variant: muiVariant, color } = VARIANTS[variant] ?? VARIANTS.primary;
 
-  // Danger override — MUI "error" colour works, but we add a subtle gradient
-  const dangerSx =
-    variant === "danger"
-      ? {
-          background: `linear-gradient(135deg, ${colors.error.base}, ${colors.error.strong})`,
-          "&:hover": {
-            background: colors.error.strong,
-            boxShadow: `0 4px 16px ${alpha(colors.error.base, 0.4)}`,
-          },
-        }
-      : {};
+  const variantSx =
+    {
+      danger: DANGER_SX,
+      secondary: SECONDARY_SX,
+      ghost: GHOST_SX,
+      link: LINK_SX,
+    }[variant] ?? {};
 
   return (
     <MuiButton
       ref={ref}
       variant={muiVariant}
-      color={muiColor}
-      size={SIZE_MAP[size] ?? "medium"}
+      color={color}
+      size={{ sm: "small", md: "medium", lg: "large" }[size] ?? "medium"}
       fullWidth={fullWidth}
-      startIcon={startIcon}
-      endIcon={endIcon}
-      className={className}
-      sx={{ ...dangerSx, ...sx }}
+      disabled={loading || disabled}
+      startIcon={
+        loading ? (
+          <CircularProgress size={15} sx={{ color: "inherit" }} aria-hidden />
+        ) : (
+          startIcon
+        )
+      }
+      endIcon={!loading ? endIcon : undefined}
+      sx={{ ...variantSx, ...sx }}
+      aria-busy={loading || undefined}
       {...props}
     >
       {children}
@@ -80,51 +102,33 @@ export const Button = forwardRef(function Button(
 });
 
 /**
- * LoadingButton
- * Shows a circular spinner in place of children while `loading` is true.
+ * IconButton — circular icon-only action
  */
-export const LoadingButton = forwardRef(function LoadingButton(
-  { loading = false, loadingText, children, disabled, ...props },
-  ref,
-) {
-  return (
-    <Button
-      ref={ref}
-      disabled={loading || disabled}
-      startIcon={
-        loading ? (
-          <CircularProgress size={16} sx={{ color: "inherit" }} aria-hidden />
-        ) : undefined
-      }
-      {...props}
-    >
-      {loading ? (loadingText ?? "Loading…") : children}
-    </Button>
-  );
-});
-
 export const IconButton = forwardRef(function IconButton(
-  { color = "default", label, children, size = "md", sx, ...props },
+  { color = "default", size = "md", label, sx, children, ...props },
   ref,
 ) {
-  const colorMap = {
-    default: {},
-    primary: {
-      color: colors.primary[500],
-      "&:hover": { background: colors.primary[50] },
-    },
-    danger: {
-      color: colors.neutral[400],
-      "&:hover": { color: colors.error.base, background: colors.error.light },
-    },
-  };
+  const colorSx =
+    {
+      primary: {
+        color: brand[500],
+        "&:hover": { background: brand[50], color: brand[600] },
+      },
+      danger: {
+        color: neutral[400],
+        "&:hover": {
+          color: semantic.error.base,
+          background: semantic.error.light,
+        },
+      },
+    }[color] ?? {};
 
   return (
     <MuiIconButton
       ref={ref}
       aria-label={label}
-      size={size === "sm" ? "small" : size === "lg" ? "large" : "medium"}
-      sx={{ ...colorMap[color], ...sx }}
+      size={{ sm: "small", md: "medium", lg: "large" }[size] ?? "medium"}
+      sx={{ ...colorSx, ...sx }}
       {...props}
     >
       {children}

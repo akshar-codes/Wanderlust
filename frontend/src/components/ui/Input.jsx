@@ -8,54 +8,46 @@ import {
   Select as MuiSelect,
   MenuItem,
 } from "@mui/material";
-import { Search } from "lucide-react";
-import { colors, radii, motion } from "../../theme/tokens";
+import { brand, neutral, semantic } from "../../theme/tokens";
 
-// ── Helper: shared sx for all inputs ─────────────────────────────────────────
-function inputSx(error) {
+// ── Shared sx factory ─────────────────────────────────────────────────────────
+function fieldSx(hasError) {
   return {
     "& .MuiOutlinedInput-root": {
-      borderRadius: radii.lg,
-      backgroundColor: colors.neutral[0],
-      transition: motion.transition.fast,
+      borderRadius: "12px",
       "& fieldset": {
-        borderColor: error ? colors.error.main : colors.neutral[200],
+        borderColor: hasError ? semantic.error.base : neutral[300],
       },
       "&:hover fieldset": {
-        borderColor: error ? colors.error.dark : colors.neutral[400],
+        borderColor: hasError ? semantic.error.strong : neutral[500],
       },
       "&.Mui-focused fieldset": {
-        borderColor: error ? colors.error.main : colors.brand[500],
-        borderWidth: 1.5,
+        borderColor: hasError ? semantic.error.base : brand[500],
+        borderWidth: "1.5px",
       },
       "&.Mui-focused": {
-        boxShadow: error
-          ? `0 0 0 3px rgba(239,68,68,0.20)`
-          : `0 0 0 3px rgba(255,90,95,0.20)`,
+        boxShadow: hasError
+          ? "0 0 0 3px rgba(239,68,68,0.18)"
+          : "0 0 0 3px rgba(255,90,95,0.22)",
       },
     },
-    "& .MuiInputLabel-root": {
-      fontSize: "0.875rem",
-      fontWeight: 600,
-      color: colors.neutral[600],
-    },
+    "& .MuiInputLabel-root": { fontWeight: 600, fontSize: "0.875rem" },
     "& .MuiInputLabel-root.Mui-focused": {
-      color: error ? colors.error.main : colors.brand[500],
-    },
-    "& .MuiOutlinedInput-input": {
-      fontSize: "0.9rem",
-      padding: "12px 16px",
+      color: hasError ? semantic.error.base : brand[500],
     },
   };
 }
 
+const helperSx = (hasError) => ({
+  sx: {
+    fontSize: "0.8125rem",
+    fontWeight: hasError ? 500 : 400,
+    color: hasError ? semantic.error.text : neutral[500],
+  },
+});
+
 /**
- * Input — wraps MUI TextField for single-line text
- *
- * @param {string}  label
- * @param {string}  error   — if set, shows error state + message below
- * @param {string}  hint    — helper text shown below
- * @param {boolean} required
+ * Input — single-line text field
  */
 export const Input = forwardRef(function Input(
   {
@@ -81,6 +73,7 @@ export const Input = forwardRef(function Input(
       type={type}
       variant="outlined"
       fullWidth
+      FormHelperTextProps={helperSx(Boolean(error))}
       InputProps={{
         startAdornment: startAdornment ? (
           <InputAdornment position="start">{startAdornment}</InputAdornment>
@@ -89,21 +82,14 @@ export const Input = forwardRef(function Input(
           <InputAdornment position="end">{endAdornment}</InputAdornment>
         ) : undefined,
       }}
-      FormHelperTextProps={{
-        sx: {
-          color: error ? colors.error.main : colors.neutral[500],
-          fontSize: "0.78rem",
-          fontWeight: error ? 500 : 400,
-        },
-      }}
-      sx={{ ...inputSx(Boolean(error)), ...sx }}
+      sx={{ ...fieldSx(Boolean(error)), ...sx }}
       {...props}
     />
   );
 });
 
 /**
- * Textarea — wraps MUI TextField with multiline
+ * Textarea — multiline text field
  */
 export const Textarea = forwardRef(function Textarea(
   { label, error, hint, required, rows = 4, sx, ...props },
@@ -120,30 +106,15 @@ export const Textarea = forwardRef(function Textarea(
       fullWidth
       multiline
       rows={rows}
-      FormHelperTextProps={{
-        sx: {
-          color: error ? colors.error.main : colors.neutral[500],
-          fontSize: "0.78rem",
-          fontWeight: error ? 500 : 400,
-        },
-      }}
-      sx={{
-        ...inputSx(Boolean(error)),
-        "& .MuiOutlinedInput-input": {
-          // Multiline textarea — no fixed padding override, MUI handles it
-        },
-        ...sx,
-      }}
+      FormHelperTextProps={helperSx(Boolean(error))}
+      sx={{ ...fieldSx(Boolean(error)), ...sx }}
       {...props}
     />
   );
 });
 
 /**
- * Select — MUI Select wrapped in FormControl
- *
- * @param {{ value: string, label: string }[]} options
- * @param {string} placeholder
+ * Select — dropdown field
  */
 export const Select = forwardRef(function Select(
   {
@@ -160,18 +131,22 @@ export const Select = forwardRef(function Select(
   },
   ref,
 ) {
+  const hasError = Boolean(error);
+  const labelId = label
+    ? `${label.toLowerCase().replace(/\s+/g, "-")}-label`
+    : undefined;
+
   return (
-    <FormControl fullWidth error={Boolean(error)} required={required}>
+    <FormControl fullWidth error={hasError} required={required}>
       {label && (
         <InputLabel
+          id={labelId}
           sx={{
-            fontSize: "0.875rem",
             fontWeight: 600,
-            color: colors.neutral[600],
+            fontSize: "0.875rem",
             "&.Mui-focused": {
-              color: error ? colors.error.main : colors.brand[500],
+              color: hasError ? semantic.error.base : brand[500],
             },
-            "&.Mui-error": { color: colors.error.main },
           }}
         >
           {label}
@@ -179,49 +154,50 @@ export const Select = forwardRef(function Select(
       )}
       <MuiSelect
         inputRef={ref}
+        labelId={labelId}
+        label={label}
         value={value}
         onChange={onChange}
-        label={label}
         displayEmpty={Boolean(placeholder)}
         sx={{
-          borderRadius: radii.lg,
-          fontSize: "0.9rem",
+          borderRadius: "12px",
+          fontSize: "0.9375rem",
           "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: error ? colors.error.main : colors.neutral[200],
+            borderColor: hasError ? semantic.error.base : neutral[300],
           },
           "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: error ? colors.error.dark : colors.neutral[400],
+            borderColor: hasError ? semantic.error.strong : neutral[500],
           },
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: error ? colors.error.main : colors.brand[500],
-            borderWidth: 1.5,
+            borderColor: hasError ? semantic.error.base : brand[500],
+            borderWidth: "1.5px",
+          },
+          "&.Mui-focused": {
+            boxShadow: hasError
+              ? "0 0 0 3px rgba(239,68,68,0.18)"
+              : "0 0 0 3px rgba(255,90,95,0.22)",
           },
           ...sx,
         }}
         {...props}
       >
         {placeholder && (
-          <MenuItem value="" disabled sx={{ color: colors.neutral[400] }}>
+          <MenuItem value="" disabled sx={{ color: neutral[400] }}>
             {placeholder}
           </MenuItem>
         )}
-        {options.map((opt) => (
-          <MenuItem
-            key={typeof opt === "string" ? opt : opt.value}
-            value={typeof opt === "string" ? opt : opt.value}
-          >
-            {typeof opt === "string" ? opt : opt.label}
-          </MenuItem>
-        ))}
+        {options.map((opt) => {
+          const val = typeof opt === "string" ? opt : opt.value;
+          const label = typeof opt === "string" ? opt : opt.label;
+          return (
+            <MenuItem key={val} value={val}>
+              {label}
+            </MenuItem>
+          );
+        })}
       </MuiSelect>
       {(error || hint) && (
-        <FormHelperText
-          sx={{
-            color: error ? colors.error.main : colors.neutral[500],
-            fontSize: "0.78rem",
-            fontWeight: error ? 500 : 400,
-          }}
-        >
+        <FormHelperText sx={helperSx(hasError).sx}>
           {error || hint}
         </FormHelperText>
       )}
@@ -230,10 +206,10 @@ export const Select = forwardRef(function Select(
 });
 
 /**
- * SearchInput — styled search field
+ * SearchInput — pill-shaped search field
  */
 export const SearchInput = forwardRef(function SearchInput(
-  { value, onChange, placeholder = "Search…", sx, ...props },
+  { value, onChange, placeholder = "Search…", sx, startAdornment, ...props },
   ref,
 ) {
   return (
@@ -248,27 +224,41 @@ export const SearchInput = forwardRef(function SearchInput(
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
-            <Search size={16} style={{ color: colors.neutral[400] }} />
+            {startAdornment ?? (
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={neutral[400]}
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            )}
           </InputAdornment>
         ),
       }}
       sx={{
         "& .MuiOutlinedInput-root": {
-          borderRadius: radii.full,
-          backgroundColor: colors.neutral[50],
-          "& fieldset": { borderColor: colors.neutral[200] },
-          "&:hover fieldset": { borderColor: colors.neutral[400] },
+          borderRadius: "9999px",
+          backgroundColor: neutral[50],
+          "& fieldset": { borderColor: neutral[200] },
+          "&:hover fieldset": { borderColor: neutral[400] },
           "&.Mui-focused fieldset": {
-            borderColor: colors.brand[500],
-            borderWidth: 1.5,
+            borderColor: brand[500],
+            borderWidth: "1.5px",
           },
           "&.Mui-focused": {
-            backgroundColor: colors.neutral[0],
+            boxShadow: "0 0 0 3px rgba(255,90,95,0.22)",
+            backgroundColor: neutral[0],
           },
         },
         "& .MuiOutlinedInput-input": {
           padding: "9px 14px 9px 0",
-          fontSize: "0.85rem",
+          fontSize: "0.875rem",
         },
         ...sx,
       }}
