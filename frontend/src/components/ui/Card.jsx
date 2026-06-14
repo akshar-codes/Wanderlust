@@ -1,22 +1,29 @@
-import { Link } from "react-router-dom";
 import {
   Card as MuiCard,
   CardContent,
   CardMedia,
-  CardActions,
   Skeleton,
+  Box,
+  Typography,
 } from "@mui/material";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import StarRating from "../common/StarRating";
-import { colors, shadows, radii, motion } from "../../theme/tokens";
+import { Link } from "react-router-dom";
+import {
+  brand,
+  neutral,
+  semantic,
+  fonts,
+  radii,
+  shadows,
+  motion,
+} from "../../theme/tokens";
 
-// ── Base Card ─────────────────────────────────────────────────────────────────
-
+/**
+ * Card — generic surface container
+ */
 export function Card({
   variant = "flat",
+  padding = "md",
   children,
-  padding = "default",
-  className = "",
   sx,
   ...props
 }) {
@@ -26,57 +33,62 @@ export function Card({
       raised: { boxShadow: shadows.md },
       hover: {
         boxShadow: "none",
-        transition: `box-shadow ${motion.duration.base}ms ${motion.easing.easeOut}, transform ${motion.duration.base}ms ${motion.easing.easeOut}`,
+        transition: `box-shadow ${motion.base}, transform ${motion.base}`,
         "&:hover": {
           boxShadow: shadows.cardHover,
           transform: "translateY(-2px)",
+        },
+      },
+      interactive: {
+        boxShadow: "none",
+        cursor: "pointer",
+        transition: `box-shadow ${motion.base}, transform ${motion.base}`,
+        "&:hover": {
+          boxShadow: shadows.cardHover,
+          transform: "translateY(-2px)",
+        },
+        "&:active": { transform: "translateY(0)" },
+        "&:focus-visible": {
+          outline: `2px solid ${brand[500]}`,
+          outlineOffset: "2px",
         },
       },
     }[variant] ?? {};
 
   const paddingSx =
     {
-      none: {
-        "& .MuiCardContent-root": { padding: 0, "&:last-child": { pb: 0 } },
-      },
-      default: {},
-      lg: {
-        "& .MuiCardContent-root": {
-          padding: "28px 32px",
-          "&:last-child": { pb: "28px" },
-        },
-      },
+      none: { "& .MuiCardContent-root": { p: 0, "&:last-child": { pb: 0 } } },
+      sm: { "& .MuiCardContent-root": { p: 2, "&:last-child": { pb: 2 } } },
+      md: {},
+      lg: { "& .MuiCardContent-root": { p: 4, "&:last-child": { pb: 4 } } },
     }[padding] ?? {};
 
   return (
-    <MuiCard
-      className={className}
-      sx={{ ...variantSx, ...paddingSx, ...sx }}
-      {...props}
-    >
+    <MuiCard sx={{ ...variantSx, ...paddingSx, ...sx }} {...props}>
       {children}
     </MuiCard>
   );
 }
 
-// ── Listing Card ───────────────────────────────────────────────────────────────
 /**
- * @param {{ _id, title, location, country, price, image: { url }, category }} listing
- * @param {boolean} showTax
- * @param {boolean} loading  — renders skeleton when true
+ * ListingCard — image + title/location/price, Airbnb-style
  */
-export function ListingCard({ listing, showTax = false, loading = false }) {
+export function ListingCard({ listing, to, loading = false, actions }) {
   if (loading) return <ListingCardSkeleton />;
 
-  const { _id, title, location, country, price, image } = listing;
-  const displayPrice = showTax
-    ? (price * 1.18).toLocaleString("en-IN")
-    : price.toLocaleString("en-IN");
+  const { _id, title, location, country, price, image, category } = listing;
+  const href = to ?? `/listings/${_id}`;
 
   return (
-    <Link
-      to={`/listings/${_id}`}
-      style={{ textDecoration: "none", color: "inherit", display: "block" }}
+    <Box
+      component={Link}
+      to={href}
+      sx={{
+        textDecoration: "none",
+        color: "inherit",
+        display: "block",
+        outline: "none",
+      }}
     >
       <MuiCard
         elevation={0}
@@ -84,307 +96,222 @@ export function ListingCard({ listing, showTax = false, loading = false }) {
           border: "none",
           borderRadius: 0,
           background: "transparent",
-          transition: motion.transition.base,
+          boxShadow: "none",
+          transition: `transform ${motion.base}`,
           "&:hover": { transform: "translateY(-2px)" },
-          "&:hover .listing-card-img": { transform: "scale(1.04)" },
-          "&:hover .listing-card-overlay": { background: "rgba(0,0,0,0.04)" },
+          "&:hover .wl-card-img": { transform: "scale(1.04)" },
+          "&:focus-within": {
+            outline: `2px solid ${brand[500]}`,
+            outlineOffset: "2px",
+            borderRadius: radii.xl,
+          },
         }}
       >
-        {/* Image */}
-        <div
-          style={{
+        <Box
+          sx={{
             position: "relative",
             borderRadius: radii.xl,
             overflow: "hidden",
             aspectRatio: "4 / 3",
+            bgcolor: neutral[100],
           }}
         >
           <CardMedia
             component="img"
             image={image?.url}
             alt={title}
-            className="listing-card-img"
+            loading="lazy"
+            className="wl-card-img"
             sx={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              transition: `transform 0.45s ease`,
+              transition: `transform 450ms ease`,
             }}
           />
-          {/* Hover overlay */}
-          <div
-            className="listing-card-overlay"
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "transparent",
-              transition: `background ${transitions.base}`,
-            }}
-          />
-        </div>
+          {category && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 12,
+                left: 12,
+                bgcolor: "rgba(255,255,255,0.92)",
+                backdropFilter: "blur(8px)",
+                borderRadius: radii.full,
+                px: 1.25,
+                py: 0.4,
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+                textTransform: "capitalize",
+                color: neutral[700],
+              }}
+            >
+              {category}
+            </Box>
+          )}
+          {actions && (
+            <Box sx={{ position: "absolute", top: 10, right: 10 }}>
+              {actions}
+            </Box>
+          )}
+        </Box>
 
-        {/* Body */}
         <CardContent sx={{ px: 0.5, pt: 1.5, pb: "0 !important" }}>
-          <p
-            style={{
+          <Typography
+            sx={{
+              fontSize: "0.94rem",
               fontWeight: 700,
-              fontSize: "0.95rem",
-              marginBottom: 2,
-              lineHeight: 1.3,
+              lineHeight: 1.35,
+              mb: 0.5,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
             }}
           >
             {title}
-          </p>
-          <p
-            style={{
-              fontSize: "0.82rem",
-              color: colors.neutral[500],
-              marginBottom: 4,
-            }}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ color: neutral[500], display: "block", mb: 0.5 }}
           >
             {location}, {country}
-          </p>
-          <p style={{ fontSize: "0.9rem" }}>
-            <strong>₹{displayPrice}</strong>
-            <span style={{ color: colors.neutral[500] }}> / night</span>
-            {showTax && (
-              <span style={{ fontSize: "0.78rem", color: colors.neutral[400] }}>
-                {" "}
-                (incl. 18% tax)
-              </span>
-            )}
-          </p>
+          </Typography>
+          <Typography sx={{ fontSize: "0.9rem" }}>
+            <strong>₹{Number(price).toLocaleString("en-IN")}</strong>
+            <Box component="span" sx={{ color: neutral[500] }}>
+              {" "}
+              / night
+            </Box>
+          </Typography>
         </CardContent>
       </MuiCard>
-    </Link>
+    </Box>
   );
 }
 
 function ListingCardSkeleton() {
   return (
-    <MuiCard elevation={0} sx={{ border: "none", background: "transparent" }}>
+    <Box>
       <Skeleton
-        variant="rectangular"
-        sx={{ borderRadius: radii.xl, aspectRatio: "4/3", height: "auto" }}
+        variant="rounded"
         animation="wave"
+        sx={{
+          aspectRatio: "4/3",
+          width: "100%",
+          height: "auto",
+          borderRadius: radii.xl,
+        }}
       />
-      <CardContent sx={{ px: 0.5, pt: 1.5 }}>
-        <Skeleton width="70%" height={20} sx={{ mb: 0.5 }} animation="wave" />
-        <Skeleton width="50%" height={16} sx={{ mb: 0.5 }} animation="wave" />
-        <Skeleton width="40%" height={16} animation="wave" />
-      </CardContent>
-    </MuiCard>
+      <Box
+        sx={{
+          px: 0.5,
+          pt: 1.5,
+          display: "flex",
+          flexDirection: "column",
+          gap: 0.75,
+        }}
+      >
+        <Skeleton variant="text" width="70%" height={20} />
+        <Skeleton variant="text" width="50%" height={16} />
+        <Skeleton variant="text" width="40%" height={16} />
+      </Box>
+    </Box>
   );
 }
 
-// ── Stats Card ────────────────────────────────────────────────────────────────
 /**
- * @param {string} label
- * @param {string|number} value
- * @param {React.ReactNode} icon
- * @param {"up"|"down"|"flat"} trend
- * @param {string} trendValue  — e.g. "12%" or "3 more"
+ * StatsCard — label + big number + trend
  */
 export function StatsCard({ label, value, icon, trend, trendValue }) {
-  const TrendIcon =
-    trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
-
   const trendColor =
     trend === "up"
-      ? colors.success.main
+      ? semantic.success.base
       : trend === "down"
-        ? colors.error.main
-        : colors.neutral[400];
+        ? semantic.error.base
+        : neutral[400];
+
+  const TrendArrow = () => (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={trendColor}
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {trend === "up" && <path d="M18 15l-6-6-6 6" />}
+      {trend === "down" && <path d="M6 9l6 6 6-6" />}
+      {trend === "flat" && <path d="M5 12h14" />}
+    </svg>
+  );
 
   return (
     <MuiCard
       elevation={0}
       sx={{
         borderRadius: radii.xl,
-        border: `1px solid ${colors.neutral[200]}`,
-        p: "24px",
+        border: `1px solid`,
+        borderColor: "divider",
+        p: 3,
         display: "flex",
         flexDirection: "column",
         gap: 1,
-        transition: `box-shadow ${motion.duration.base}ms ${motion.easing.easeOut}`,
-        "&:hover": { boxShadow: shadows.md },
       }}
     >
-      {/* Header row */}
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
         }}
       >
-        <span
-          style={{
-            fontSize: "0.78rem",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            color: colors.neutral[500],
-          }}
-        >
+        <Typography variant="overline" sx={{ color: neutral[500] }}>
           {label}
-        </span>
+        </Typography>
         {icon && (
-          <div
-            style={{
+          <Box
+            sx={{
               width: 36,
               height: 36,
               borderRadius: radii.md,
-              background: colors.brand[50],
-              color: colors.brand[500],
+              bgcolor: brand[50],
+              color: brand[500],
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
             {icon}
-          </div>
+          </Box>
         )}
-      </div>
-
-      {/* Value */}
-      <p
-        style={{
-          fontFamily: '"DM Serif Display", Georgia, serif',
+      </Box>
+      <Typography
+        sx={{
+          fontFamily: fonts.display,
           fontSize: "2rem",
           fontWeight: 400,
           lineHeight: 1.2,
-          color: colors.neutral[800],
+          color: neutral[800],
         }}
       >
         {value}
-      </p>
-
-      {/* Trend */}
+      </Typography>
       {trend && trendValue && (
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <TrendIcon size={14} style={{ color: trendColor }} />
-          <span
-            style={{ fontSize: "0.78rem", fontWeight: 600, color: trendColor }}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <TrendArrow />
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 700, color: trendColor }}
           >
             {trendValue}
-          </span>
-        </div>
+          </Typography>
+        </Box>
       )}
-    </MuiCard>
-  );
-}
-
-// ── Review Card ───────────────────────────────────────────────────────────────
-/**
- * @param {{ _id, author: { username }, rating, comment, createdAt }} review
- * @param {boolean} canDelete
- * @param {Function} onDelete
- */
-export function ReviewCardDS({ review, canDelete = false, onDelete }) {
-  const initial = review.author?.username?.[0]?.toUpperCase() ?? "?";
-
-  return (
-    <MuiCard
-      elevation={0}
-      sx={{
-        borderRadius: radii.xl,
-        border: `1px solid ${colors.neutral[200]}`,
-        transition: `box-shadow ${transitions.base}`,
-        "&:hover": { boxShadow: shadows.sm },
-      }}
-    >
-      <CardContent>
-        {/* Author row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: 12,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {/* Avatar */}
-            <div
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: "50%",
-                background: colors.brand[50],
-                color: colors.brand[600],
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 700,
-                fontSize: "0.9rem",
-                flexShrink: 0,
-              }}
-            >
-              {initial}
-            </div>
-            <div>
-              <p
-                style={{ fontWeight: 600, fontSize: "0.9rem", marginBottom: 2 }}
-              >
-                @{review.author?.username ?? "unknown"}
-              </p>
-              <StarRating rating={review.rating} size={14} />
-            </div>
-          </div>
-
-          {canDelete && (
-            <button
-              onClick={onDelete}
-              aria-label="Delete review"
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: colors.neutral[400],
-                padding: "4px",
-                borderRadius: radii.sm,
-                transition: `color ${transitions.fast}`,
-                display: "flex",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.color = colors.error.main)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = colors.neutral[400])
-              }
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
-        {/* Comment */}
-        <p
-          style={{
-            fontSize: "0.9rem",
-            lineHeight: 1.6,
-            color: colors.neutral[700],
-            marginBottom: 8,
-          }}
-        >
-          {review.comment}
-        </p>
-
-        {/* Date */}
-        {review.createdAt && (
-          <time
-            dateTime={review.createdAt}
-            style={{ fontSize: "0.78rem", color: colors.neutral[400] }}
-          >
-            {new Date(review.createdAt).toLocaleDateString("en-IN", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </time>
-        )}
-      </CardContent>
     </MuiCard>
   );
 }
