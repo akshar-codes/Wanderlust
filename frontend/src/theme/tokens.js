@@ -121,19 +121,31 @@ export const shadows = {
   md: `0 4px 6px rgba(${s},.07), 0 2px 4px rgba(${s},.05)`,
   lg: `0 10px 15px rgba(${s},.08), 0 4px 6px rgba(${s},.04)`,
   xl: `0 20px 25px rgba(${s},.08), 0 8px 10px rgba(${s},.04)`,
+  "2xl": `0 25px 50px rgba(${s},.12)`,
+  "3xl": `0 35px 60px rgba(${s},.15)`,
   brand: `0 4px 14px rgba(255,90,95,.30), 0 2px 6px rgba(255,90,95,.18)`,
   brandLg: `0 8px 24px rgba(255,90,95,.35), 0 4px 10px rgba(255,90,95,.20)`,
   card: `0 2px 8px rgba(${s},.07), 0 0 1px rgba(${s},.05)`,
   cardHover: `0 8px 24px rgba(${s},.10), 0 2px 6px rgba(${s},.06)`,
   focus: `0 0 0 3px rgba(255,90,95,.28)`,
+  focusPrimary: `0 0 0 3px rgba(255,90,95,.25)`,
+  float: `0 12px 32px rgba(${s},.12)`,
 };
 
 // ─── Motion ───────────────────────────────────────────────────────────────────
 export const motion = {
-  fast: "120ms cubic-bezier(0.2,0,0,1)",
-  base: "200ms cubic-bezier(0.4,0,0.2,1)",
-  moderate: "280ms cubic-bezier(0.4,0,0.2,1)",
-  spring: "400ms cubic-bezier(0.34,1.56,0.64,1)",
+  duration: {
+    fastest: 100,
+    fast: 150,
+    normal: 250,
+    slow: 350,
+  },
+
+  easing: {
+    easeIn: "cubic-bezier(0.4,0,1,1)",
+    easeOut: "cubic-bezier(0,0,0.2,1)",
+    easeInOut: "cubic-bezier(0.4,0,0.2,1)",
+  },
 };
 
 export const zIndex = {
@@ -141,4 +153,39 @@ export const zIndex = {
   drawer: 1200,
   popover: 1100,
   toast: 1400,
+};
+
+export const breakpoints = {
+  values: {
+    xs: 0,
+    sm: 600,
+    md: 900,
+    lg: 1200,
+    xl: 1536,
+  },
+};
+
+export const colors = {
+  primary: brand,
+  secondary: teal,
+  neutral,
+  success: semantic.success,
+  warning: semantic.warning,
+  error: semantic.error,
+  info: semantic.info,
+  dark,
+};
+
+export const spacing = {
+  0: "0",
+  1: "4px",
+  2: "8px",
+  3: "12px",
+  4: "16px",
+  5: "20px",
+  6: "24px",
+  7: "32px",
+  8: "40px",
+  9: "48px",
+  10: "64px",
 };

@@ -614,7 +614,6 @@ function GuestButtons() {
             display: "inline-flex",
             alignItems: "center",
             padding: "8px 16px",
-            background: "transparent",
             border: "1.5px solid rgba(230,224,218,0.9)",
             borderRadius: 999,
             fontSize: "0.875rem",

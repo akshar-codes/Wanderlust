@@ -4,14 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useListings } from "../hooks/useListings";
 import ListingCard from "../components/listings/ListingCard";
 import CategoryFilters from "../components/listings/CategoryFilters";
-import {
-  ListingsGridSkeleton,
-  EmptyState,
-  ErrorBanner,
-  ScrollReveal,
-  StaggerContainer,
-  StaggerItem,
-} from "../components/common/GlobalStates";
+import { Skeleton, EmptyState } from "../components/ui";
 
 export default function ListingsPage() {
   const [searchParams] = useSearchParams();
@@ -51,9 +44,13 @@ export default function ListingsPage() {
 
   return (
     <div style={{ paddingTop: 8 }}>
-      <ScrollReveal direction="down" delay={0.05}>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35 }}
+      >
         <CategoryFilters showTax={showTax} onTaxToggle={setShowTax} />
-      </ScrollReveal>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {isLoading ? (
@@ -63,7 +60,7 @@ export default function ListingsPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <ListingsGridSkeleton count={8} />
+            <Skeleton.Grid count={8} />
           </motion.div>
         ) : isError ? (
           <motion.div
@@ -116,12 +113,21 @@ export default function ListingsPage() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <StaggerContainer
-              staggerDelay={0.06}
+            <motion.div
+              variants={{
+                hidden: {},
+                show: {
+                  transition: {
+                    staggerChildren: 0.06,
+                  },
+                },
+              }}
+              initial="hidden"
+              animate="show"
               style={{
                 display: "grid",
                 gap: "28px 20px",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
               }}
             >
               {filtered.map((listing) => (
@@ -129,8 +135,7 @@ export default function ListingsPage() {
                   <ListingCard listing={listing} showTax={showTax} />
                 </StaggerItem>
               ))}
-            </StaggerContainer>
-
+            </motion.div>
             {/* Results count */}
             <motion.div
               initial={{ opacity: 0 }}

@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../store/auth.store";
-import { Spinner } from "../common/GlobalStates";
+import Spinner from "../common/Spinner";
 
 /** Full-screen loading screen shown while the session is being hydrated */
 function SplashLoader() {

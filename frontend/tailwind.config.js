@@ -1,4 +1,5 @@
 export default {
+  darkMode: "class",
   // ── Purge / Content paths ────────────────────────────────────────────────
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 

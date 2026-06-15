@@ -1,15 +1,19 @@
 import { createTheme, alpha } from "@mui/material/styles";
 import {
   colors,
-  typography,
+  brand,
+  teal,
+  neutral,
+  semantic,
+  dark,
+  fonts,
+  fontSizes,
   spacing,
   radii,
   shadows,
   motion,
   breakpoints,
   zIndex,
-  components as compTokens,
-  cssVariables,
 } from "./tokens";
 
 // ─── CSS Variable Injection ───────────────────────────────────────────────────

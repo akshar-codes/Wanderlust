@@ -202,7 +202,6 @@ function Lightbox({ images, initialIdx, onClose }) {
 
       {/* Image */}
       <div
-        onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: "90vw",
           maxHeight: "90vh",

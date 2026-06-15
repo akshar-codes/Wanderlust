@@ -13,7 +13,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { colors, radii } from "../../theme/tokens";
+import { brand, neutral, radii } from "../../theme/tokens";
 
 // ── Helper: stable sort ───────────────────────────────────────────────────────
 function stableSort(array, comparator) {
@@ -79,7 +79,7 @@ export function Table({
         elevation={0}
         sx={{
           borderRadius: radii.xl,
-          border: `1px solid ${colors.neutral[200]}`,
+          border: `1px solid ${neutral[200]}`,
           overflow: "hidden",
           ...(maxHeight ? { maxHeight, overflow: "auto" } : {}),
         }}
@@ -95,8 +95,8 @@ export function Table({
                   sortDirection={orderBy === col.key ? order : false}
                   sx={{
                     width: col.width,
-                    background: colors.neutral[50],
-                    borderBottom: `2px solid ${colors.neutral[200]}`,
+                    background: neutral[50],
+                    borderBottom: `2px solid ${neutral[200]}`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -109,10 +109,10 @@ export function Table({
                         "& .MuiTableSortLabel-icon": { opacity: 0.4 },
                         "&.Mui-active .MuiTableSortLabel-icon": {
                           opacity: 1,
-                          color: colors.brand[500],
+                          color: brand[500],
                         },
-                        "&.Mui-active": { color: colors.brand[500] },
-                        "&:hover": { color: colors.neutral[800] },
+                        "&.Mui-active": { color: brand[500] },
+                        "&:hover": { color: neutral[800] },
                       }}
                     >
                       {col.label}
@@ -145,7 +145,7 @@ export function Table({
                 <TableCell
                   colSpan={columns.length}
                   align="center"
-                  sx={{ py: 6, color: colors.neutral[400] }}
+                  sx={{ py: 6, color: neutral[400] }}
                 >
                   <Typography variant="body2">{emptyMessage}</Typography>
                 </TableCell>

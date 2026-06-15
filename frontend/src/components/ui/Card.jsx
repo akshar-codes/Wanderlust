@@ -316,4 +316,6 @@ export function StatsCard({ label, value, icon, trend, trendValue }) {
   );
 }
 
+export const ReviewCardDS = Card;
+
 export default Card;

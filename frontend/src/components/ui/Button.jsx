@@ -102,6 +102,27 @@ export const Button = forwardRef(function Button(
 });
 
 /**
+ * LoadingButton
+ * Always displays the loading spinner when loading=true.
+ * Behaves like a normal Button otherwise.
+ */
+export const LoadingButton = forwardRef(function LoadingButton(
+  { loading = true, loadingText, children, disabled, ...props },
+  ref,
+) {
+  return (
+    <Button
+      ref={ref}
+      loading={loading}
+      disabled={loading || disabled}
+      {...props}
+    >
+      {loading && loadingText ? loadingText : children}
+    </Button>
+  );
+});
+
+/**
  * IconButton — circular icon-only action
  */
 export const IconButton = forwardRef(function IconButton(
