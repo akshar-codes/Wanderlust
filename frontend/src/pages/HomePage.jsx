@@ -1,893 +1,103 @@
-/**
- * Wanderlust — Redesigned Homepage
- *
- * Drop-in replacement for the existing wanderlust-react frontend.
- * Compatible with the existing Express backend API at /api.
- *
- * How to integrate:
- *  1. Copy this file to wanderlust-react/src/pages/HomePage.jsx
- *  2. In App.jsx, add a route for "/" → <HomePage />
- *     (before the redirect to /listings)
- *  3. npm install @mui/material @mui/icons-material @emotion/react @emotion/styled
- *  4. The component self-imports everything it needs from MUI + existing hooks.
- *
- * All API calls use the existing hooks (useListings) and services — fully compatible.
- */
-
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useListings } from "../hooks/useListings";
 
-// ─── Inline CSS-variables theme (no build step needed) ───────────────────────
-const THEME = {
-  coral: "#FF5A5F",
-  coralDark: "#E04E53",
-  coralLight: "#FFF0F0",
-  teal: "#00A699",
-  navy: "#0D1B2A",
-  sand: "#F7F4EF",
-  warmWhite: "#FDFCFB",
-  slate: "#6B7280",
-  border: "#E5E0D8",
-  gold: "#F59E0B",
-};
+// ─── Inline styles injected once ─────────────────────────────────────────────
+const GLOBAL_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-// ─── Tiny keyframe injection ──────────────────────────────────────────────────
-const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --coral: #FF5A5F;
-    --coral-dark: #E04E53;
-    --teal: #00A699;
-    --navy: #0D1B2A;
-    --sand: #F7F4EF;
-    --warm-white: #FDFCFB;
-    --slate: #6B7280;
-    --border: #E5E0D8;
-    --gold: #F59E0B;
-    --font-display: 'Cormorant Garamond', Georgia, serif;
-    --font-body: 'Outfit', system-ui, sans-serif;
-    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(32px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50%       { transform: translateY(-12px); }
-  }
-  @keyframes shimmer {
-    0%   { background-position: -800px 0; }
-    100% { background-position: 800px 0; }
-  }
-  @keyframes pulse-ring {
-    0%   { transform: scale(0.8); opacity: 1; }
-    100% { transform: scale(2); opacity: 0; }
-  }
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.92); }
-    to   { opacity: 1; transform: scale(1); }
-  }
-  @keyframes slideRight {
-    from { transform: translateX(-20px); opacity: 0; }
-    to   { transform: translateX(0); opacity: 1; }
-  }
-  @keyframes ticker {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-
-  .wl-page {
-    font-family: var(--font-body);
-    background: var(--warm-white);
-    color: var(--navy);
+  .hp-root {
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    color: #1a1410;
+    background: #fdfcfb;
     overflow-x: hidden;
   }
 
-  /* ─── Skeleton loader ────────────────── */
-  .skeleton {
-    background: linear-gradient(90deg, #f0ece4 25%, #e8e3db 50%, #f0ece4 75%);
+  /* ── Keyframes ── */
+  @keyframes hp-fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes hp-shimmer {
+    0%   { background-position: -800px 0; }
+    100% { background-position:  800px 0; }
+  }
+  @keyframes hp-pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.4); opacity: 0.6; }
+  }
+  @keyframes hp-ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes hp-float {
+    0%, 100% { transform: translateY(0px) rotate(-1deg); }
+    50%       { transform: translateY(-10px) rotate(1deg); }
+  }
+  @keyframes hp-gradient-shift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ── Skeleton ── */
+  .hp-skeleton {
+    background: linear-gradient(90deg, #f0ece4 25%, #e6e1d9 50%, #f0ece4 75%);
     background-size: 800px 100%;
-    animation: shimmer 1.6s infinite;
+    animation: hp-shimmer 1.5s ease-in-out infinite;
     border-radius: 12px;
   }
 
-  /* ─── Hero ───────────────────────────── */
-  .hero {
-    position: relative;
-    min-height: 92vh;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    background: var(--navy);
+  /* ── Scrollbar hide ── */
+  .hp-scroll-hide { scrollbar-width: none; }
+  .hp-scroll-hide::-webkit-scrollbar { display: none; }
+
+  /* ── Section fade-in ── */
+  .hp-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
   }
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(0,166,153,0.18) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 80% at 20% 80%, rgba(255,90,95,0.22) 0%, transparent 55%),
-      linear-gradient(135deg, #0D1B2A 0%, #1a3a4a 100%);
-  }
-  .hero-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 120px 48px 80px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-  }
-  .hero-text { animation: fadeUp 0.9s var(--ease-smooth) both; }
-  .hero-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255,90,95,0.15);
-    border: 1px solid rgba(255,90,95,0.3);
-    color: #FF8A8E;
-    padding: 6px 14px;
-    border-radius: 100px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 28px;
-  }
-  .hero-eyebrow-dot {
-    width: 6px; height: 6px;
-    background: var(--coral);
-    border-radius: 50%;
-    position: relative;
-  }
-  .hero-eyebrow-dot::after {
-    content: '';
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    border: 1.5px solid var(--coral);
-    animation: pulse-ring 1.5s ease infinite;
-  }
-  .hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(3.2rem, 5.5vw, 5.5rem);
-    font-weight: 300;
-    line-height: 1.08;
-    color: #fff;
-    letter-spacing: -0.01em;
-    margin-bottom: 24px;
-  }
-  .hero-title em {
-    font-style: italic;
-    color: var(--coral);
-  }
-  .hero-subtitle {
-    font-size: 1.05rem;
-    color: rgba(255,255,255,0.6);
-    line-height: 1.75;
-    max-width: 420px;
-    margin-bottom: 44px;
-    font-weight: 300;
-  }
-  .hero-cta-row {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--coral);
-    color: #fff;
-    padding: 14px 28px;
-    border-radius: 100px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.2s var(--ease-smooth);
-    border: none;
-    cursor: pointer;
-    font-family: var(--font-body);
-  }
-  .btn-primary:hover {
-    background: var(--coral-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(255,90,95,0.35);
-  }
-  .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: transparent;
-    color: rgba(255,255,255,0.8);
-    padding: 14px 24px;
-    border-radius: 100px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    text-decoration: none;
-    border: 1.5px solid rgba(255,255,255,0.2);
-    transition: all 0.2s var(--ease-smooth);
-    cursor: pointer;
-    font-family: var(--font-body);
-  }
-  .btn-ghost:hover {
-    border-color: rgba(255,255,255,0.5);
-    background: rgba(255,255,255,0.07);
-  }
-  .hero-stats {
-    display: flex;
-    gap: 40px;
-    margin-top: 56px;
-    padding-top: 40px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-  .hero-stat-num {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    color: #fff;
-    font-weight: 600;
-    line-height: 1;
-  }
-  .hero-stat-label {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.45);
-    margin-top: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  .hp-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
-  /* Hero visual card cluster */
-  .hero-visual {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 16px;
-    animation: scaleIn 1s 0.3s var(--ease-smooth) both;
-  }
-  .hero-card {
-    border-radius: 20px;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.35s var(--ease-spring);
-  }
-  .hero-card:hover { transform: scale(1.03) translateY(-4px); }
-  .hero-card--large {
-    grid-row: span 2;
-    min-height: 380px;
-  }
-  .hero-card--sm { min-height: 180px; }
-  .hero-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .hero-card-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%);
-  }
-  .hero-card-label {
-    position: absolute;
-    bottom: 14px;
-    left: 14px;
-    right: 14px;
-    color: #fff;
-    font-size: 0.82rem;
-    font-weight: 600;
-  }
-  .hero-card-price {
-    display: inline-block;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(8px);
-    padding: 3px 10px;
-    border-radius: 100px;
-    font-size: 0.75rem;
-    margin-top: 4px;
-  }
-
-  /* ─── Search bar (floating) ──────────────── */
-  .search-bar-wrap {
-    position: relative;
-    z-index: 10;
-    max-width: 1000px;
-    margin: -36px auto 0;
-    padding: 0 24px;
-    animation: fadeUp 0.8s 0.5s both;
-  }
-  .search-bar {
-    background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 24px 80px rgba(13,27,42,0.18), 0 2px 12px rgba(13,27,42,0.08);
-    display: flex;
-    align-items: stretch;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-  .search-field {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 16px 24px;
-    border-right: 1px solid var(--border);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .search-field:last-of-type { border-right: none; }
-  .search-field:hover { background: #fafaf8; }
-  .search-field label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--navy);
-    margin-bottom: 4px;
-  }
-  .search-field input,
-  .search-field select {
-    border: none;
-    outline: none;
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    color: var(--slate);
-    background: transparent;
-    width: 100%;
-  }
-  .search-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--coral);
-    color: #fff;
-    border: none;
-    padding: 0 28px;
-    font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    flex-shrink: 0;
-    border-radius: 0 24px 24px 0;
-  }
-  .search-btn:hover { background: var(--coral-dark); }
-
-  /* ─── Section scaffolding ────────────────── */
-  .section {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 80px 48px;
-  }
-  .section-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 48px;
-    gap: 20px;
-  }
-  .section-eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--coral);
-    margin-bottom: 10px;
-  }
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 3.5vw, 3rem);
-    font-weight: 400;
-    line-height: 1.15;
-    color: var(--navy);
-  }
-  .section-title em {
-    font-style: italic;
-    color: var(--coral);
-  }
-  .view-all {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--navy);
-    text-decoration: none;
-    border-bottom: 1.5px solid var(--navy);
-    padding-bottom: 2px;
-    white-space: nowrap;
-    transition: color 0.15s, border-color 0.15s;
-    flex-shrink: 0;
-  }
-  .view-all:hover { color: var(--coral); border-color: var(--coral); }
-
-  /* ─── Destination cards ──────────────────── */
-  .destinations-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-  .dest-card {
-    position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-    aspect-ratio: 3/4;
-    cursor: pointer;
-    transition: transform 0.35s var(--ease-spring), box-shadow 0.35s;
-    text-decoration: none;
-  }
-  .dest-card:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 24px 60px rgba(13,27,42,0.18);
-  }
-  .dest-card img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s var(--ease-smooth);
-  }
-  .dest-card:hover img { transform: scale(1.06); }
-  .dest-card-gradient {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(13,27,42,0.8) 0%, rgba(13,27,42,0.2) 50%, transparent 100%);
-  }
-  .dest-card-info {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    padding: 24px 20px;
-    color: #fff;
-  }
-  .dest-card-city {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 400;
-    line-height: 1.1;
-    margin-bottom: 4px;
-  }
-  .dest-card-count {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.7);
-    font-weight: 400;
-  }
-  .dest-card-tag {
-    position: absolute;
-    top: 16px; right: 16px;
-    background: rgba(255,255,255,0.18);
-    backdrop-filter: blur(10px);
-    color: #fff;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 100px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-  }
-
-  /* ─── Category pills ─────────────────────── */
-  .cats-section {
-    background: var(--sand);
-    padding: 64px 0;
-  }
-  .cats-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 48px;
-  }
-  .cats-scroll {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    scrollbar-width: none;
-    margin-top: 36px;
-  }
-  .cats-scroll::-webkit-scrollbar { display: none; }
-  .cat-pill {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 20px 24px;
-    background: #fff;
-    border: 1.5px solid var(--border);
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s var(--ease-smooth);
-    text-decoration: none;
-    color: var(--navy);
-    white-space: nowrap;
-    flex-shrink: 0;
-    min-width: 100px;
-  }
-  .cat-pill:hover, .cat-pill--active {
-    border-color: var(--coral);
-    background: var(--coral);
-    color: #fff;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(255,90,95,0.25);
-  }
-  .cat-pill-icon { font-size: 1.6rem; line-height: 1; }
-  .cat-pill-label { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.02em; }
-
-  /* ─── Listings grid ──────────────────────── */
-  .listings-section { background: var(--warm-white); }
-  .listings-grid-home {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 28px;
-  }
-  .listing-card-home {
-    border-radius: 20px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid var(--border);
-    transition: transform 0.3s var(--ease-spring), box-shadow 0.3s;
-    cursor: pointer;
-    text-decoration: none;
-    color: var(--navy);
-    display: flex;
-    flex-direction: column;
-    animation: fadeUp 0.6s var(--ease-smooth) both;
-  }
-  .listing-card-home:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 60px rgba(13,27,42,0.12);
-  }
-  .listing-card-home:nth-child(1) { animation-delay: 0s; }
-  .listing-card-home:nth-child(2) { animation-delay: 0.08s; }
-  .listing-card-home:nth-child(3) { animation-delay: 0.16s; }
-  .listing-card-home:nth-child(4) { animation-delay: 0.24s; }
-  .listing-card-home:nth-child(5) { animation-delay: 0.32s; }
-  .listing-card-home:nth-child(6) { animation-delay: 0.40s; }
-  .listing-img-wrap {
-    position: relative;
-    aspect-ratio: 4/3;
-    overflow: hidden;
-    flex-shrink: 0;
-  }
-  .listing-img-wrap img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s var(--ease-smooth);
-  }
-  .listing-card-home:hover .listing-img-wrap img { transform: scale(1.06); }
-  .listing-badge {
-    position: absolute;
-    top: 12px; left: 12px;
-    background: var(--coral);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 100px;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-  }
-  .listing-fav {
-    position: absolute;
-    top: 12px; right: 12px;
-    width: 32px; height: 32px;
-    background: rgba(255,255,255,0.9);
-    backdrop-filter: blur(6px);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: none;
-    font-size: 1rem;
-    transition: transform 0.2s var(--ease-spring);
-  }
-  .listing-fav:hover { transform: scale(1.15); }
-  .listing-fav--active { background: #FFE5E5; }
-  .listing-body {
-    padding: 18px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-  }
-  .listing-location {
-    font-size: 0.72rem;
-    color: var(--slate);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .listing-title-home {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    font-weight: 400;
-    line-height: 1.3;
-    color: var(--navy);
-  }
-  .listing-meta-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 4px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-  }
-  .listing-price-home {
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--navy);
-  }
-  .listing-price-home span {
-    font-weight: 400;
-    font-size: 0.8rem;
-    color: var(--slate);
-  }
-  .listing-rating {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--navy);
-  }
-  .listing-rating-star { color: var(--gold); font-size: 0.9rem; }
-  .listing-category-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--sand);
-    color: var(--slate);
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 100px;
-    text-transform: capitalize;
-  }
-
-  /* ─── Ticker / marquee ───────────────────── */
-  .ticker-wrap {
-    background: var(--navy);
-    overflow: hidden;
-    padding: 16px 0;
-  }
-  .ticker-inner {
-    display: flex;
-    white-space: nowrap;
-    animation: ticker 30s linear infinite;
-    will-change: transform;
-  }
-  .ticker-inner:hover { animation-play-state: paused; }
-  .ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 16px;
-    padding: 0 40px;
-    color: rgba(255,255,255,0.7);
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .ticker-dot {
-    width: 4px; height: 4px;
-    background: var(--coral);
-    border-radius: 50%;
-  }
-
-  /* ─── Value props ─────────────────────────── */
-  .values-section {
-    background: linear-gradient(135deg, var(--navy) 0%, #1a3a4a 100%);
-    padding: 80px 0;
-  }
-  .values-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 48px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 40px;
-  }
-  .value-item {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 36px 28px;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.04);
-    transition: all 0.25s;
-  }
-  .value-item:hover {
-    background: rgba(255,255,255,0.07);
-    border-color: rgba(255,90,95,0.3);
-    transform: translateY(-4px);
-  }
-  .value-icon {
-    width: 48px; height: 48px;
-    background: rgba(255,90,95,0.15);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.4rem;
-  }
-  .value-title {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    color: #fff;
-    font-weight: 400;
-  }
-  .value-desc {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.55);
-    line-height: 1.7;
-    font-weight: 300;
-  }
-
-  /* ─── CTA banner ─────────────────────────── */
-  .cta-section {
-    max-width: 1280px;
-    margin: 80px auto;
-    padding: 0 48px;
-  }
-  .cta-card {
-    background: var(--coral);
-    border-radius: 28px;
-    padding: 72px 80px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 48px;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .cta-card::before {
-    content: '';
-    position: absolute;
-    top: -40%;
-    right: 0;
-    width: 60%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-  }
-  .cta-card::after {
-    content: '';
-    position: absolute;
-    bottom: -60%;
-    left: 10%;
-    width: 40%;
-    height: 150%;
-    background: radial-gradient(circle, rgba(0,0,0,0.08) 0%, transparent 60%);
-  }
-  .cta-eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 16px;
-  }
-  .cta-title {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 3vw, 2.8rem);
-    font-weight: 400;
-    color: #fff;
-    line-height: 1.15;
-    margin-bottom: 16px;
-  }
-  .cta-subtitle {
-    color: rgba(255,255,255,0.8);
-    font-size: 1rem;
-    font-weight: 300;
-    line-height: 1.6;
-  }
-  .cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #fff;
-    color: var(--coral);
-    padding: 16px 32px;
-    border-radius: 100px;
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.2s;
-    white-space: nowrap;
-    flex-shrink: 0;
-    font-family: var(--font-body);
-    border: none;
-    cursor: pointer;
-  }
-  .cta-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-  }
-
-  /* ─── Responsive ─────────────────────────── */
-  @media (max-width: 1024px) {
-    .hero-content { grid-template-columns: 1fr; gap: 48px; padding: 100px 32px 60px; }
-    .hero-visual { display: none; }
-    .destinations-grid { grid-template-columns: repeat(2, 1fr); }
-    .listings-grid-home { grid-template-columns: repeat(2, 1fr); }
-    .values-inner { grid-template-columns: repeat(2, 1fr); }
-    .cta-card { grid-template-columns: 1fr; padding: 48px; }
-    .section { padding: 60px 32px; }
-    .cats-inner { padding: 0 32px; }
-  }
-  @media (max-width: 640px) {
-    .hero-title { font-size: 2.6rem; }
-    .search-bar { flex-direction: column; border-radius: 20px; }
-    .search-field { border-right: none; border-bottom: 1px solid var(--border); }
-    .search-btn { border-radius: 0 0 20px 20px; padding: 16px; justify-content: center; }
-    .destinations-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .listings-grid-home { grid-template-columns: 1fr; }
-    .values-inner { grid-template-columns: 1fr; }
-    .section { padding: 48px 20px; }
-    .search-bar-wrap { padding: 0 16px; }
-    .cta-card { padding: 36px 24px; }
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
 `;
 
-// ─── Destination data (uses real listing data or falls back to placeholders) ──
-const TRENDING_DESTINATIONS = [
-  {
-    city: "Bali",
-    country: "Indonesia",
-    tag: "Trending",
-    img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80",
-    count: "240+ stays",
-  },
-  {
-    city: "Santorini",
-    country: "Greece",
-    tag: "Popular",
-    img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&q=80",
-    count: "180+ stays",
-  },
-  {
-    city: "Kyoto",
-    country: "Japan",
-    tag: "Hidden gem",
-    img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&q=80",
-    count: "120+ stays",
-  },
-  {
-    city: "Tuscany",
-    country: "Italy",
-    tag: "Romantic",
-    img: "https://images.unsplash.com/photo-1547754980-3df97fed72a8?w=600&q=80",
-    count: "95+ stays",
-  },
-];
+// ─── Design tokens ────────────────────────────────────────────────────────────
+const C = {
+  coral: "#FF5A5F",
+  coralDark: "#E04E53",
+  coralLight: "#FFF0F0",
+  coralGlow: "rgba(255,90,95,0.22)",
+  teal: "#0D9488",
+  navy: "#1a1410",
+  navyLight: "#2d2520",
+  warmWhite: "#FDFCFB",
+  sand: "#F7F4EF",
+  sandDark: "#EDE9E2",
+  slate: "#6B7280",
+  slateLight: "#9CA3AF",
+  gold: "#F59E0B",
+  border: "#E8E3DC",
+  green: "#10B981",
+};
 
+const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
+const FONT_BODY = "'Plus Jakarta Sans', system-ui, sans-serif";
+
+// ─── Static data ──────────────────────────────────────────────────────────────
 const CATEGORIES = [
-  { key: null, icon: "⊞", label: "All" },
+  { key: null, icon: "✦", label: "All" },
   { key: "trending", icon: "🔥", label: "Trending" },
   { key: "rooms", icon: "🛏", label: "Rooms" },
-  { key: "iconic", icon: "🏙", label: "Iconic City" },
+  { key: "iconic", icon: "🏙", label: "Iconic" },
   { key: "mountains", icon: "⛰", label: "Mountains" },
   { key: "castles", icon: "🏰", label: "Castles" },
   { key: "pools", icon: "🏊", label: "Pools" },
@@ -898,579 +108,2419 @@ const CATEGORIES = [
   { key: "boats", icon: "⛵", label: "Boats" },
 ];
 
-const VALUES = [
+const DESTINATIONS = [
   {
-    icon: "🛡️",
-    title: "Verified Listings",
-    desc: "Every property is reviewed and verified by our trust & safety team before going live.",
+    city: "Santorini",
+    country: "Greece",
+    tag: "Most loved",
+    stays: "240+",
+    img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=700&q=80",
+    color: "#2563EB",
   },
   {
-    icon: "💬",
-    title: "24/7 Support",
-    desc: "Real humans available around the clock. No bots — real help when you need it most.",
+    city: "Kyoto",
+    country: "Japan",
+    tag: "Hidden gem",
+    stays: "185+",
+    img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=700&q=80",
+    color: "#7C3AED",
   },
   {
-    icon: "🔑",
-    title: "Flexible Booking",
-    desc: "Change your plans? Most hosts offer free cancellation up to 48 hours before arrival.",
+    city: "Tuscany",
+    country: "Italy",
+    tag: "Romantic",
+    stays: "320+",
+    img: "https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=700&q=80",
+    color: "#D97706",
   },
   {
-    icon: "🌍",
-    title: "Local Experiences",
-    desc: "Handpicked stays that put you in the heart of each destination's community.",
+    city: "Bali",
+    country: "Indonesia",
+    tag: "Trending",
+    stays: "410+",
+    img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=700&q=80",
+    color: "#059669",
+  },
+  {
+    city: "Patagonia",
+    country: "Argentina",
+    tag: "Wild",
+    stays: "90+",
+    img: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=700&q=80",
+    color: "#0369A1",
+  },
+];
+
+const EXPERIENCES = [
+  {
+    title: "Sunset Sailing",
+    location: "Amalfi Coast, Italy",
+    duration: "3 hours",
+    price: 4200,
+    rating: 4.97,
+    reviews: 312,
+    img: "https://images.unsplash.com/photo-1548574505-5e239809ee19?w=600&q=80",
+  },
+  {
+    title: "Truffle Hunting",
+    location: "Périgord, France",
+    duration: "Half day",
+    price: 6800,
+    rating: 4.95,
+    reviews: 189,
+    img: "https://images.unsplash.com/photo-1505253758473-96b7015fcd40?w=600&q=80",
+  },
+  {
+    title: "Northern Lights",
+    location: "Tromsø, Norway",
+    duration: "Full night",
+    price: 8500,
+    rating: 4.98,
+    reviews: 524,
+    img: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=600&q=80",
+  },
+  {
+    title: "Rice Paddy Walk",
+    location: "Ubud, Bali",
+    duration: "4 hours",
+    price: 2100,
+    rating: 4.92,
+    reviews: 847,
+    img: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&q=80",
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    name: "Priya Sharma",
+    location: "Mumbai, India",
+    avatar: "P",
+    avatarColor: "#7C3AED",
+    text: "We booked a cliffside villa in Santorini through Wanderlust and it exceeded every expectation. The host was exceptional, the property was stunning, and the whole experience felt effortless.",
+    property: "Cliffside Villa · Santorini",
+    rating: 5,
+    date: "March 2025",
+  },
+  {
+    name: "James Okafor",
+    location: "London, UK",
+    avatar: "J",
+    avatarColor: "#0369A1",
+    text: "I've used every major booking platform and Wanderlust is categorically different. The curation is impeccable — no filler properties, just places with genuine character.",
+    property: "Kyoto Machiya · Japan",
+    rating: 5,
+    date: "January 2025",
+  },
+  {
+    name: "Elena Vasquez",
+    location: "Barcelona, Spain",
+    avatar: "E",
+    avatarColor: "#059669",
+    text: "The Northern Lights experience they recommended changed my life. The guide was knowledgeable, the conditions were perfect, and the photos I got were magazine-worthy.",
+    property: "Aurora Glamping · Norway",
+    rating: 5,
+    date: "February 2025",
   },
 ];
 
 const TICKER_ITEMS = [
-  "10,000+ Properties",
-  "180+ Countries",
-  "Trusted by Millions",
-  "Best Price Guarantee",
-  "Instant Confirmation",
-  "24/7 Support",
-  "No Hidden Fees",
-  "Verified Hosts",
-  "Top Rated Stays",
+  "10,000+ verified properties",
+  "180 countries",
+  "Trusted by millions",
+  "Best price guarantee",
+  "Instant confirmation",
+  "24/7 support",
+  "No hidden fees",
+  "Superhost network",
 ];
 
-// ─── Skeleton card ────────────────────────────────────────────────────────────
-function SkeletonCard() {
+// ─── Framer Motion variants ───────────────────────────────────────────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  }),
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+// ─── Reveal wrapper ───────────────────────────────────────────────────────────
+function Reveal({ children, delay = 0, style }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
   return (
-    <div
-      style={{
-        borderRadius: 20,
-        overflow: "hidden",
-        background: "#fff",
-        border: "1px solid #E5E0D8",
-      }}
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      variants={fadeUp}
+      custom={delay}
+      style={style}
     >
-      <div className="skeleton" style={{ aspectRatio: "4/3", width: "100%" }} />
+      {children}
+    </motion.div>
+  );
+}
+
+// ─── Section title component ──────────────────────────────────────────────────
+function SectionTitle({ eyebrow, title, subtitle, center = false }) {
+  return (
+    <div style={{ textAlign: center ? "center" : "left", marginBottom: 40 }}>
+      {eyebrow && (
+        <p
+          style={{
+            fontFamily: FONT_BODY,
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: C.coral,
+            marginBottom: 10,
+          }}
+        >
+          {eyebrow}
+        </p>
+      )}
+      <h2
+        style={{
+          fontFamily: FONT_DISPLAY,
+          fontSize: "clamp(1.9rem, 3.2vw, 2.8rem)",
+          fontWeight: 400,
+          lineHeight: 1.12,
+          color: C.navy,
+          letterSpacing: "-0.01em",
+          marginBottom: subtitle ? 12 : 0,
+        }}
+      >
+        {title}
+      </h2>
+      {subtitle && (
+        <p
+          style={{
+            fontFamily: FONT_BODY,
+            fontSize: "1rem",
+            color: C.slate,
+            lineHeight: 1.65,
+            maxWidth: center ? 520 : "none",
+            marginInline: center ? "auto" : undefined,
+            fontWeight: 400,
+          }}
+        >
+          {subtitle}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─── Star rating ──────────────────────────────────────────────────────────────
+function Stars({ rating, size = 13 }) {
+  return (
+    <span style={{ display: "inline-flex", gap: 1 }}>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <svg key={i} width={size} height={size} viewBox="0 0 24 24">
+          <path
+            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+            fill={i <= Math.round(rating) ? C.gold : "#E5E7EB"}
+            stroke="none"
+          />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
+// ─── Skeleton variants ────────────────────────────────────────────────────────
+function ListingCardSkeleton() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div
+        className="hp-skeleton"
+        style={{ aspectRatio: "4/3", borderRadius: 18 }}
+      />
       <div
         style={{
-          padding: "18px 20px 20px",
+          padding: "0 2px",
           display: "flex",
           flexDirection: "column",
-          gap: 10,
+          gap: 8,
         }}
       >
         <div
-          className="skeleton"
+          className="hp-skeleton"
           style={{ height: 12, width: "40%", borderRadius: 6 }}
         />
         <div
-          className="skeleton"
+          className="hp-skeleton"
           style={{ height: 18, width: "75%", borderRadius: 6 }}
         />
         <div
-          className="skeleton"
-          style={{ height: 14, width: "55%", borderRadius: 6 }}
+          className="hp-skeleton"
+          style={{ height: 13, width: "55%", borderRadius: 6 }}
         />
       </div>
     </div>
   );
 }
 
-// ─── Listing card ─────────────────────────────────────────────────────────────
-function ListingCardHome({ listing, index }) {
-  const [fav, setFav] = useState(false);
-  const isNew = index < 3;
-  const rating = (4.2 + Math.random() * 0.7).toFixed(1);
-  const reviewCount = Math.floor(12 + Math.random() * 88);
+// ─── Listing Card ─────────────────────────────────────────────────────────────
+function ListingCard({ listing, index }) {
+  const [saved, setSaved] = useState(false);
+  const { _id, title, location, country, price, image, category } = listing;
+  const seed = _id ? parseInt(_id.slice(-4), 16) : index;
+  const rating = (4.2 + (seed % 9) * 0.09).toFixed(1);
+  const reviews = 18 + (seed % 120);
+  const catIcon = CATEGORIES.find((c) => c.key === category)?.icon ?? "🏠";
 
   return (
-    <Link
-      to={`/listings/${listing._id}`}
-      className="listing-card-home"
-      style={{ animationDelay: `${index * 0.08}s` }}
+    <motion.div
+      variants={fadeUp}
+      custom={index * 0.5}
+      whileHover="hover"
+      initial="rest"
+      animate="rest"
     >
-      <div className="listing-img-wrap">
-        <img src={listing.image?.url} alt={listing.title} loading="lazy" />
-        {isNew && <span className="listing-badge">New</span>}
-        <button
-          className={`listing-fav${fav ? " listing-fav--active" : ""}`}
-          onClick={(e) => {
-            e.preventDefault();
-            setFav((f) => !f);
+      <Link
+        to={`/listings/${_id}`}
+        style={{ textDecoration: "none", color: "inherit", display: "block" }}
+      >
+        {/* Image */}
+        <div
+          style={{
+            position: "relative",
+            borderRadius: 18,
+            overflow: "hidden",
+            aspectRatio: "4/3",
+            background: "#f0ece4",
           }}
-          aria-label="Save to wishlist"
         >
-          {fav ? "❤️" : "🤍"}
-        </button>
-      </div>
-      <div className="listing-body">
-        <div className="listing-location">
-          <span>📍</span>
-          {listing.location}, {listing.country}
-        </div>
-        <h3 className="listing-title-home">{listing.title}</h3>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span className="listing-category-chip">
-            {CATEGORIES.find((c) => c.key === listing.category)?.icon ?? "🏠"}{" "}
-            {listing.category || "stay"}
-          </span>
-        </div>
-        <div className="listing-meta-row">
-          <div className="listing-price-home">
-            ₹{listing.price?.toLocaleString("en-IN")}
-            <span> / night</span>
+          <motion.img
+            variants={{ rest: { scale: 1 }, hover: { scale: 1.05 } }}
+            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            src={image?.url}
+            alt={title}
+            loading="lazy"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+
+          {/* Gradient fade bottom */}
+          <motion.div
+            variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(to top, rgba(26,20,16,0.4) 0%, transparent 55%)",
+            }}
+          />
+
+          {/* Category badge */}
+          <div
+            style={{
+              position: "absolute",
+              top: 12,
+              left: 12,
+              background: "rgba(255,255,255,0.93)",
+              backdropFilter: "blur(10px)",
+              borderRadius: 999,
+              padding: "4px 11px",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              color: C.navy,
+              letterSpacing: "0.03em",
+            }}
+          >
+            <span>{catIcon}</span>
+            <span style={{ textTransform: "capitalize" }}>
+              {category || "Stay"}
+            </span>
           </div>
-          <div className="listing-rating">
-            <span className="listing-rating-star">★</span>
-            {rating}
-            <span style={{ color: "#9CA3AF", fontWeight: 400 }}>
-              ({reviewCount})
+
+          {/* Save button */}
+          <motion.button
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.88 }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setSaved((s) => !s);
+            }}
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              width: 34,
+              height: 34,
+              borderRadius: "50%",
+              background: saved
+                ? "rgba(255,90,95,0.12)"
+                : "rgba(255,255,255,0.93)",
+              backdropFilter: "blur(10px)",
+              border: saved ? "1.5px solid rgba(255,90,95,0.35)" : "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+            }}
+            aria-label={saved ? "Remove from wishlist" : "Save"}
+          >
+            <svg width={15} height={15} viewBox="0 0 24 24">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                fill={saved ? C.coral : "none"}
+                stroke={saved ? C.coral : C.navy}
+                strokeWidth={2}
+                strokeLinecap="round"
+              />
+            </svg>
+          </motion.button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "12px 2px 0" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              marginBottom: 4,
+            }}
+          >
+            <svg
+              width={11}
+              height={11}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={C.slateLight}
+              strokeWidth={2.5}
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span
+              style={{
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                color: C.slateLight,
+                textTransform: "uppercase",
+                letterSpacing: "0.07em",
+              }}
+            >
+              {location}, {country}
+            </span>
+          </div>
+          <h3
+            style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: "1.05rem",
+              fontWeight: 400,
+              color: C.navy,
+              lineHeight: 1.3,
+              marginBottom: 8,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {title}
+          </h3>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  fontWeight: 700,
+                  fontSize: "0.9375rem",
+                  color: C.navy,
+                }}
+              >
+                ₹{price?.toLocaleString("en-IN")}
+              </span>
+              <span style={{ color: C.slate, fontSize: "0.8rem" }}>
+                {" "}
+                / night
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <Stars rating={parseFloat(rating)} />
+              <span
+                style={{ fontSize: "0.8rem", fontWeight: 600, color: C.navy }}
+              >
+                {rating}
+              </span>
+              <span style={{ fontSize: "0.72rem", color: C.slateLight }}>
+                ({reviews})
+              </span>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}
+
+// ─── Experience Card ──────────────────────────────────────────────────────────
+function ExperienceCard({ exp, index }) {
+  return (
+    <motion.div
+      variants={fadeUp}
+      custom={index * 0.5}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+      style={{
+        background: "#fff",
+        border: `1px solid ${C.border}`,
+        borderRadius: 20,
+        overflow: "hidden",
+        cursor: "pointer",
+        boxShadow: "0 2px 12px rgba(26,20,16,0.06)",
+        transition: "box-shadow 0.25s",
+      }}
+    >
+      {/* Image */}
+      <div
+        style={{ position: "relative", overflow: "hidden", aspectRatio: "3/2" }}
+      >
+        <img
+          src={exp.img}
+          alt={exp.title}
+          loading="lazy"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            transition: "transform 0.5s ease",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.transform = "scale(1.04)")
+          }
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 12,
+            left: 12,
+            background: "rgba(26,20,16,0.72)",
+            backdropFilter: "blur(8px)",
+            borderRadius: 999,
+            padding: "4px 12px",
+            fontSize: "0.72rem",
+            fontWeight: 600,
+            color: "#fff",
+            letterSpacing: "0.04em",
+          }}
+        >
+          {exp.duration}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "18px 20px 20px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: 6,
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: "1.15rem",
+              fontWeight: 400,
+              color: C.navy,
+              lineHeight: 1.25,
+              flex: 1,
+            }}
+          >
+            {exp.title}
+          </h3>
+        </div>
+        <p
+          style={{
+            fontSize: "0.8rem",
+            color: C.slate,
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          <svg
+            width={11}
+            height={11}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={C.slateLight}
+            strokeWidth={2.5}
+          >
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          {exp.location}
+        </p>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingTop: 12,
+            borderTop: `1px solid ${C.border}`,
+          }}
+        >
+          <div>
+            <span
+              style={{ fontWeight: 700, fontSize: "0.95rem", color: C.navy }}
+            >
+              ₹{exp.price.toLocaleString("en-IN")}
+            </span>
+            <span style={{ color: C.slate, fontSize: "0.78rem" }}>
+              {" "}
+              / person
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <Stars rating={exp.rating} />
+            <span
+              style={{ fontSize: "0.8rem", fontWeight: 700, color: C.navy }}
+            >
+              {exp.rating}
+            </span>
+            <span style={{ fontSize: "0.72rem", color: C.slateLight }}>
+              ({exp.reviews})
             </span>
           </div>
         </div>
       </div>
-    </Link>
+    </motion.div>
   );
 }
 
-// ─── Destination card ─────────────────────────────────────────────────────────
-function DestinationCard({ dest, index }) {
+// ─── Destination Card ─────────────────────────────────────────────────────────
+function DestinationCard({ dest, index, isLarge }) {
   return (
-    <Link
-      to={`/listings?q=${dest.city}`}
-      className="dest-card"
+    <motion.div
+      variants={fadeUp}
+      custom={index * 0.6}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.3 }}
       style={{
-        animationDelay: `${index * 0.1}s`,
-        animation: "fadeUp 0.6s both",
+        position: "relative",
+        borderRadius: isLarge ? 24 : 20,
+        overflow: "hidden",
+        cursor: "pointer",
+        height: isLarge ? "100%" : undefined,
+        aspectRatio: isLarge ? undefined : "4/3",
       }}
     >
-      <img src={dest.img} alt={dest.city} loading="lazy" />
-      <div className="dest-card-gradient" />
-      <span className="dest-card-tag">{dest.tag}</span>
-      <div className="dest-card-info">
-        <div className="dest-card-city">{dest.city}</div>
-        <div className="dest-card-count">
-          {dest.country} · {dest.count}
+      <Link
+        to={`/listings?q=${dest.city}`}
+        style={{ display: "block", height: "100%" }}
+      >
+        <img
+          src={dest.img}
+          alt={dest.city}
+          loading="lazy"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            transition: "transform 0.5s ease",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.transform = "scale(1.05)")
+          }
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        />
+
+        {/* Gradient */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to top, rgba(26,20,16,0.82) 0%, rgba(26,20,16,0.2) 50%, transparent 100%)",
+          }}
+        />
+
+        {/* Tag */}
+        <div
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            background: "rgba(255,255,255,0.18)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255,255,255,0.25)",
+            borderRadius: 999,
+            padding: "4px 13px",
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            color: "#fff",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+          }}
+        >
+          {dest.tag}
         </div>
-      </div>
-    </Link>
+
+        {/* Info */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: isLarge ? "28px 24px" : "20px 18px",
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: isLarge ? "2rem" : "1.4rem",
+              fontWeight: 400,
+              color: "#fff",
+              lineHeight: 1.1,
+              marginBottom: 5,
+            }}
+          >
+            {dest.city}
+          </h3>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <p style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.75)" }}>
+              {dest.country} · {dest.stays} stays
+            </p>
+            <div
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.18)",
+                backdropFilter: "blur(8px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <svg
+                width={13}
+                height={13}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
 
-// ─── Hero visual card ─────────────────────────────────────────────────────────
-function HeroVisual({ listings }) {
-  const cards = listings.slice(0, 3);
-  if (cards.length < 2) return null;
+// ─── Testimonial Card ─────────────────────────────────────────────────────────
+function TestimonialCard({ t, index }) {
+  return (
+    <motion.div
+      variants={fadeUp}
+      custom={index * 0.5}
+      style={{
+        background: "#fff",
+        border: `1px solid ${C.border}`,
+        borderRadius: 22,
+        padding: "28px 28px 26px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 20,
+        boxShadow: "0 4px 24px rgba(26,20,16,0.06)",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Quote mark */}
+      <div
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 24,
+          fontFamily: FONT_DISPLAY,
+          fontSize: "5rem",
+          lineHeight: 1,
+          color: "rgba(255,90,95,0.08)",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        "
+      </div>
+
+      {/* Stars */}
+      <Stars rating={t.rating} size={15} />
+
+      {/* Text */}
+      <p
+        style={{
+          fontFamily: FONT_DISPLAY,
+          fontSize: "1.05rem",
+          fontWeight: 300,
+          lineHeight: 1.7,
+          color: C.navy,
+          fontStyle: "italic",
+          flex: 1,
+        }}
+      >
+        "{t.text}"
+      </p>
+
+      {/* Property chip */}
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "5px 12px",
+          background: C.coralLight,
+          borderRadius: 999,
+          fontSize: "0.72rem",
+          fontWeight: 700,
+          color: C.coralDark,
+          letterSpacing: "0.03em",
+          alignSelf: "flex-start",
+        }}
+      >
+        <svg
+          width={11}
+          height={11}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+        >
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        </svg>
+        {t.property}
+      </div>
+
+      {/* Author */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          paddingTop: 12,
+          borderTop: `1px solid ${C.border}`,
+        }}
+      >
+        <div
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: "50%",
+            background: t.avatarColor,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: FONT_DISPLAY,
+            fontSize: "1.1rem",
+            color: "#fff",
+            flexShrink: 0,
+          }}
+        >
+          {t.avatar}
+        </div>
+        <div>
+          <p
+            style={{
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              color: C.navy,
+              marginBottom: 1,
+            }}
+          >
+            {t.name}
+          </p>
+          <p style={{ fontSize: "0.75rem", color: C.slate }}>
+            {t.location} · {t.date}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Main Hero Search ─────────────────────────────────────────────────────────
+function HeroSearch({ listings }) {
+  const navigate = useNavigate();
+  const [where, setWhere] = useState("");
+  const [category, setCategory] = useState("");
+  const [focused, setFocused] = useState(null); // "where" | "when" | "guests"
+  const [when, setWhen] = useState("");
+  const [guests, setGuests] = useState("1 guest");
+
+  const countries = useMemo(
+    () => [...new Set(listings.map((l) => l.country))].sort().filter(Boolean),
+    [listings],
+  );
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const p = new URLSearchParams();
+    if (where) p.set("q", where);
+    if (category) p.set("category", category);
+    navigate(`/listings?${p}`);
+  };
+
+  const fieldStyle = (key) => ({
+    flex: 1,
+    padding: "16px 22px",
+    borderRight: key !== "guests" ? `1px solid ${C.border}` : "none",
+    cursor: "text",
+    background: focused === key ? "#fff" : "transparent",
+    transition: "background 0.2s",
+  });
 
   return (
-    <div className="hero-visual">
-      {cards[0] && (
-        <div className="hero-card hero-card--large">
-          <img src={cards[0].image?.url} alt={cards[0].title} />
-          <div className="hero-card-overlay" />
-          <div className="hero-card-label">
-            <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>
-              {cards[0].title}
-            </div>
-            <div className="hero-card-price">
-              ₹{cards[0].price?.toLocaleString("en-IN")} /night
-            </div>
+    <div style={{ width: "100%", maxWidth: 860, margin: "0 auto" }}>
+      <form onSubmit={handleSearch}>
+        <div
+          style={{
+            background: "#fff",
+            borderRadius: 24,
+            border: `1.5px solid ${C.border}`,
+            boxShadow:
+              "0 20px 60px rgba(26,20,16,0.14), 0 4px 16px rgba(26,20,16,0.08)",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "stretch",
+          }}
+        >
+          {/* WHERE */}
+          <div style={fieldStyle("where")} onClick={() => setFocused("where")}>
+            <p
+              style={{
+                fontSize: "0.65rem",
+                fontWeight: 800,
+                letterSpacing: "0.12em",
+                color: C.navy,
+                textTransform: "uppercase",
+                marginBottom: 4,
+              }}
+            >
+              Where
+            </p>
+            <input
+              type="text"
+              value={where}
+              onChange={(e) => setWhere(e.target.value)}
+              onFocus={() => setFocused("where")}
+              onBlur={() => setFocused(null)}
+              placeholder="Search destinations"
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                fontFamily: FONT_BODY,
+                fontSize: "0.9rem",
+                color: C.navy,
+                width: "100%",
+                padding: 0,
+              }}
+            />
+          </div>
+
+          {/* WHEN */}
+          <div style={fieldStyle("when")} onClick={() => setFocused("when")}>
+            <p
+              style={{
+                fontSize: "0.65rem",
+                fontWeight: 800,
+                letterSpacing: "0.12em",
+                color: C.navy,
+                textTransform: "uppercase",
+                marginBottom: 4,
+              }}
+            >
+              When
+            </p>
+            <input
+              type="text"
+              value={when}
+              onChange={(e) => setWhen(e.target.value)}
+              onFocus={() => setFocused("when")}
+              onBlur={() => setFocused(null)}
+              placeholder="Add dates"
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                fontFamily: FONT_BODY,
+                fontSize: "0.9rem",
+                color: C.navy,
+                width: "100%",
+                padding: 0,
+              }}
+            />
+          </div>
+
+          {/* GUESTS */}
+          <div
+            style={fieldStyle("guests")}
+            onClick={() => setFocused("guests")}
+          >
+            <p
+              style={{
+                fontSize: "0.65rem",
+                fontWeight: 800,
+                letterSpacing: "0.12em",
+                color: C.navy,
+                textTransform: "uppercase",
+                marginBottom: 4,
+              }}
+            >
+              Who
+            </p>
+            <select
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              onFocus={() => setFocused("guests")}
+              onBlur={() => setFocused(null)}
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                fontFamily: FONT_BODY,
+                fontSize: "0.9rem",
+                color: C.navy,
+                width: "100%",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              {["1 guest", "2 guests", "3 guests", "4 guests", "5+ guests"].map(
+                (g) => (
+                  <option key={g} value={g}>
+                    {g}
+                  </option>
+                ),
+              )}
+            </select>
+          </div>
+
+          {/* Search button */}
+          <div
+            style={{
+              padding: "10px 10px 10px 4px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              type="submit"
+              style={{
+                background: `linear-gradient(135deg, ${C.coral} 0%, ${C.coralDark} 100%)`,
+                border: "none",
+                borderRadius: 16,
+                width: 52,
+                height: 52,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: "0 6px 20px rgba(255,90,95,0.4)",
+                flexShrink: 0,
+              }}
+              aria-label="Search"
+            >
+              <svg
+                width={20}
+                height={20}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </motion.button>
           </div>
         </div>
-      )}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {cards[1] && (
-          <div className="hero-card hero-card--sm">
-            <img src={cards[1].image?.url} alt={cards[1].title} />
-            <div className="hero-card-overlay" />
-            <div className="hero-card-label">
-              <div style={{ fontWeight: 600, fontSize: "0.82rem" }}>
-                {cards[1].title}
-              </div>
-            </div>
+
+        {/* Quick filters */}
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            marginTop: 14,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
+          {CATEGORIES.filter((c) => c.key)
+            .slice(0, 6)
+            .map((c) => (
+              <motion.button
+                key={c.key}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={() =>
+                  setCategory((prev) => (prev === c.key ? "" : c.key))
+                }
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  padding: "7px 14px",
+                  borderRadius: 999,
+                  border: `1.5px solid ${category === c.key ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.3)"}`,
+                  background:
+                    category === c.key
+                      ? "rgba(255,255,255,0.25)"
+                      : "rgba(255,255,255,0.1)",
+                  backdropFilter: "blur(10px)",
+                  color: "#fff",
+                  fontSize: "0.8rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  fontFamily: FONT_BODY,
+                  transition: "all 0.15s",
+                }}
+              >
+                <span>{c.icon}</span>
+                <span>{c.label}</span>
+              </motion.button>
+            ))}
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// ─── SECTION 1: Hero ──────────────────────────────────────────────────────────
+function HeroSection({ listings }) {
+  return (
+    <section
+      style={{
+        position: "relative",
+        minHeight: "92vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+        {/* Main bg image */}
+        <img
+          src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80"
+          alt=""
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            filter: "brightness(0.65)",
+          }}
+        />
+        {/* Tonal overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(165deg, rgba(26,20,16,0.7) 0%, rgba(26,20,16,0.3) 50%, rgba(26,20,16,0.6) 100%)",
+          }}
+        />
+        {/* Bottom fade for section continuity */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 200,
+            background: "linear-gradient(to top, #fdfcfb 0%, transparent 100%)",
+          }}
+        />
+      </div>
+
+      {/* Content */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          maxWidth: 1200,
+          padding: "120px 32px 80px",
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        {/* Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "6px 16px",
+              borderRadius: 999,
+              border: "1px solid rgba(255,255,255,0.3)",
+              background: "rgba(255,255,255,0.1)",
+              backdropFilter: "blur(10px)",
+              marginBottom: 28,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: C.coral,
+                animation: "hp-pulse-dot 2s ease infinite",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.9)",
+              }}
+            >
+              Over 10,000 verified properties worldwide
+            </span>
           </div>
-        )}
-        {cards[2] && (
-          <div className="hero-card hero-card--sm">
-            <img src={cards[2].image?.url} alt={cards[2].title} />
-            <div className="hero-card-overlay" />
-            <div className="hero-card-label">
-              <div style={{ fontWeight: 600, fontSize: "0.82rem" }}>
-                {cards[2].title}
-              </div>
+        </motion.div>
+
+        {/* Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            fontFamily: FONT_DISPLAY,
+            fontSize: "clamp(3rem, 7vw, 6rem)",
+            fontWeight: 300,
+            color: "#fff",
+            lineHeight: 1.06,
+            letterSpacing: "-0.015em",
+            marginBottom: 20,
+            maxWidth: 820,
+          }}
+        >
+          Where will your{" "}
+          <em style={{ fontStyle: "italic", color: C.coral }}>next story</em>{" "}
+          begin?
+        </motion.h1>
+
+        {/* Subheadline */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          style={{
+            fontFamily: FONT_BODY,
+            fontSize: "1.05rem",
+            color: "rgba(255,255,255,0.75)",
+            fontWeight: 300,
+            lineHeight: 1.65,
+            maxWidth: 480,
+            marginBottom: 48,
+          }}
+        >
+          Handpicked homes, villas, and unique stays in 180+ countries — curated
+          for those who travel with intention.
+        </motion.p>
+
+        {/* Search */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, delay: 0.45 }}
+          style={{ width: "100%", maxWidth: 860 }}
+        >
+          <HeroSearch listings={listings} />
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+          style={{
+            display: "flex",
+            gap: 40,
+            marginTop: 52,
+            paddingTop: 36,
+            borderTop: "1px solid rgba(255,255,255,0.15)",
+          }}
+        >
+          {[
+            ["10K+", "Properties"],
+            ["180+", "Countries"],
+            ["4.95★", "Avg. Rating"],
+            ["2M+", "Happy guests"],
+          ].map(([n, l]) => (
+            <div key={l} style={{ textAlign: "center" }}>
+              <p
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontSize: "1.8rem",
+                  color: "#fff",
+                  lineHeight: 1,
+                  marginBottom: 4,
+                  fontWeight: 400,
+                }}
+              >
+                {n}
+              </p>
+              <p
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.5)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                {l}
+              </p>
             </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ─── SECTION 2: Categories ────────────────────────────────────────────────────
+function CategoriesSection({ activeCategory, setActiveCategory }) {
+  const scrollRef = useRef(null);
+
+  const scroll = (dir) => {
+    if (scrollRef.current)
+      scrollRef.current.scrollBy({ left: dir * 240, behavior: "smooth" });
+  };
+
+  return (
+    <Reveal>
+      <section
+        style={{
+          background: C.sand,
+          padding: "52px 0 44px",
+          borderTop: `1px solid ${C.border}`,
+          borderBottom: `1px solid ${C.border}`,
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {/* Left scroll */}
+            <motion.button
+              whileHover={{ scale: 1.08, background: "#fff" }}
+              whileTap={{ scale: 0.93 }}
+              onClick={() => scroll(-1)}
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: "50%",
+                background: "#fff",
+                border: `1.5px solid ${C.border}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                flexShrink: 0,
+                boxShadow: "0 2px 8px rgba(26,20,16,0.07)",
+              }}
+              aria-label="Scroll left"
+            >
+              <svg
+                width={14}
+                height={14}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={C.slate}
+                strokeWidth={2.5}
+                strokeLinecap="round"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </motion.button>
+
+            {/* Scroll container */}
+            <div
+              ref={scrollRef}
+              className="hp-scroll-hide"
+              style={{
+                display: "flex",
+                gap: 10,
+                flex: 1,
+                overflowX: "auto",
+                paddingBottom: 2,
+              }}
+            >
+              {CATEGORIES.map(({ key, icon, label }, i) => {
+                const active = activeCategory === key;
+                return (
+                  <motion.button
+                    key={label}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04, duration: 0.3 }}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setActiveCategory(key)}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 7,
+                      padding: "14px 20px",
+                      borderRadius: 18,
+                      border: `1.5px solid ${active ? C.navy : "transparent"}`,
+                      background: active ? "rgba(26,20,16,0.07)" : "#fff",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                      fontFamily: FONT_BODY,
+                      boxShadow: active
+                        ? "none"
+                        : "0 1px 4px rgba(26,20,16,0.06)",
+                      transition: "all 0.15s",
+                      minWidth: 80,
+                    }}
+                    aria-pressed={active}
+                  >
+                    <span style={{ fontSize: "1.4rem", lineHeight: 1 }}>
+                      {icon}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.68rem",
+                        fontWeight: active ? 700 : 600,
+                        color: active ? C.navy : C.slate,
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {label}
+                    </span>
+                    {active && (
+                      <motion.div
+                        layoutId="cat-indicator"
+                        style={{
+                          position: "absolute",
+                          bottom: -1,
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          width: 24,
+                          height: 2.5,
+                          background: C.navy,
+                          borderRadius: 999,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 35,
+                        }}
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Right scroll */}
+            <motion.button
+              whileHover={{ scale: 1.08, background: "#fff" }}
+              whileTap={{ scale: 0.93 }}
+              onClick={() => scroll(1)}
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: "50%",
+                background: "#fff",
+                border: `1.5px solid ${C.border}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                flexShrink: 0,
+                boxShadow: "0 2px 8px rgba(26,20,16,0.07)",
+              }}
+              aria-label="Scroll right"
+            >
+              <svg
+                width={14}
+                height={14}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={C.slate}
+                strokeWidth={2.5}
+                strokeLinecap="round"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </motion.button>
           </div>
-        )}
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
+// ─── SECTION 3: Featured Listings ────────────────────────────────────────────
+function FeaturedListingsSection({ activeCategory }) {
+  const { data, isLoading } = useListings({
+    category: activeCategory || undefined,
+  });
+  const listings = data?.listings ?? [];
+  const displayed = listings.slice(0, 8);
+
+  const catLabel = CATEGORIES.find((c) => c.key === activeCategory)?.label;
+
+  return (
+    <Reveal>
+      <section
+        style={{ maxWidth: 1280, margin: "0 auto", padding: "72px 32px" }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: 44,
+            flexWrap: "wrap",
+            gap: 16,
+          }}
+        >
+          <SectionTitle
+            eyebrow={
+              activeCategory ? `${catLabel} stays` : "Hand-picked for you"
+            }
+            title={
+              activeCategory ? (
+                <>
+                  The finest{" "}
+                  <em style={{ fontStyle: "italic", color: C.coral }}>
+                    {catLabel}
+                  </em>{" "}
+                  stays
+                </>
+              ) : (
+                <>
+                  Stays worth{" "}
+                  <em style={{ fontStyle: "italic", color: C.coral }}>
+                    remembering
+                  </em>
+                </>
+              )
+            }
+          />
+          <Link
+            to="/listings"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: "0.875rem",
+              fontWeight: 700,
+              color: C.navy,
+              textDecoration: "none",
+              borderBottom: `1.5px solid ${C.navy}`,
+              paddingBottom: 2,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              transition: "color 0.15s, border-color 0.15s",
+            }}
+          >
+            View all listings
+            <svg
+              width={13}
+              height={13}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <motion.div
+              key="skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(268px, 1fr))",
+                gap: "28px 20px",
+              }}
+            >
+              {Array.from({ length: 8 }).map((_, i) => (
+                <ListingCardSkeleton key={i} />
+              ))}
+            </motion.div>
+          ) : displayed.length === 0 ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              style={{ textAlign: "center", padding: "60px 0", color: C.slate }}
+            >
+              <div style={{ fontSize: "3rem", marginBottom: 16 }}>🔍</div>
+              <p
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontSize: "1.4rem",
+                  marginBottom: 16,
+                  color: C.navy,
+                }}
+              >
+                No listings found
+              </p>
+              <button
+                onClick={() => {}}
+                style={{
+                  padding: "10px 24px",
+                  border: `1.5px solid ${C.coral}`,
+                  borderRadius: 999,
+                  background: "transparent",
+                  color: C.coral,
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  fontFamily: FONT_BODY,
+                }}
+              >
+                Clear filters
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={activeCategory || "all"}
+              variants={stagger}
+              initial="hidden"
+              animate="visible"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(268px, 1fr))",
+                gap: "36px 20px",
+              }}
+            >
+              {displayed.map((listing, i) => (
+                <ListingCard key={listing._id} listing={listing} index={i} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+    </Reveal>
+  );
+}
+
+// ─── Ticker ───────────────────────────────────────────────────────────────────
+function Ticker() {
+  return (
+    <div
+      style={{
+        background: C.navy,
+        overflow: "hidden",
+        padding: "14px 0",
+        borderTop: `1px solid rgba(255,255,255,0.05)`,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          whiteSpace: "nowrap",
+          animation: "hp-ticker 28s linear infinite",
+          willChange: "transform",
+        }}
+      >
+        {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
+          <span
+            key={i}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 16,
+              padding: "0 36px",
+              color: "rgba(255,255,255,0.6)",
+              fontSize: "0.82rem",
+              fontWeight: 500,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            {item}
+            <span
+              style={{
+                width: 4,
+                height: 4,
+                borderRadius: "50%",
+                background: C.coral,
+                display: "inline-block",
+              }}
+            />
+          </span>
+        ))}
       </div>
     </div>
   );
 }
 
-// ─── Main page component ──────────────────────────────────────────────────────
-export default function HomePage() {
-  const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchCountry, setSearchCountry] = useState("");
-  const [visibleListings, setVisibleListings] = useState(6);
-
-  // Fetch listings (compatible with existing hook)
-  const { data: allData, isLoading } = useListings({
-    category: activeCategory || undefined,
-  });
-  const { data: featuredData } = useListings({ limit: 6 });
-
-  const listings = allData?.listings ?? [];
-  const featured = featuredData?.listings?.slice(0, 6) ?? [];
-
-  // Extract unique countries for search dropdown
-  const countries = [...new Set(listings.map((l) => l.country))]
-    .sort()
-    .filter(Boolean);
-
-  const handleSearch = useCallback(
-    (e) => {
-      e.preventDefault();
-      const params = new URLSearchParams();
-      if (searchQuery) params.set("q", searchQuery);
-      if (searchCountry) params.set("country", searchCountry);
-      if (activeCategory) params.set("category", activeCategory);
-      navigate(`/listings?${params.toString()}`);
-    },
-    [searchQuery, searchCountry, activeCategory, navigate],
-  );
-
-  // Inject styles once
-  useEffect(() => {
-    const id = "wl-homepage-styles";
-    if (!document.getElementById(id)) {
-      const tag = document.createElement("style");
-      tag.id = id;
-      tag.textContent = STYLES;
-      document.head.appendChild(tag);
-    }
-    return () => {
-      // styles persist intentionally across SPA navigations
-    };
-  }, []);
-
-  // Intersect observer for "load more" feel
-  const loadMoreRef = useRef(null);
-  useEffect(() => {
-    const el = loadMoreRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting)
-          setVisibleListings((v) => Math.min(v + 3, listings.length));
-      },
-      { threshold: 0.1 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [listings.length]);
-
-  const displayedListings = listings.slice(0, visibleListings);
-
+// ─── SECTION 4: Trending Destinations ────────────────────────────────────────
+function TrendingDestinationsSection() {
   return (
-    <div className="wl-page">
-      {/* ── HERO ────────────────────────────────────────── */}
-      <section className="hero">
-        <div className="hero-bg" />
-        <div className="hero-grid" />
-        <div className="hero-content">
-          <div className="hero-text">
-            <div className="hero-eyebrow">
-              <span className="hero-eyebrow-dot" />
-              Over 10,000 verified properties
-            </div>
-            <h1 className="hero-title">
-              Find your
-              <br />
-              <em>perfect</em> stay
-              <br />
-              anywhere
-            </h1>
-            <p className="hero-subtitle">
-              Handpicked homes, villas, and unique stays for every kind of
-              traveller. Book with confidence — real reviews, real hosts.
-            </p>
-            <div className="hero-cta-row">
-              <Link to="/listings" className="btn-primary">
-                Explore stays ↗
-              </Link>
-              <Link to="/listings/new" className="btn-ghost">
-                + List your home
-              </Link>
-            </div>
-            <div className="hero-stats">
-              {[
-                ["10K+", "Properties"],
-                ["180+", "Countries"],
-                ["4.9★", "Avg Rating"],
-              ].map(([num, label]) => (
-                <div key={label}>
-                  <div className="hero-stat-num">{num}</div>
-                  <div className="hero-stat-label">{label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <HeroVisual listings={featured} />
-        </div>
-      </section>
-
-      {/* ── FLOATING SEARCH BAR ─────────────────────────── */}
-      <div
-        className="search-bar-wrap"
-        style={{ maxWidth: 1000, margin: "-36px auto 0", padding: "0 24px" }}
+    <Reveal>
+      <section
+        style={{ maxWidth: 1280, margin: "0 auto", padding: "72px 32px" }}
       >
-        <form className="search-bar" onSubmit={handleSearch}>
-          <div className="search-field">
-            <label>Where</label>
-            <input
-              type="text"
-              placeholder="Search destinations…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="search-field">
-            <label>Country</label>
-            <select
-              value={searchCountry}
-              onChange={(e) => setSearchCountry(e.target.value)}
-            >
-              <option value="">All countries</option>
-              {countries.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="search-field">
-            <label>Category</label>
-            <select
-              value={activeCategory ?? ""}
-              onChange={(e) => setActiveCategory(e.target.value || null)}
-            >
-              <option value="">All types</option>
-              {CATEGORIES.filter((c) => c.key).map((c) => (
-                <option key={c.key} value={c.key}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button className="search-btn" type="submit">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: 44,
+            flexWrap: "wrap",
+            gap: 16,
+          }}
+        >
+          <SectionTitle
+            eyebrow="Discover the world"
+            title={
+              <>
+                Trending{" "}
+                <em style={{ fontStyle: "italic", color: C.coral }}>
+                  destinations
+                </em>
+              </>
+            }
+            subtitle="The places everyone is talking about right now."
+          />
+          <Link
+            to="/listings"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: "0.875rem",
+              fontWeight: 700,
+              color: C.navy,
+              textDecoration: "none",
+              borderBottom: `1.5px solid ${C.navy}`,
+              paddingBottom: 2,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            Explore all
             <svg
-              width="16"
-              height="16"
+              width={13}
+              height={13}
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2.5"
+              strokeWidth={2.5}
+              strokeLinecap="round"
             >
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
+              <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
-            Search
-          </button>
-        </form>
-      </div>
-
-      {/* ── TICKER ──────────────────────────────────────── */}
-      <div className="ticker-wrap" style={{ marginTop: 64 }}>
-        <div className="ticker-inner">
-          {[...TICKER_ITEMS, ...TICKER_ITEMS].map((item, i) => (
-            <span className="ticker-item" key={i}>
-              {item}
-              {i !== TICKER_ITEMS.length * 2 - 1 && (
-                <span className="ticker-dot" />
-              )}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ── TRENDING DESTINATIONS ────────────────────────── */}
-      <div className="section">
-        <div className="section-header">
-          <div>
-            <div className="section-eyebrow">Discover the World</div>
-            <h2 className="section-title">
-              Trending <em>Destinations</em>
-            </h2>
-          </div>
-          <Link to="/listings" className="view-all">
-            View all →
-          </Link>
-        </div>
-        <div className="destinations-grid">
-          {TRENDING_DESTINATIONS.map((dest, i) => (
-            <DestinationCard key={dest.city} dest={dest} index={i} />
-          ))}
-        </div>
-      </div>
-
-      {/* ── CATEGORIES ──────────────────────────────────── */}
-      <div className="cats-section">
-        <div className="cats-inner">
-          <div className="section-header" style={{ marginBottom: 0 }}>
-            <div>
-              <div className="section-eyebrow">Browse by Type</div>
-              <h2 className="section-title">
-                Find Your <em>Style</em>
-              </h2>
-            </div>
-          </div>
-          <div className="cats-scroll">
-            {CATEGORIES.map(({ key, icon, label }) => (
-              <button
-                key={label}
-                className={`cat-pill${activeCategory === key ? " cat-pill--active" : ""}`}
-                onClick={() => setActiveCategory(key)}
-              >
-                <span className="cat-pill-icon">{icon}</span>
-                <span className="cat-pill-label">{label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── FEATURED LISTINGS ───────────────────────────── */}
-      <div className="section listings-section">
-        <div className="section-header">
-          <div>
-            <div className="section-eyebrow">
-              {activeCategory
-                ? `${CATEGORIES.find((c) => c.key === activeCategory)?.label ?? ""} Stays`
-                : "Featured Stays"}
-            </div>
-            <h2 className="section-title">
-              {activeCategory ? "Filtered" : "Hand-Picked"} <em>for You</em>
-            </h2>
-          </div>
-          <Link to="/listings" className="view-all">
-            All {listings.length > 0 ? `${listings.length} ` : ""}listings →
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="listings-grid-home">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
+        {/* Mosaic grid: 2 large + 3 small */}
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateRows: "280px 220px",
+            gap: 12,
+          }}
+        >
+          {/* Large — spans 2 rows */}
+          <div style={{ gridColumn: "1", gridRow: "1 / 3" }}>
+            <DestinationCard dest={DESTINATIONS[0]} index={0} isLarge />
           </div>
-        ) : displayedListings.length === 0 ? (
-          <div
-            style={{ textAlign: "center", padding: "60px 0", color: "#9CA3AF" }}
-          >
-            <div style={{ fontSize: "3rem", marginBottom: 16 }}>🔍</div>
-            <p
-              style={{ fontSize: "1.1rem", fontFamily: "var(--font-display)" }}
-            >
-              No listings found
-            </p>
-            <button
-              style={{
-                marginTop: 20,
-                color: THEME.coral,
-                border: `1.5px solid ${THEME.coral}`,
-                borderRadius: 100,
-                padding: "10px 24px",
-                background: "transparent",
-                cursor: "pointer",
-                fontFamily: "var(--font-body)",
-                fontWeight: 600,
-              }}
-              onClick={() => setActiveCategory(null)}
-            >
-              Clear filter
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="listings-grid-home">
-              {displayedListings.map((listing, i) => (
-                <ListingCardHome
-                  key={listing._id}
-                  listing={listing}
-                  index={i}
-                />
-              ))}
-            </div>
-            {visibleListings < listings.length && (
-              <div
-                ref={loadMoreRef}
-                style={{ textAlign: "center", marginTop: 48 }}
-              >
-                <button
-                  className="btn-primary"
-                  onClick={() => setVisibleListings((v) => v + 6)}
-                  style={{ margin: "0 auto" }}
-                >
-                  Load more stays
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          <DestinationCard dest={DESTINATIONS[1]} index={1} isLarge={false} />
+          <DestinationCard dest={DESTINATIONS[2]} index={2} isLarge={false} />
+          <DestinationCard dest={DESTINATIONS[3]} index={3} isLarge={false} />
+          <DestinationCard dest={DESTINATIONS[4]} index={4} isLarge={false} />
+        </motion.div>
+      </section>
+    </Reveal>
+  );
+}
 
-      {/* ── VALUE PROPS ─────────────────────────────────── */}
-      <div className="values-section">
-        <div className="values-inner">
-          {VALUES.map((v) => (
-            <div key={v.title} className="value-item">
-              <div className="value-icon">{v.icon}</div>
-              <div className="value-title">{v.title}</div>
-              <div className="value-desc">{v.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── CTA BANNER ──────────────────────────────────── */}
-      <div className="cta-section">
-        <div className="cta-card">
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <div className="cta-eyebrow">Become a Host</div>
-            <h2 className="cta-title">
-              Your home could be
-              <br />
-              someone's dream stay
-            </h2>
-            <p className="cta-subtitle">
-              Join thousands of hosts earning extra income by sharing their
-              spaces. It's free to list, and you set your own rules.
-            </p>
-          </div>
+// ─── SECTION 5: Experiences ───────────────────────────────────────────────────
+function ExperiencesSection() {
+  return (
+    <Reveal>
+      <section
+        style={{
+          background: C.sand,
+          padding: "72px 0",
+          borderTop: `1px solid ${C.border}`,
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
           <div
             style={{
-              position: "relative",
-              zIndex: 1,
               display: "flex",
-              flexDirection: "column",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              marginBottom: 44,
+              flexWrap: "wrap",
               gap: 16,
-              alignItems: "flex-start",
             }}
           >
-            <Link to="/listings/new" className="cta-btn">
-              Start hosting →
+            <SectionTitle
+              eyebrow="Curated experiences"
+              title={
+                <>
+                  More than a place to{" "}
+                  <em style={{ fontStyle: "italic", color: C.coral }}>sleep</em>
+                </>
+              }
+              subtitle="Local experiences that turn a trip into a memory."
+            />
+            <Link
+              to="/listings"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.875rem",
+                fontWeight: 700,
+                color: C.navy,
+                textDecoration: "none",
+                borderBottom: `1.5px solid ${C.navy}`,
+                paddingBottom: 2,
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            >
+              Browse experiences
+              <svg
+                width={13}
+                height={13}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
             </Link>
+          </div>
+
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: 20,
+            }}
+          >
+            {EXPERIENCES.map((exp, i) => (
+              <ExperienceCard key={exp.title} exp={exp} index={i} />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
+// ─── SECTION 6: Become a Host CTA ─────────────────────────────────────────────
+function HostCTASection() {
+  return (
+    <Reveal>
+      <section
+        style={{ maxWidth: 1280, margin: "0 auto", padding: "72px 32px" }}
+      >
+        <div
+          style={{
+            borderRadius: 28,
+            overflow: "hidden",
+            position: "relative",
+            minHeight: 420,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            background: C.navy,
+          }}
+        >
+          {/* Left: Content */}
+          <div
+            style={{
+              padding: "60px 56px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: 24,
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  fontSize: "0.72rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: C.coral,
+                  marginBottom: 14,
+                }}
+              >
+                Earn with Wanderlust
+              </p>
+              <h2
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontSize: "clamp(2rem, 3.5vw, 3rem)",
+                  fontWeight: 300,
+                  color: "#fff",
+                  lineHeight: 1.12,
+                  marginBottom: 16,
+                }}
+              >
+                Your home could be{" "}
+                <em style={{ fontStyle: "italic", color: C.coral }}>
+                  someone's dream
+                </em>
+              </h2>
+              <p
+                style={{
+                  fontFamily: FONT_BODY,
+                  fontSize: "1rem",
+                  color: "rgba(255,255,255,0.6)",
+                  lineHeight: 1.65,
+                  fontWeight: 300,
+                  maxWidth: 400,
+                }}
+              >
+                Join 50,000+ hosts earning on their own terms. Set your own
+                schedule, your own rules, and your own price — we handle the
+                rest.
+              </p>
+            </div>
+
+            {/* Benefits */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[
+                { icon: "🔑", text: "Free to list, no subscription" },
+                { icon: "🛡️", text: "$1M host protection guarantee" },
+                { icon: "💬", text: "Dedicated host support 24/7" },
+              ].map(({ icon, text }) => (
+                <div
+                  key={text}
+                  style={{ display: "flex", alignItems: "center", gap: 12 }}
+                >
+                  <span style={{ fontSize: "1.1rem" }}>{icon}</span>
+                  <span
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "rgba(255,255,255,0.75)",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {text}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <motion.div
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Link
+                  to="/listings/new"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "14px 28px",
+                    background: C.coral,
+                    borderRadius: 999,
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: "0.9375rem",
+                    textDecoration: "none",
+                    boxShadow: "0 8px 28px rgba(255,90,95,0.35)",
+                    fontFamily: FONT_BODY,
+                  }}
+                >
+                  Start hosting
+                  <svg
+                    width={15}
+                    height={15}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    strokeLinecap="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <button
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "14px 28px",
+                    background: "transparent",
+                    border: "1.5px solid rgba(255,255,255,0.25)",
+                    borderRadius: 999,
+                    color: "rgba(255,255,255,0.85)",
+                    fontWeight: 600,
+                    fontSize: "0.9375rem",
+                    cursor: "pointer",
+                    fontFamily: FONT_BODY,
+                    transition: "border-color 0.15s",
+                  }}
+                >
+                  Learn how it works
+                </button>
+              </motion.div>
+            </div>
+
             <p
               style={{
-                color: "rgba(255,255,255,0.75)",
-                fontSize: "0.8rem",
-                fontWeight: 300,
-                lineHeight: 1.5,
+                fontSize: "0.75rem",
+                color: "rgba(255,255,255,0.35)",
+                marginTop: -8,
               }}
             >
               Free to list · No commission until you earn
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* bottom spacer */}
-      <div style={{ height: 40 }} />
+          {/* Right: Image */}
+          <div style={{ position: "relative", overflow: "hidden" }}>
+            <img
+              src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&q=80"
+              alt="Beautiful home for hosting"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(to right, rgba(26,20,16,0.5) 0%, transparent 60%)",
+              }}
+            />
+
+            {/* Floating earning card */}
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{
+                duration: 3.5,
+                ease: "easeInOut",
+                repeat: Infinity,
+              }}
+              style={{
+                position: "absolute",
+                bottom: 32,
+                left: 32,
+                background: "rgba(255,255,255,0.97)",
+                backdropFilter: "blur(16px)",
+                borderRadius: 18,
+                padding: "16px 20px",
+                boxShadow: "0 12px 40px rgba(26,20,16,0.2)",
+                minWidth: 200,
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  color: C.slate,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  marginBottom: 6,
+                }}
+              >
+                Average earnings
+              </p>
+              <p
+                style={{
+                  fontFamily: FONT_DISPLAY,
+                  fontSize: "2rem",
+                  color: C.navy,
+                  fontWeight: 400,
+                  lineHeight: 1,
+                  marginBottom: 4,
+                }}
+              >
+                ₹45,000
+              </p>
+              <p style={{ fontSize: "0.75rem", color: C.slate }}>
+                per month for 3-bed homes
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                  marginTop: 8,
+                }}
+              >
+                <div
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: C.green,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "0.72rem",
+                    color: C.green,
+                    fontWeight: 700,
+                  }}
+                >
+                  +18% vs last year
+                </span>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
+// ─── SECTION 7: Testimonials ──────────────────────────────────────────────────
+function TestimonialsSection() {
+  return (
+    <Reveal>
+      <section
+        style={{
+          background: C.sand,
+          padding: "72px 0",
+          borderTop: `1px solid ${C.border}`,
+          borderBottom: `1px solid ${C.border}`,
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
+          <div style={{ marginBottom: 48 }}>
+            <SectionTitle
+              eyebrow="What travellers say"
+              title={
+                <>
+                  Stories from{" "}
+                  <em style={{ fontStyle: "italic", color: C.coral }}>
+                    real guests
+                  </em>
+                </>
+              }
+              subtitle="Not every stay is memorable. These ones were."
+              center
+            />
+          </div>
+
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: 20,
+            }}
+          >
+            {TESTIMONIALS.map((t, i) => (
+              <TestimonialCard key={t.name} t={t} index={i} />
+            ))}
+          </motion.div>
+
+          {/* Trust line */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 32,
+              marginTop: 48,
+              paddingTop: 40,
+              borderTop: `1px solid ${C.border}`,
+              flexWrap: "wrap",
+            }}
+          >
+            {[
+              { icon: "🛡️", label: "Verified reviews only" },
+              { icon: "⭐", label: "4.95 average rating" },
+              { icon: "💬", label: "Over 2M guest reviews" },
+            ].map(({ icon, label }) => (
+              <div
+                key={label}
+                style={{ display: "flex", alignItems: "center", gap: 8 }}
+              >
+                <span style={{ fontSize: "1.2rem" }}>{icon}</span>
+                <span
+                  style={{
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    color: C.navy,
+                  }}
+                >
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
+// ─── SECTION 8: Mini Footer CTA ───────────────────────────────────────────────
+function MiniFooterCTA() {
+  return (
+    <Reveal>
+      <section
+        style={{
+          background: C.navy,
+          padding: "64px 32px",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+          <p
+            style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+              fontWeight: 300,
+              color: "#fff",
+              lineHeight: 1.2,
+              marginBottom: 18,
+            }}
+          >
+            Ready to find your{" "}
+            <em style={{ fontStyle: "italic", color: C.coral }}>
+              perfect stay?
+            </em>
+          </p>
+          <p
+            style={{
+              fontFamily: FONT_BODY,
+              fontSize: "0.95rem",
+              color: "rgba(255,255,255,0.55)",
+              fontWeight: 300,
+              lineHeight: 1.65,
+              marginBottom: 32,
+            }}
+          >
+            Join over 2 million travellers who discovered something
+            extraordinary.
+          </p>
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <motion.div
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Link
+                to="/listings"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "15px 32px",
+                  background: C.coral,
+                  borderRadius: 999,
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: "0.9375rem",
+                  textDecoration: "none",
+                  boxShadow: "0 8px 28px rgba(255,90,95,0.4)",
+                  fontFamily: FONT_BODY,
+                }}
+              >
+                Explore stays
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                to="/listings/new"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "15px 28px",
+                  background: "transparent",
+                  border: "1.5px solid rgba(255,255,255,0.25)",
+                  borderRadius: 999,
+                  color: "rgba(255,255,255,0.85)",
+                  fontWeight: 600,
+                  fontSize: "0.9375rem",
+                  textDecoration: "none",
+                  fontFamily: FONT_BODY,
+                }}
+              >
+                Become a host
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
+// ─── Responsive CSS ───────────────────────────────────────────────────────────
+const RESPONSIVE_CSS = `
+  @media (max-width: 1024px) {
+    .hp-dest-grid { grid-template-columns: 1fr 1fr !important; grid-template-rows: auto !important; }
+    .hp-dest-grid > *:first-child { grid-column: 1; grid-row: 1; }
+  }
+  @media (max-width: 768px) {
+    .hp-hero-stats { display: none !important; }
+    .hp-host-grid { grid-template-columns: 1fr !important; }
+    .hp-host-grid > *:last-child { display: none; }
+    .hp-dest-grid { grid-template-columns: 1fr !important; grid-template-rows: auto !important; }
+    .hp-search-bar { flex-direction: column !important; border-radius: 20px !important; }
+    .hp-search-field { border-right: none !important; border-bottom: 1px solid #E8E3DC; }
+    .hp-search-field:last-of-type { border-bottom: none; }
+  }
+`;
+
+// ─── Root component ───────────────────────────────────────────────────────────
+export default function HomePage() {
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  // Inject styles once
+  useEffect(() => {
+    const id = "wl-hp-styles";
+    if (!document.getElementById(id)) {
+      const el = document.createElement("style");
+      el.id = id;
+      el.textContent = GLOBAL_CSS + RESPONSIVE_CSS;
+      document.head.appendChild(el);
+    }
+  }, []);
+
+  // Prefetch listings for hero visual
+  const { data: allData } = useListings({});
+  const listings = allData?.listings ?? [];
+
+  return (
+    <div className="hp-root">
+      {/* ── 1. Hero ── */}
+      <HeroSection listings={listings} />
+
+      {/* ── Ticker ── */}
+      <Ticker />
+
+      {/* ── 2. Categories ── */}
+      <CategoriesSection
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+      />
+
+      {/* ── 3. Featured Listings ── */}
+      <FeaturedListingsSection activeCategory={activeCategory} />
+
+      {/* ── 4. Trending Destinations ── */}
+      <TrendingDestinationsSection />
+
+      {/* ── 5. Experiences ── */}
+      <ExperiencesSection />
+
+      {/* ── 6. Host CTA ── */}
+      <HostCTASection />
+
+      {/* ── 7. Testimonials ── */}
+      <TestimonialsSection />
+
+      {/* ── 8. Mini Footer CTA ── */}
+      <MiniFooterCTA />
     </div>
   );
 }
