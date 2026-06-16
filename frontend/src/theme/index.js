@@ -14,14 +14,73 @@ import {
   motion,
   breakpoints,
   zIndex,
+  typography,
+  compTokens,
 } from "./tokens";
 
 // ─── CSS Variable Injection ───────────────────────────────────────────────────
+// Maps the JS design tokens onto the CSS custom properties consumed by
+// src/styles/index.css. Most of those variables are already defined as static
+// CSS in index.css (including dark-mode overrides via prefers-color-scheme and
+// the .dark class), so this is primarily useful for keeping brand/neutral
+// colors driven from a single JS source of truth and for any future
+// JS-driven theme switching (e.g. via useColorMode).
+const cssVariables = {
+  // Brand
+  "--color-primary-50": colors.primary[50],
+  "--color-primary-100": colors.primary[100],
+  "--color-primary-200": colors.primary[200],
+  "--color-primary-300": colors.primary[300],
+  "--color-primary-400": colors.primary[400],
+  "--color-primary-500": colors.primary[500],
+  "--color-primary-600": colors.primary[600],
+  "--color-primary-700": colors.primary[700],
+  "--color-primary-800": colors.primary[800],
+  "--color-primary-900": colors.primary[900],
+
+  // Secondary / teal
+  "--color-secondary-500": colors.secondary[500],
+  "--color-secondary-600": colors.secondary[600],
+
+  // Neutral scale
+  "--color-neutral-0": colors.neutral[0],
+  "--color-neutral-25": colors.neutral[25],
+  "--color-neutral-50": colors.neutral[50],
+  "--color-neutral-100": colors.neutral[100],
+  "--color-neutral-200": colors.neutral[200],
+  "--color-neutral-300": colors.neutral[300],
+  "--color-neutral-400": colors.neutral[400],
+  "--color-neutral-500": colors.neutral[500],
+  "--color-neutral-600": colors.neutral[600],
+  "--color-neutral-700": colors.neutral[700],
+  "--color-neutral-800": colors.neutral[800],
+  "--color-neutral-900": colors.neutral[900],
+
+  // Semantic
+  "--color-success": colors.success.base,
+  "--color-warning": colors.warning.base,
+  "--color-error": colors.error.base,
+  "--color-info": colors.info.base,
+
+  // Radii
+  "--radius-sm": radii.sm,
+  "--radius-md": radii.md,
+  "--radius-lg": radii.lg,
+  "--radius-xl": radii.xl,
+  "--radius-2xl": radii["2xl"],
+  "--radius-3xl": radii["3xl"],
+  "--radius-pill": radii.full,
+
+  // Fonts
+  "--font-display": fonts.display,
+  "--font-body": fonts.body,
+  "--font-mono": fonts.mono,
+};
 
 export function injectCSSVariables() {
   const root = document.documentElement;
   Object.entries(cssVariables).forEach(([key, value]) => {
-    root.style.setProperty(key, value);
+    if (value != null) root.style.setProperty(key, value);
   });
 }
 
@@ -401,12 +460,12 @@ export function getWanderlustTheme(mode = "light") {
         },
         styleOverrides: {
           root: ({ ownerState }) => ({
-            borderRadius: radii.pill,
+            borderRadius: radii.pill ?? radii.full,
             fontFamily: typography.fonts.body,
             fontWeight: typography.weights.semibold,
             letterSpacing: "0.01em",
             textTransform: "none",
-            transition: `background-color ${motion.duration.fast} ${motion.easing.easeOut}, color ${motion.duration.fast} ${motion.easing.easeOut}, box-shadow ${motion.duration.fast} ${motion.easing.easeOut}, transform ${motion.duration.fastest} ${motion.easing.easeOut}, border-color ${motion.duration.fast} ${motion.easing.easeOut}`,
+            transition: `background-color ${motion.duration.fast}ms ${motion.easing.easeOut}, color ${motion.duration.fast}ms ${motion.easing.easeOut}, box-shadow ${motion.duration.fast}ms ${motion.easing.easeOut}, transform ${motion.duration.fastest}ms ${motion.easing.easeOut}, border-color ${motion.duration.fast}ms ${motion.easing.easeOut}`,
             "&:active": {
               transform: "scale(0.98)",
             },
@@ -502,7 +561,7 @@ export function getWanderlustTheme(mode = "light") {
       MuiChip: {
         styleOverrides: {
           root: {
-            borderRadius: radii.pill,
+            borderRadius: radii.pill ?? radii.full,
             fontFamily: typography.fonts.body,
             fontWeight: typography.weights.medium,
             fontSize: "0.8125rem",
@@ -621,7 +680,7 @@ export function getWanderlustTheme(mode = "light") {
             border: `1px solid ${isDark ? darkColors.border : colors.neutral[200]}`,
             backgroundColor: isDark ? darkColors.surface : colors.neutral[0],
             boxShadow: shadows.card,
-            transition: `box-shadow ${motion.duration.base} ${motion.easing.easeOut}, transform ${motion.duration.base} ${motion.easing.easeOut}`,
+            transition: `box-shadow ${motion.duration.normal}ms ${motion.easing.easeOut}, transform ${motion.duration.normal}ms ${motion.easing.easeOut}`,
             overflow: "hidden",
           },
         },
@@ -732,7 +791,7 @@ export function getWanderlustTheme(mode = "light") {
             fontFamily: typography.fonts.body,
             fontSize: "0.9375rem",
             fontWeight: typography.weights.regular,
-            padding: `${spacing[2.5]} ${spacing[4]}`,
+            padding: `${spacing[2.5] ?? "10px"} ${spacing[4]}`,
             color: isDark ? darkColors.text : colors.neutral[700],
             borderRadius: radii.sm,
             margin: `0 ${spacing[1]}`,
@@ -769,7 +828,7 @@ export function getWanderlustTheme(mode = "light") {
             fontFamily: typography.fonts.body,
             fontWeight: typography.weights.regular,
             borderRadius: radii.md,
-            padding: `${spacing[1.5]} ${spacing[3]}`,
+            padding: `${spacing[1.5] ?? "6px"} ${spacing[3]}`,
             boxShadow: shadows.float,
             border: `1px solid ${isDark ? darkColors.border : colors.neutral[700]}`,
           },
@@ -936,7 +995,7 @@ export function getWanderlustTheme(mode = "light") {
       MuiTableRow: {
         styleOverrides: {
           root: {
-            transition: `background-color ${motion.duration.fast} ${motion.easing.easeOut}`,
+            transition: `background-color ${motion.duration.fast}ms ${motion.easing.easeOut}`,
             "&:hover": {
               backgroundColor: isDark
                 ? darkColors.surface2

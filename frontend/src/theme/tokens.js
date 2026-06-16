@@ -82,7 +82,7 @@ export const semantic = {
   },
 };
 
-// ─── Typography ───────────────────────────────────────────────────────────────
+// ─── Typography (raw font tokens) ──────────────────────────────────────────────
 export const fonts = {
   display: '"DM Serif Display", Georgia, serif',
   body: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -99,6 +99,45 @@ export const fontSizes = {
   "2xl": "1.5rem", // 24px
   "3xl": "1.875rem", // 30px
   "4xl": "2.25rem", // 36px
+};
+
+// ─── Typography (consolidated — used by theme/index.js) ────────────────────────
+export const typography = {
+  fonts,
+  fontSizes,
+  weights: {
+    thin: 100,
+    extralight: 200,
+    light: 300,
+    regular: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+    extrabold: 800,
+    black: 900,
+  },
+  lineHeights: {
+    none: 1.0,
+    tightest: 1.05,
+    tighter: 1.1,
+    tight: 1.25,
+    snug: 1.375,
+    normal: 1.5,
+    relaxed: 1.625,
+    loose: 1.75,
+    looser: 2.0,
+  },
+  tracking: {
+    tightest: "-0.03em",
+    tighter: "-0.02em",
+    tight: "-0.01em",
+    normal: "0em",
+    wide: "0.025em",
+    wider: "0.05em",
+    widest: "0.10em",
+    overline: "0.12em",
+    "overline-wide": "0.14em",
+  },
 };
 
 // ─── Radii ────────────────────────────────────────────────────────────────────
@@ -145,6 +184,23 @@ export const motion = {
     easeIn: "cubic-bezier(0.4,0,1,1)",
     easeOut: "cubic-bezier(0,0,0.2,1)",
     easeInOut: "cubic-bezier(0.4,0,0.2,1)",
+    emphatic: "cubic-bezier(0.4,0,0,1)",
+  },
+
+  // Pre-composed `transition` shorthand strings — used directly in sx props
+  transition: {
+    fastest: "all 100ms cubic-bezier(0.2,0,0,1)",
+    fast: "all 150ms cubic-bezier(0.2,0,0,1)",
+    base: "all 250ms cubic-bezier(0.4,0,0.2,1)",
+    slow: "all 350ms cubic-bezier(0.4,0,0.2,1)",
+  },
+};
+
+// ─── Component-level tokens ─────────────────────────────────────────────────────
+export const compTokens = {
+  input: {
+    transition:
+      "border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease",
   },
 };
 
