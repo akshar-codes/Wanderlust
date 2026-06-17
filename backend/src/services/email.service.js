@@ -220,15 +220,15 @@ async function sendEmailVerificationEmail({
     <div class="body">
       <p class="greeting">Hi ${escapeHtml(username)},</p>
       <p>Thanks for joining Wanderlust! Please verify your email address to unlock all features, including creating listings and booking stays.</p>
- 
+
       <div class="cta-wrapper">
         <a href="${verifyUrl}" class="cta">Verify my email</a>
       </div>
- 
+
       <p>This link will expire in <strong>${expiresInHours} hours</strong>. If you did not create a Wanderlust account, you can safely ignore this email.</p>
- 
+
       <hr class="divider" />
- 
+
       <p style="font-size:13px;color:#7a6f68;">If the button above doesn't work, copy and paste this URL into your browser:</p>
       <div class="fallback">
         <code>${verifyUrl}</code>
@@ -268,4 +268,5 @@ function escapeHtml(str) {
 module.exports = {
   sendMail,
   sendPasswordResetEmail,
+  sendEmailVerificationEmail,
 };

@@ -1,3 +1,9 @@
+"use strict";
+
+// ── Seed review data — plain objects only, no Mongoose models ────────────────
+// The Review model is registered in src/models/review.js; importing or
+// re-registering it here causes an OverwriteModelError at startup.
+
 const reviews = [
   {
     comment:
@@ -142,8 +148,6 @@ const reviews = [
     comment: "Absolutely pristine condition. Felt like a brand new apartment.",
     rating: 5,
   },
-
-  // ── Added for a more realistic ratings spread (originals were all 3★+) ──
   {
     comment:
       "Absolutely stunning location, but the photos were a bit misleading about the actual room size.",

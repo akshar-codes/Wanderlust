@@ -26,8 +26,6 @@ function requireAuth() {
 
 // ── requireRole ───────────────────────────────────────────────────────────────
 
-requireRole("host", "admin");
-
 function requireRole(...roles) {
   if (roles.length === 0)
     throw new Error("requireRole: at least one role required");

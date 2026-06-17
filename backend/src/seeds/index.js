@@ -30,10 +30,9 @@ if (!Array.isArray(userData.hosts) || !Array.isArray(userData.travelers)) {
 // ── Connection ─────────────────────────────────────────────────────────────
 
 async function main() {
-  await mongoose.connect(MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  // FIX: removed deprecated useNewUrlParser and useUnifiedTopology options —
+  // Mongoose 7+ accepts neither and will throw on unrecognised options.
+  await mongoose.connect(MONGO_URL);
   console.log("✅ MongoDB connected");
 }
 
@@ -141,7 +140,7 @@ async function initDB() {
       });
       newListing.image = {
         url: result.secure_url,
-        filename: result.public_id, // was incorrectly `public_id` — image schema only has `filename`
+        filename: result.public_id,
       };
     }
 
