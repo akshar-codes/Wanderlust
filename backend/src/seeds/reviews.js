@@ -142,6 +142,97 @@ const reviews = [
     comment: "Absolutely pristine condition. Felt like a brand new apartment.",
     rating: 5,
   },
+
+  // ── Added for a more realistic ratings spread (originals were all 3★+) ──
+  {
+    comment:
+      "Absolutely stunning location, but the photos were a bit misleading about the actual room size.",
+    rating: 3,
+  },
+  {
+    comment:
+      "Checked in late and the host was incredibly understanding and flexible. Made our trip stress-free.",
+    rating: 5,
+  },
+  {
+    comment:
+      "The Wi-Fi kept dropping, which was a problem since I needed it for work calls.",
+    rating: 2,
+  },
+  {
+    comment:
+      "Beautiful place but quite far from public transport — we needed a car to get around.",
+    rating: 3,
+  },
+  {
+    comment:
+      "Everything was exactly as described. No surprises, just a great stay.",
+    rating: 5,
+  },
+  {
+    comment:
+      "The cleaning fee felt steep for how short our stay was, but the place itself was lovely.",
+    rating: 4,
+  },
+  {
+    comment:
+      "Unfortunately the listing was cancelled on us two days before check-in with no real explanation. Very disappointing.",
+    rating: 1,
+  },
+  {
+    comment:
+      "Loved the little touches — local snacks, a handwritten welcome note, recommendations for the area.",
+    rating: 5,
+  },
+  {
+    comment:
+      "It was okay. Nothing wrong with it, but nothing particularly memorable either.",
+    rating: 3,
+  },
+  {
+    comment:
+      "The pictures really don't capture how peaceful and quiet this place is. Exactly what we needed.",
+    rating: 5,
+  },
+  {
+    comment:
+      "Arrived to find the place hadn't been cleaned properly — dust everywhere and dishes left in the sink.",
+    rating: 1,
+  },
+  {
+    comment:
+      "Great for a family trip — plenty of space and the kids had a blast.",
+    rating: 4,
+  },
+  {
+    comment:
+      "The shower had almost no water pressure, which was frustrating after a long day of travel.",
+    rating: 2,
+  },
+  {
+    comment:
+      "Host was very responsive and answered all of our questions quickly before and during our stay.",
+    rating: 5,
+  },
+  {
+    comment:
+      "Decent place for the price but a few maintenance issues — a sticky door, a flickering hallway light.",
+    rating: 3,
+  },
+  {
+    comment:
+      "This was hands-down one of the best stays I've ever had. Can't wait to come back.",
+    rating: 5,
+  },
+  {
+    comment:
+      "Noise from a nearby construction site started early most mornings. Wish that had been mentioned.",
+    rating: 2,
+  },
+  {
+    comment: "Solid, no-frills stay. Did the job for a short work trip.",
+    rating: 4,
+  },
 ];
 
 module.exports = { data: reviews };

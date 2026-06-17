@@ -5,7 +5,6 @@ import { useListings } from "../hooks/useListings";
 
 // ─── Inline styles injected once ─────────────────────────────────────────────
 const GLOBAL_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
   .hp-root {
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;

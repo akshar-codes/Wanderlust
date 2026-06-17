@@ -1,5 +1,19 @@
 "use strict";
 
+/**
+ * Seed listing data — kept structurally aligned with the current Listing
+ * schema (models/listing.js). Each entry populates:
+ *  - the legacy `image` field (for backward compatibility)
+ *  - the structured `images[]` array (multiple captioned photos)
+ *  - `pricing` breakdown alongside the legacy `price`
+ *  - `houseRules`, `availabilityCalendar`, and cached `bookingCount` /
+ *    `wishlistCount` values for a more realistic demo dataset
+ *
+ * Image URLs reuse already-allowlisted images.unsplash.com photo IDs (see
+ * helmet.config.js CSP imgSrc) at varying widths/captions rather than
+ * introducing unverified new URLs.
+ */
+
 const sampleListings = [
   {
     title: "Cozy Beachfront Cottage",
@@ -8,9 +22,29 @@ const sampleListings = [
     description:
       "Escape to this charming beachfront cottage for a relaxing getaway. Enjoy stunning ocean views and easy beach access.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "malibu-beachfront-cottage-hero",
+      url: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "malibu-beachfront-cottage-hero",
+        caption: "Cottage exterior steps from the sand",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "malibu-beachfront-cottage-deck",
+        caption: "Morning coffee on the ocean-view deck",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "malibu-beachfront-cottage-beach",
+        caption: "Direct path to the private beach access",
+        isPrimary: false,
+      },
+    ],
     price: 1500,
     pricing: {
       nightlyPrice: 1500,
@@ -35,6 +69,9 @@ const sampleListings = [
       "beach_access",
       "bbq_grill",
       "hot_water",
+      "towels",
+      "bed_linens",
+      "smoke_alarm",
     ],
     houseRules: {
       checkInTime: "15:00",
@@ -47,6 +84,15 @@ const sampleListings = [
     draft: false,
     minimumStay: 2,
     maximumStay: 30,
+    bookingCount: 86,
+    wishlistCount: 412,
+    availabilityCalendar: [
+      {
+        startDate: "2026-07-10T00:00:00.000Z",
+        endDate: "2026-07-17T00:00:00.000Z",
+        reason: "booked",
+      },
+    ],
   },
   {
     title: "Modern Loft in Downtown",
@@ -55,9 +101,29 @@ const sampleListings = [
     description:
       "Stay in the heart of the city in this stylish loft apartment. Perfect for urban explorers!",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "nyc-downtown-loft-hero",
+      url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "nyc-downtown-loft-hero",
+        caption: "Open-plan living area with skyline views",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "nyc-downtown-loft-workspace",
+        caption: "Dedicated workspace, ideal for remote work",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "nyc-downtown-loft-bedroom",
+        caption: "Bedroom nook with floor-to-ceiling windows",
+        isPrimary: false,
+      },
+    ],
     price: 1200,
     pricing: {
       nightlyPrice: 1200,
@@ -68,7 +134,7 @@ const sampleListings = [
     location: "New York City",
     country: "United States",
     geometry: { type: "Point", coordinates: [-74.006, 40.7128] },
-    category: "boats",
+    category: "iconic",
     propertyType: "loft",
     bedrooms: 1,
     bathrooms: 1,
@@ -82,6 +148,9 @@ const sampleListings = [
       "dedicated_workspace",
       "elevator",
       "tv",
+      "streaming_services",
+      "gym",
+      "paid_parking",
     ],
     houseRules: {
       checkInTime: "16:00",
@@ -92,6 +161,10 @@ const sampleListings = [
     featured: false,
     status: "active",
     draft: false,
+    minimumStay: 1,
+    maximumStay: 14,
+    bookingCount: 34,
+    wishlistCount: 120,
   },
   {
     title: "Mountain Retreat",
@@ -100,9 +173,29 @@ const sampleListings = [
     description:
       "Unplug and unwind in this peaceful mountain cabin. Surrounded by nature, it's a perfect place to recharge.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "aspen-mountain-retreat-hero",
+      url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "aspen-mountain-retreat-hero",
+        caption: "Log cabin nestled among the pines",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "aspen-mountain-retreat-firepit",
+        caption: "Evenings by the outdoor fire pit",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "aspen-mountain-retreat-hottub",
+        caption: "Private hot tub with mountain views",
+        isPrimary: false,
+      },
+    ],
     price: 1000,
     pricing: {
       nightlyPrice: 1000,
@@ -128,17 +221,36 @@ const sampleListings = [
       "fire_pit",
       "bbq_grill",
       "hot_tub",
+      "smoke_alarm",
+      "carbon_monoxide_alarm",
+      "books_and_reading_material",
     ],
     houseRules: {
       checkInTime: "15:00",
       checkOutTime: "11:00",
       petsAllowed: true,
       smokingAllowed: false,
+      quietHoursStart: "22:00",
+      quietHoursEnd: "07:00",
+      additionalRules: [
+        "No loud music after quiet hours",
+        "Please recycle glass and paper",
+      ],
     },
     featured: true,
     status: "active",
     draft: false,
     minimumStay: 3,
+    maximumStay: 21,
+    bookingCount: 64,
+    wishlistCount: 301,
+    availabilityCalendar: [
+      {
+        startDate: "2026-09-01T00:00:00.000Z",
+        endDate: "2026-09-05T00:00:00.000Z",
+        reason: "maintenance",
+      },
+    ],
   },
   {
     title: "Historic Villa in Tuscany",
@@ -147,9 +259,29 @@ const sampleListings = [
     description:
       "Experience the charm of Tuscany in this beautifully restored villa. Explore the rolling hills and vineyards.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "florence-tuscany-villa-hero",
+      url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "florence-tuscany-villa-hero",
+        caption: "Villa façade overlooking the vineyard",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "florence-tuscany-villa-pool",
+        caption: "Private pool surrounded by olive trees",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "florence-tuscany-villa-dining",
+        caption: "Al fresco dining terrace at sunset",
+        isPrimary: false,
+      },
+    ],
     price: 2500,
     pricing: {
       nightlyPrice: 2500,
@@ -175,17 +307,34 @@ const sampleListings = [
       "bbq_grill",
       "outdoor_dining",
       "hot_water",
+      "washer",
+      "dryer",
+      "dedicated_workspace",
     ],
     houseRules: {
       checkInTime: "14:00",
       checkOutTime: "12:00",
       smokingAllowed: false,
       partiesAllowed: false,
+      additionalRules: [
+        "No outside catering without prior host approval",
+        "Pool area closes at 9pm",
+      ],
     },
     featured: true,
     status: "active",
     draft: false,
     minimumStay: 5,
+    maximumStay: 21,
+    bookingCount: 41,
+    wishlistCount: 528,
+    availabilityCalendar: [
+      {
+        startDate: "2026-08-01T00:00:00.000Z",
+        endDate: "2026-08-15T00:00:00.000Z",
+        reason: "booked",
+      },
+    ],
   },
   {
     title: "Secluded Treehouse Getaway",
@@ -194,9 +343,29 @@ const sampleListings = [
     description:
       "Live among the treetops in this unique treehouse retreat. A true nature lover's paradise.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "portland-treehouse-hero",
+      url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "portland-treehouse-hero",
+        caption: "Treehouse tucked among the forest canopy",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "portland-treehouse-deck",
+        caption: "Wraparound deck with forest views",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "portland-treehouse-interior",
+        caption: "Snug interior with reading nook",
+        isPrimary: false,
+      },
+    ],
     price: 800,
     pricing: { nightlyPrice: 800, cleaningFee: 60, serviceFee: 40, taxes: 80 },
     location: "Portland",
@@ -208,7 +377,15 @@ const sampleListings = [
     bathrooms: 1,
     beds: 1,
     maxGuests: 2,
-    amenities: ["wifi", "hot_water", "heating", "garden", "fire_pit"],
+    amenities: [
+      "wifi",
+      "hot_water",
+      "heating",
+      "garden",
+      "fire_pit",
+      "smoke_alarm",
+      "books_and_reading_material",
+    ],
     houseRules: {
       checkInTime: "15:00",
       checkOutTime: "11:00",
@@ -218,6 +395,10 @@ const sampleListings = [
     featured: false,
     status: "active",
     draft: false,
+    minimumStay: 1,
+    maximumStay: 7,
+    bookingCount: 22,
+    wishlistCount: 198,
   },
   {
     title: "Beachfront Paradise",
@@ -226,9 +407,29 @@ const sampleListings = [
     description:
       "Step out of your door onto the sandy beach. This beachfront condo offers the ultimate relaxation.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "cancun-beachfront-paradise-hero",
+      url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "cancun-beachfront-paradise-hero",
+        caption: "Condo balcony steps from turquoise water",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "cancun-beachfront-paradise-pool",
+        caption: "Shared pool overlooking the beach",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "cancun-beachfront-paradise-living",
+        caption: "Bright living area with ocean breeze",
+        isPrimary: false,
+      },
+    ],
     price: 2000,
     pricing: {
       nightlyPrice: 2000,
@@ -253,6 +454,9 @@ const sampleListings = [
       "beach_access",
       "ocean_view",
       "free_parking",
+      "hot_water",
+      "towels",
+      "smoke_alarm",
     ],
     houseRules: {
       checkInTime: "15:00",
@@ -263,6 +467,10 @@ const sampleListings = [
     featured: false,
     status: "active",
     draft: false,
+    minimumStay: 1,
+    maximumStay: 21,
+    bookingCount: 53,
+    wishlistCount: 240,
   },
   {
     title: "Rustic Cabin by the Lake",
@@ -271,9 +479,29 @@ const sampleListings = [
     description:
       "Spend your days fishing and kayaking on the serene lake. This cozy cabin is perfect for outdoor enthusiasts.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "tahoe-lake-cabin-hero",
+      url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "tahoe-lake-cabin-hero",
+        caption: "Cabin exterior at the water's edge",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "tahoe-lake-cabin-dock",
+        caption: "Private dock for fishing and kayaking",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "tahoe-lake-cabin-fireplace",
+        caption: "Warm living room with stone fireplace",
+        isPrimary: false,
+      },
+    ],
     price: 900,
     pricing: { nightlyPrice: 900, cleaningFee: 75, serviceFee: 45, taxes: 90 },
     location: "Lake Tahoe",
@@ -294,6 +522,8 @@ const sampleListings = [
       "bbq_grill",
       "fire_pit",
       "smoke_alarm",
+      "carbon_monoxide_alarm",
+      "first_aid_kit",
     ],
     houseRules: {
       checkInTime: "15:00",
@@ -305,6 +535,9 @@ const sampleListings = [
     status: "active",
     draft: false,
     minimumStay: 2,
+    maximumStay: 14,
+    bookingCount: 38,
+    wishlistCount: 165,
   },
   {
     title: "Luxury Penthouse with City Views",
@@ -312,9 +545,29 @@ const sampleListings = [
     description:
       "Indulge in luxury living with panoramic city views from this stunning penthouse apartment.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "la-luxury-penthouse-hero",
+      url: "https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "la-luxury-penthouse-hero",
+        caption: "Floor-to-ceiling windows overlooking the skyline",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "la-luxury-penthouse-balcony",
+        caption: "Private balcony, ideal for sunset views",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "la-luxury-penthouse-lounge",
+        caption: "Designer lounge with home entertainment system",
+        isPrimary: false,
+      },
+    ],
     price: 3500,
     pricing: {
       nightlyPrice: 3500,
@@ -342,6 +595,8 @@ const sampleListings = [
       "dedicated_workspace",
       "tv",
       "streaming_services",
+      "balcony",
+      "smoke_alarm",
     ],
     houseRules: {
       checkInTime: "15:00",
@@ -352,6 +607,10 @@ const sampleListings = [
     featured: true,
     status: "active",
     draft: false,
+    minimumStay: 1,
+    maximumStay: 30,
+    bookingCount: 29,
+    wishlistCount: 612,
   },
   {
     title: "Ski-In/Ski-Out Chalet",
@@ -359,9 +618,29 @@ const sampleListings = [
     description:
       "Hit the slopes right from your doorstep in this ski-in/ski-out chalet in the Swiss Alps.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "verbier-ski-chalet-hero",
+      url: "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "verbier-ski-chalet-hero",
+        caption: "Chalet exterior with direct slope access",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "verbier-ski-chalet-hottub",
+        caption: "Outdoor hot tub with alpine views",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "verbier-ski-chalet-livingroom",
+        caption: "Living room with stone fireplace",
+        isPrimary: false,
+      },
+    ],
     price: 3000,
     pricing: {
       nightlyPrice: 3000,
@@ -387,16 +666,31 @@ const sampleListings = [
       "mountain_view",
       "free_parking",
       "fire_pit",
+      "smoke_alarm",
+      "carbon_monoxide_alarm",
+      "fire_extinguisher",
     ],
     houseRules: {
       checkInTime: "16:00",
       checkOutTime: "10:00",
       smokingAllowed: false,
+      quietHoursStart: "23:00",
+      quietHoursEnd: "08:00",
     },
     featured: true,
     status: "active",
     draft: false,
     minimumStay: 7,
+    maximumStay: 14,
+    bookingCount: 18,
+    wishlistCount: 487,
+    availabilityCalendar: [
+      {
+        startDate: "2026-12-24T00:00:00.000Z",
+        endDate: "2026-12-31T00:00:00.000Z",
+        reason: "blocked",
+      },
+    ],
   },
   {
     title: "Safari Lodge in the Serengeti",
@@ -405,9 +699,29 @@ const sampleListings = [
     description:
       "Experience the thrill of the wild in a comfortable safari lodge. Witness the Great Migration up close.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "serengeti-safari-lodge-hero",
+      url: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "serengeti-safari-lodge-hero",
+        caption: "Lodge overlooking the open savanna",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "serengeti-safari-lodge-deck",
+        caption: "Viewing deck for wildlife at sunrise",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "serengeti-safari-lodge-tent",
+        caption: "Furnished safari tent interior",
+        isPrimary: false,
+      },
+    ],
     price: 4000,
     pricing: {
       nightlyPrice: 4000,
@@ -424,16 +738,29 @@ const sampleListings = [
     bathrooms: 2,
     beds: 2,
     maxGuests: 4,
-    amenities: ["hot_water", "breakfast", "first_aid_kit", "smoke_alarm"],
+    amenities: [
+      "hot_water",
+      "breakfast",
+      "first_aid_kit",
+      "smoke_alarm",
+      "fire_extinguisher",
+    ],
     houseRules: {
       checkInTime: "14:00",
       checkOutTime: "10:00",
       smokingAllowed: false,
+      additionalRules: [
+        "Stay on marked paths after dark for safety",
+        "Keep tent zipped at all times",
+      ],
     },
     featured: true,
     status: "active",
     draft: false,
     minimumStay: 3,
+    maximumStay: 10,
+    bookingCount: 12,
+    wishlistCount: 355,
   },
   {
     title: "Historic Canal House",
@@ -442,9 +769,29 @@ const sampleListings = [
     description:
       "Stay in a piece of history in this beautifully preserved canal house in Amsterdam's iconic district.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "amsterdam-canal-house-hero",
+      url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "amsterdam-canal-house-hero",
+        caption: "Canal-side façade in the historic district",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "amsterdam-canal-house-living",
+        caption: "Living room with original wood beams",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "amsterdam-canal-house-kitchen",
+        caption: "Updated kitchen with canal views",
+        isPrimary: false,
+      },
+    ],
     price: 1800,
     pricing: {
       nightlyPrice: 1800,
@@ -461,7 +808,17 @@ const sampleListings = [
     bathrooms: 2,
     beds: 3,
     maxGuests: 5,
-    amenities: ["wifi", "kitchen", "heating", "washer", "tv", "hot_water"],
+    amenities: [
+      "wifi",
+      "kitchen",
+      "heating",
+      "washer",
+      "dryer",
+      "tv",
+      "hot_water",
+      "smoke_alarm",
+      "books_and_reading_material",
+    ],
     houseRules: {
       checkInTime: "15:00",
       checkOutTime: "11:00",
@@ -471,6 +828,10 @@ const sampleListings = [
     featured: false,
     status: "active",
     draft: false,
+    minimumStay: 1,
+    maximumStay: 21,
+    bookingCount: 47,
+    wishlistCount: 210,
   },
   {
     title: "Private Island Retreat",
@@ -479,9 +840,29 @@ const sampleListings = [
     description:
       "Have an entire island to yourself for a truly exclusive and unforgettable vacation experience.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1618140052121-39fc6db33972?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "fiji-private-island-hero",
+      url: "https://images.unsplash.com/photo-1618140052121-39fc6db33972?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1618140052121-39fc6db33972?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "fiji-private-island-hero",
+        caption: "Aerial view of the private island",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1618140052121-39fc6db33972?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "fiji-private-island-villa",
+        caption: "Overwater villa with infinity pool",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1618140052121-39fc6db33972?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "fiji-private-island-beach",
+        caption: "Secluded private beach at sunset",
+        isPrimary: false,
+      },
+    ],
     price: 10000,
     pricing: {
       nightlyPrice: 10000,
@@ -506,9 +887,10 @@ const sampleListings = [
       "ocean_view",
       "bbq_grill",
       "hot_tub",
-      "kayaks",
       "breakfast",
       "smoke_alarm",
+      "garden",
+      "first_aid_kit",
     ],
     houseRules: {
       checkInTime: "14:00",
@@ -519,6 +901,21 @@ const sampleListings = [
     status: "active",
     draft: false,
     minimumStay: 5,
+    maximumStay: 14,
+    bookingCount: 6,
+    wishlistCount: 891,
+    availabilityCalendar: [
+      {
+        startDate: "2026-07-01T00:00:00.000Z",
+        endDate: "2026-07-08T00:00:00.000Z",
+        reason: "booked",
+      },
+      {
+        startDate: "2026-12-20T00:00:00.000Z",
+        endDate: "2027-01-02T00:00:00.000Z",
+        reason: "booked",
+      },
+    ],
   },
   {
     title: "Charming Cottage in the Cotswolds",
@@ -527,9 +924,29 @@ const sampleListings = [
     description:
       "Escape to the picturesque Cotswolds in this quaint and charming cottage with a thatched roof.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1602088113235-229c19758e9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "cotswolds-cottage-hero",
+      url: "https://images.unsplash.com/photo-1602088113235-229c19758e9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1602088113235-229c19758e9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "cotswolds-cottage-hero",
+        caption: "Thatched-roof cottage exterior",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1602088113235-229c19758e9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "cotswolds-cottage-garden",
+        caption: "Cottage garden with fire pit",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1602088113235-229c19758e9f?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "cotswolds-cottage-kitchen",
+        caption: "Country kitchen with original beams",
+        isPrimary: false,
+      },
+    ],
     price: 1200,
     pricing: {
       nightlyPrice: 1200,
@@ -553,7 +970,9 @@ const sampleListings = [
       "garden",
       "fire_pit",
       "washer",
+      "dryer",
       "hot_water",
+      "smoke_alarm",
     ],
     houseRules: {
       checkInTime: "15:00",
@@ -564,6 +983,10 @@ const sampleListings = [
     featured: false,
     status: "active",
     draft: false,
+    minimumStay: 1,
+    maximumStay: 14,
+    bookingCount: 33,
+    wishlistCount: 144,
   },
   {
     title: "Beachfront Bungalow in Bali",
@@ -572,9 +995,29 @@ const sampleListings = [
     description:
       "Relax on the sandy shores of Bali in this beautiful beachfront bungalow with a private pool.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "bali-beachfront-bungalow-hero",
+      url: "https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "bali-beachfront-bungalow-hero",
+        caption: "Bungalow exterior with private pool",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "bali-beachfront-bungalow-pool",
+        caption: "Plunge pool steps from the beach",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1602391833977-358a52198938?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "bali-beachfront-bungalow-bedroom",
+        caption: "Open-air bedroom with ocean breeze",
+        isPrimary: false,
+      },
+    ],
     price: 1800,
     pricing: {
       nightlyPrice: 1800,
@@ -600,6 +1043,8 @@ const sampleListings = [
       "ocean_view",
       "breakfast",
       "hot_water",
+      "outdoor_dining",
+      "smoke_alarm",
     ],
     houseRules: {
       checkInTime: "14:00",
@@ -610,6 +1055,9 @@ const sampleListings = [
     status: "active",
     draft: false,
     minimumStay: 3,
+    maximumStay: 21,
+    bookingCount: 59,
+    wishlistCount: 276,
   },
   {
     title: "Desert Oasis in Dubai",
@@ -618,9 +1066,29 @@ const sampleListings = [
     description:
       "Experience luxury in the middle of the desert in this opulent oasis in Dubai with a private pool.",
     image: {
-      filename: "listingimage",
-      url: "https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60",
+      filename: "dubai-desert-oasis-hero",
+      url: "https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
     },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "dubai-desert-oasis-hero",
+        caption: "Villa infinity pool overlooking the dunes",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "dubai-desert-oasis-lounge",
+        caption: "Air-conditioned lounge with desert views",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "dubai-desert-oasis-suite",
+        caption: "Master suite with private terrace",
+        isPrimary: false,
+      },
+    ],
     price: 5000,
     pricing: {
       nightlyPrice: 5000,
@@ -647,6 +1115,8 @@ const sampleListings = [
       "tv",
       "free_parking",
       "breakfast",
+      "hot_tub",
+      "smoke_alarm",
     ],
     houseRules: {
       checkInTime: "15:00",
@@ -657,6 +1127,150 @@ const sampleListings = [
     featured: true,
     status: "active",
     draft: false,
+    minimumStay: 1,
+    maximumStay: 14,
+    bookingCount: 21,
+    wishlistCount: 503,
+  },
+  {
+    title: "Sunlit Private Room near Hyde Park",
+    shortDescription:
+      "A bright private room in a quiet townhouse, minutes from Hyde Park and the Tube.",
+    description:
+      "Settle into this sunlit private room inside a beautifully kept Victorian townhouse, just a short walk from Hyde Park. Enjoy a quiet residential street with easy access to the Underground — ideal for budget-conscious travelers who still want a comfortable, central base in London.",
+    image: {
+      filename: "london-hyde-park-room-hero",
+      url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+    },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "london-hyde-park-room-hero",
+        caption: "Bright private room with a large window",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "london-hyde-park-room-desk",
+        caption: "Cosy desk nook, perfect for remote work",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "london-hyde-park-room-bed",
+        caption: "Comfortable bed with fresh linens",
+        isPrimary: false,
+      },
+    ],
+    price: 45,
+    pricing: { nightlyPrice: 45, cleaningFee: 10, serviceFee: 5, taxes: 5 },
+    location: "London",
+    country: "United Kingdom",
+    geometry: { type: "Point", coordinates: [-0.1657, 51.5073] },
+    category: "rooms",
+    propertyType: "other",
+    bedrooms: 1,
+    bathrooms: 1,
+    beds: 1,
+    maxGuests: 2,
+    amenities: [
+      "wifi",
+      "heating",
+      "bed_linens",
+      "towels",
+      "hair_dryer",
+      "iron",
+      "long_term_stays_allowed",
+      "kitchen",
+    ],
+    houseRules: {
+      checkInTime: "15:00",
+      checkOutTime: "10:00",
+      smokingAllowed: false,
+      petsAllowed: false,
+      quietHoursStart: "22:00",
+      quietHoursEnd: "08:00",
+      additionalRules: [
+        "Please remove shoes indoors",
+        "Kitchen is shared — please clean up after use",
+      ],
+    },
+    featured: false,
+    status: "active",
+    draft: false,
+    minimumStay: 2,
+    maximumStay: 60,
+    bookingCount: 71,
+    wishlistCount: 95,
+  },
+  {
+    title: "Floating Houseboat on Lake Union",
+    shortDescription:
+      "Wake up to water views in a cozy floating home moored on Lake Union.",
+    description:
+      "Experience Seattle from the water in this charming floating houseboat moored on Lake Union. Watch seaplanes take off, paddle right from your dock, and enjoy skyline views — all within a short drive of downtown.",
+    image: {
+      filename: "seattle-houseboat-hero",
+      url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+    },
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60",
+        filename: "seattle-houseboat-hero",
+        caption: "Houseboat exterior on Lake Union",
+        isPrimary: true,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=900&q=60",
+        filename: "seattle-houseboat-deck",
+        caption: "Private dock and deck seating",
+        isPrimary: false,
+      },
+      {
+        url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=60",
+        filename: "seattle-houseboat-interior",
+        caption: "Cozy galley kitchen and living space",
+        isPrimary: false,
+      },
+    ],
+    price: 950,
+    pricing: { nightlyPrice: 950, cleaningFee: 70, serviceFee: 40, taxes: 95 },
+    location: "Seattle",
+    country: "United States",
+    geometry: { type: "Point", coordinates: [-122.3344, 47.6262] },
+    category: "boats",
+    propertyType: "boat",
+    bedrooms: 1,
+    bathrooms: 1,
+    beds: 2,
+    maxGuests: 3,
+    amenities: [
+      "wifi",
+      "kitchen",
+      "heating",
+      "lake_access",
+      "hot_water",
+      "smoke_alarm",
+      "carbon_monoxide_alarm",
+      "fire_extinguisher",
+    ],
+    houseRules: {
+      checkInTime: "16:00",
+      checkOutTime: "11:00",
+      smokingAllowed: false,
+      petsAllowed: false,
+      additionalRules: [
+        "Life jackets provided — please wear them when on the dock with children",
+        "No diving from the deck",
+      ],
+    },
+    featured: false,
+    status: "active",
+    draft: false,
+    minimumStay: 2,
+    maximumStay: 14,
+    bookingCount: 27,
+    wishlistCount: 168,
   },
 ];
 

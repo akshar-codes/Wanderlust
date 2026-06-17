@@ -401,7 +401,6 @@ export function getWanderlustTheme(mode = "light") {
       // ── CssBaseline — reset + global styles ─────────────────────────────
       MuiCssBaseline: {
         styleOverrides: `
-          @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
           *, *::before, *::after { box-sizing: border-box; }
 
