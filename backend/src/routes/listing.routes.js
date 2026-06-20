@@ -12,7 +12,7 @@ const {
   listingBodySchema,
   listingPatchSchema,
   blockedDateSchema,
-} = require("../validators/schemas");
+} = require("../validators");
 const { createLimiter } = require("../config/rateLimiter.config");
 const listingRepo = require("../repositories/listing.repository");
 

@@ -5,10 +5,7 @@ const router = express.Router();
 
 const asyncHandler = require("../utils/asyncHandler");
 
-const {
-  searchQuerySchema,
-  autocompleteQuerySchema,
-} = require("../validators/schemas");
+const { searchQuerySchema, autocompleteQuerySchema } = require("../validators");
 
 const {
   searchListings,

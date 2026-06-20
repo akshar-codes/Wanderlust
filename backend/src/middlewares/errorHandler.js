@@ -1,6 +1,6 @@
 const AppError = require("../utils/AppError");
 const { sendError } = require("../utils/apiResponse");
-const { flattenZodErrors } = require("../validators/schemas");
+const { flattenZodErrors } = require("../validators");
 const logger = require("../utils/logger");
 
 const IS_PROD = process.env.NODE_ENV === "production";

@@ -12,7 +12,7 @@ const {
   updateSettingsBodySchema,
   notificationPreferencesBodySchema,
   changeRoleBodySchema,
-} = require("../validators/schemas");
+} = require("../validators");
 
 const {
   requireAuth,

@@ -1,5 +1,5 @@
 const AppError = require("../utils/AppError");
-const { flattenZodErrors } = require("../validators/schemas");
+const { flattenZodErrors } = require("../validators");
 
 const validate = (schema) => (req, res, next) => {
   const result = schema.safeParse(req.body);

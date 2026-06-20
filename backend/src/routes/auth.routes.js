@@ -12,12 +12,12 @@ const {
   loginBodySchema,
   forgotPasswordBodySchema,
   resetPasswordBodySchema,
-} = require("../validators/schemas");
+  verifyEmailBodySchema,
+} = require("../validators");
 const { authLimiter } = require("../config/rateLimiter.config");
 const saveRedirectUrl = require("../middlewares/saveRedirectUrl");
 const authFailureLogger = require("../middlewares/authFailureLogger");
 const { requireAuth } = require("../middlewares/rbac");
-const { verifyEmailBodySchema } = require("../validators/schemas");
 const { resendLimiter } = require("../config/rateLimiter.config");
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

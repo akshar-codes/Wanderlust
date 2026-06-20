@@ -6,7 +6,7 @@ const router = express.Router({ mergeParams: true });
 const asyncHandler = require("../utils/asyncHandler");
 const reviewCtrl = require("../controllers/review.controller");
 const validate = require("../middlewares/validate");
-const { reviewBodySchema } = require("../validators/schemas");
+const { reviewBodySchema } = require("../validators");
 const reviewRepo = require("../repositories/review.repository");
 
 const {
