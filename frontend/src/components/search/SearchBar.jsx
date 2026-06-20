@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Loader2, MapPin } from "lucide-react";
-import { useAutocomplete } from "../hooks/useSearch";
+import { useAutocomplete } from "../../hooks/useSearch";
 
 // ─── Sub-component: Suggestion row ────────────────────────────────────────────
 function SuggestionRow({ item, isHighlighted, onSelect }) {
