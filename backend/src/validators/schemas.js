@@ -25,6 +25,39 @@ const coerceNonNegativeNumber = (label) =>
     z.number().min(0, `${label} must be 0 or greater`),
   );
 
+const numericQueryParam = (label, { min, max } = {}) =>
+  z.preprocess(
+    (v) => (v === "" || v === undefined ? undefined : Number(v)),
+    z
+      .number({ invalid_type_error: `${label} must be a number` })
+      .optional()
+      .refine(
+        (v) => v === undefined || !isNaN(v),
+        `${label} must be a valid number`,
+      )
+      .refine(
+        (v) => min === undefined || v === undefined || v >= min,
+        `${label} must be ≥ ${min}`,
+      )
+      .refine(
+        (v) => max === undefined || v === undefined || v <= max,
+        `${label} must be ≤ ${max}`,
+      ),
+  );
+
+/** Splits "wifi,pool,kitchen" → ["wifi", "pool", "kitchen"] */
+const commaSeparatedArray = z
+  .string()
+  .optional()
+  .transform((v) =>
+    v === undefined
+      ? undefined
+      : v
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+  );
+
 // ── Enums ─────────────────────────────────────────────────────────────────────
 
 const LISTING_CATEGORIES = [
@@ -117,6 +150,14 @@ const AMENITIES_LIST = [
   "long_term_stays_allowed",
   "pets_allowed",
   "smoking_allowed",
+];
+
+const SEARCH_SORT_VALUES = [
+  "createdAt",
+  "price_asc",
+  "price_desc",
+  "rating",
+  "popular",
 ];
 
 const LISTING_STATUSES = ["active", "inactive", "suspended", "deleted"];
@@ -474,6 +515,83 @@ const changeRoleBodySchema = z.object({
   }),
 });
 
+/**
+ * GET /api/search
+ * Validates req.query (all string inputs, coerced to correct types).
+ */
+const searchQuerySchema = z
+  .object({
+    // Text / destination
+    q: z.string().trim().max(200).optional(),
+    destination: z.string().trim().max(200).optional(),
+
+    // Category
+    category: z
+      .enum(LISTING_CATEGORIES, { message: "Invalid category" })
+      .optional(),
+
+    // Price range
+    minPrice: numericQueryParam("minPrice", { min: 0 }),
+    maxPrice: numericQueryParam("maxPrice", { min: 0 }),
+
+    // Guest capacity
+    guests: numericQueryParam("guests", { min: 1, max: 50 }),
+
+    // Amenities — comma-separated string, reuses your existing AMENITIES_LIST
+    amenities: commaSeparatedArray,
+
+    // Map bounds — all four required together or omit entirely
+    swLat: numericQueryParam("swLat", { min: -90, max: 90 }),
+    swLng: numericQueryParam("swLng", { min: -180, max: 180 }),
+    neLat: numericQueryParam("neLat", { min: -90, max: 90 }),
+    neLng: numericQueryParam("neLng", { min: -180, max: 180 }),
+
+    // Sorting & pagination
+    sort: z.enum(SEARCH_SORT_VALUES).optional().default("createdAt"),
+    page: numericQueryParam("page", { min: 1 }),
+    limit: numericQueryParam("limit", { min: 1, max: 100 }),
+
+    // Misc
+    featured: z
+      .enum(["true", "false"])
+      .optional()
+      .transform((v) =>
+        v === "true" ? true : v === "false" ? false : undefined,
+      ),
+  })
+  .refine(
+    (d) =>
+      d.minPrice === undefined ||
+      d.maxPrice === undefined ||
+      d.minPrice <= d.maxPrice,
+    { message: "minPrice must be ≤ maxPrice", path: ["minPrice"] },
+  )
+  .refine(
+    (d) => {
+      const keys = [d.swLat, d.swLng, d.neLat, d.neLng];
+      const defined = keys.filter((v) => v !== undefined);
+      return defined.length === 0 || defined.length === 4;
+    },
+    {
+      message:
+        "Provide all four map-bounds params (swLat, swLng, neLat, neLng) or none",
+      path: ["swLat"],
+    },
+  )
+  // amenities must be valid values from the existing AMENITIES_LIST
+  .refine(
+    (d) => !d.amenities || d.amenities.every((a) => AMENITIES_LIST.includes(a)),
+    { message: "One or more amenities are invalid", path: ["amenities"] },
+  );
+
+/**
+ * GET /api/search/autocomplete
+ */
+const autocompleteQuerySchema = z.object({
+  q: z.string().trim().min(1, "Query is required").max(100),
+  limit: numericQueryParam("limit", { min: 1, max: 20 }),
+});
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const flattenZodErrors = (zodError) =>
@@ -500,6 +618,9 @@ module.exports = {
   updateSettingsBodySchema,
   notificationPreferencesBodySchema,
   changeRoleBodySchema,
+  // Search
+  searchQuerySchema,
+  autocompleteQuerySchema,
   // Helpers & enums (re-exported for controllers/docs)
   flattenZodErrors,
   LISTING_CATEGORIES,
