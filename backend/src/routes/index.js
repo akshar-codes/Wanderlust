@@ -5,6 +5,7 @@ const authRoutes = require("./auth.routes");
 const listingRoutes = require("./listing.routes");
 const reviewRoutes = require("./review.routes");
 const userRoutes = require("./user.routes");
+const searchRoutes = require("./search.routes");
 
 router.get("/health", (_req, res) =>
   res.json({
@@ -13,6 +14,7 @@ router.get("/health", (_req, res) =>
   }),
 );
 
+router.use("/search", searchRoutes);
 router.use("/auth", authRoutes);
 router.use("/listings", listingRoutes);
 router.use("/listings/:listingId/reviews", reviewRoutes);
