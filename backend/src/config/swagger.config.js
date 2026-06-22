@@ -1,16 +1,13 @@
-"use strict";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import yaml from "js-yaml";
+import swaggerUi from "swagger-ui-express";
 
-const path = require("path");
-const fs = require("fs");
-const yaml = require("js-yaml");
-const swaggerUi = require("swagger-ui-express");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-/**
- * Mount Swagger UI onto the Express app.
- *
- * @param {import("express").Application} app
- */
-function setupSwagger(app) {
+export default function setupSwagger(app) {
   // ── Guard: disable in production ──────────────────────────────────────────
   if (
     process.env.SWAGGER_ENABLED !== "true" &&
@@ -19,7 +16,7 @@ function setupSwagger(app) {
     return;
   }
 
-  // ── Load spec from disk (supports hot-reload in dev) ─────────────────────
+  // ── Load spec from disk ───────────────────────────────────────────────────
   const specPath = path.resolve(__dirname, "../../../docs/openapi.yaml");
 
   let spec;
@@ -42,18 +39,14 @@ function setupSwagger(app) {
   // ── Swagger UI options ────────────────────────────────────────────────────
   const uiOptions = {
     customSiteTitle: "Wanderlust API Docs",
-
-    // Show the "Authorize" button; lets testers log in via the UI
     swaggerOptions: {
-      persistAuthorization: true, // remembers credentials across refreshes
-      withCredentials: true, // sends session cookie automatically
-      displayRequestDuration: true, // shows response-time in each call
-      filter: true, // adds a search/filter box for tags
-      tryItOutEnabled: true, // opens "Try it out" by default
-      requestSnippetsEnabled: true, // shows code snippets (curl, JS, etc.)
+      persistAuthorization: true,
+      withCredentials: true,
+      displayRequestDuration: true,
+      filter: true,
+      tryItOutEnabled: true,
+      requestSnippetsEnabled: true,
     },
-
-    // Inject minimal custom CSS
     customCss: `
       .swagger-ui .topbar { background-color: #fe424d; }
       .swagger-ui .topbar .download-url-wrapper { display: none; }
@@ -63,10 +56,7 @@ function setupSwagger(app) {
   // ── Mount ─────────────────────────────────────────────────────────────────
   app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(spec, uiOptions));
 
-  // Also serve the raw spec (useful for code-gen tools, Postman import, etc.)
   app.get("/api/docs/openapi.json", (_req, res) => res.json(spec));
 
   console.log(`[Swagger] UI available at ${baseUrl}/api/docs`);
 }
-
-module.exports = setupSwagger;

@@ -1,4 +1,4 @@
-const cors = require("cors");
+import cors from "cors";
 
 // ── Allowed origins ───────────────────────────────────────────────────────────
 
@@ -30,24 +30,16 @@ function originValidator(origin, callback) {
 // ── CORS options ──────────────────────────────────────────────────────────────
 const corsOptions = {
   origin: allowedOrigins.length > 0 ? originValidator : false,
-
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-
   allowedHeaders: [
     "Content-Type",
     "Authorization",
     "X-Requested-With",
     "Accept",
   ],
-
-  // Expose no custom response headers to the browser
   exposedHeaders: [],
-
-  // Allow cookies / Authorization headers in cross-origin requests
   credentials: true,
-
-  // Pre-flight cache: 10 minutes
   maxAge: 600,
 };
 
-module.exports = cors(corsOptions);
+export default cors(corsOptions);

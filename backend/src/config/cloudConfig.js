@@ -1,7 +1,6 @@
-const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 
-// Credentials are kept in env vars to support multiple environments
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUD_API_KEY,
@@ -12,15 +11,9 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    // All project images are grouped under a single folder
     folder: "wanderlust_DEV",
-
-    // Restrict uploads to images only
     allowedFormats: ["png", "jpg", "jpeg"],
   },
 });
 
-module.exports = {
-  cloudinary, // used later for delete/update operations
-  storage,
-};
+export { cloudinary, storage };

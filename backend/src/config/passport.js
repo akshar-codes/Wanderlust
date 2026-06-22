@@ -1,17 +1,14 @@
-"use strict";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as GitHubStrategy } from "passport-github2";
 
-const passport = require("passport");
-const LocalStrategy = require("passport-local");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const GitHubStrategy = require("passport-github2").Strategy;
-
-const User = require("../models/user");
-const logger = require("../utils/logger");
+import User from "../models/user.js";
+import logger from "../utils/logger.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function deriveUsername(base) {
-  // Strip non-alphanumeric, lowercase, max 20 chars
   const slug =
     (base ?? "user")
       .toLowerCase()
@@ -28,7 +25,6 @@ async function deriveUsername(base) {
     attempts++;
   }
 
-  // Last-resort: timestamp suffix
   return `${slug}${Date.now().toString(36)}`;
 }
 
@@ -41,7 +37,7 @@ async function oauthUpsert({
   req,
   done,
 }) {
-  const providerIdField = `${provider}Id`; // "googleId" | "githubId"
+  const providerIdField = `${provider}Id`;
 
   try {
     // ── Case 1: Already linked — just log in ────────────────────────────────
@@ -50,7 +46,6 @@ async function oauthUpsert({
     });
 
     if (existingByProvider) {
-      // Refresh avatar/name if they changed on the provider side
       const updates = {};
       if (avatarUrl && !existingByProvider.avatar?.url) {
         updates["avatar.url"] = avatarUrl;
@@ -89,10 +84,7 @@ async function oauthUpsert({
 
       logger.auth.info(
         `OAuth link (${provider}) — provider linked to existing account`,
-        {
-          userId: linked._id,
-          username: linked.username,
-        },
+        { userId: linked._id, username: linked.username },
       );
       return done(null, linked);
     }
@@ -108,7 +100,6 @@ async function oauthUpsert({
           {
             $set: {
               [providerIdField]: providerId,
-              // Only set provider if they had no OAuth provider before
               ...(existingByEmail.provider === "local" ? { provider } : {}),
               ...(avatarUrl && !existingByEmail.avatar?.url
                 ? { "avatar.url": avatarUrl }
@@ -120,11 +111,7 @@ async function oauthUpsert({
 
         logger.auth.info(
           `OAuth link (${provider}) — linked to existing email account`,
-          {
-            userId: updated._id,
-            username: updated.username,
-            email,
-          },
+          { userId: updated._id, username: updated.username, email },
         );
         return done(null, updated);
       }
@@ -146,7 +133,7 @@ async function oauthUpsert({
       lastName,
       provider,
       [providerIdField]: providerId,
-      emailVerified: !!email, // trust OAuth provider's email
+      emailVerified: !!email,
       avatar: avatarUrl
         ? { url: avatarUrl, filename: null, publicId: null }
         : undefined,
@@ -170,8 +157,8 @@ async function oauthUpsert({
 
 // ── Module export ─────────────────────────────────────────────────────────────
 
-module.exports = function configurePassport() {
-  // ── 1. Local strategy (passport-local-mongoose handles it) ─────────────────
+export default function configurePassport() {
+  // ── 1. Local strategy ──────────────────────────────────────────────────────
   passport.use(new LocalStrategy(User.authenticate()));
 
   // ── 2. Google OAuth 2.0 ────────────────────────────────────────────────────
@@ -183,7 +170,7 @@ module.exports = function configurePassport() {
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
           callbackURL: `${process.env.BASE_URL ?? "http://localhost:8080"}/api/auth/google/callback`,
           scope: ["profile", "email"],
-          passReqToCallback: true, // enables provider linking for authenticated users
+          passReqToCallback: true,
         },
         async (req, accessToken, refreshToken, profile, done) => {
           const email =
@@ -250,4 +237,4 @@ module.exports = function configurePassport() {
   // ── Session serialisation ──────────────────────────────────────────────────
   passport.serializeUser(User.serializeUser());
   passport.deserializeUser(User.deserializeUser());
-};
+}

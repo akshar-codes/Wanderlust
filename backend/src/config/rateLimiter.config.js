@@ -1,7 +1,5 @@
-"use strict";
-
-const rateLimit = require("express-rate-limit");
-const logger = require("../utils/logger");
+import rateLimit from "express-rate-limit";
+import logger from "../utils/logger.js";
 
 // ── Shared handler: log every rate-limit hit ──────────────────────────────────
 
@@ -11,18 +9,17 @@ function onLimitReached(req, _res, options) {
     method: req.method,
     path: req.path,
     userAgent: req.get("user-agent"),
-    limit: options.limit, // v7: use `limit`, not the deprecated `max`
+    limit: options.limit,
     window: options.windowMs,
   });
 }
 
 // ── 1. Global limiter — all routes ───────────────────────────────────────────
-// 200 requests per 15 minutes per IP
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 min
-  limit: 200, // v7 canonical field (replaces deprecated `max`)
-  standardHeaders: true, // RateLimit-* headers (RFC 6585)
-  legacyHeaders: false, // drop X-RateLimit-* headers
+export const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: {
     success: false,
     message: "Too many requests — please try again later.",
@@ -35,10 +32,9 @@ const globalLimiter = rateLimit({
 });
 
 // ── 2. Auth limiter — /login, /signup ────────────────────────────────────────
-// 20 attempts per 15 minutes per IP (brute-force protection)
-const authLimiter = rateLimit({
+export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 20, // v7 canonical field
+  limit: 20,
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
@@ -48,7 +44,6 @@ const authLimiter = rateLimit({
     code: "AUTH_RATE_LIMIT_EXCEEDED",
   },
   handler(req, res, next, options) {
-    // Log as auth context so it lands in auth.log as well as combined.log
     logger.auth.warn("Auth rate limit exceeded", {
       ip: req.ip,
       path: req.path,
@@ -60,10 +55,9 @@ const authLimiter = rateLimit({
 });
 
 // ── 3. API write limiter — POST /listings, POST /reviews ─────────────────────
-// 30 creates per hour per IP
-const createLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  limit: 30, // v7 canonical field
+export const createLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 30,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -77,10 +71,9 @@ const createLimiter = rateLimit({
   },
 });
 
-// ── 4. Resend-verification limiter — POST /api/auth/resend-verification ───────
-// 5 resend requests per hour per IP (HTTP layer; DB layer enforces per-user
-const resendLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
+// ── 4. Resend-verification limiter ────────────────────────────────────────────
+export const resendLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
   limit: 5,
   standardHeaders: true,
   legacyHeaders: false,
@@ -100,10 +93,3 @@ const resendLimiter = rateLimit({
     res.status(options.statusCode).json(options.message);
   },
 });
-
-module.exports = {
-  globalLimiter,
-  authLimiter,
-  createLimiter,
-  resendLimiter,
-};
