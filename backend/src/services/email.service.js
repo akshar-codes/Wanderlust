@@ -1,7 +1,5 @@
-"use strict";
-
-const nodemailer = require("nodemailer");
-const logger = require("../utils/logger");
+import nodemailer from "nodemailer";
+import logger from "../utils/logger.js";
 
 // ── Transporter factory ───────────────────────────────────────────────────────
 
@@ -13,16 +11,14 @@ async function getTransporter() {
   const isDev = process.env.NODE_ENV !== "production";
 
   if (process.env.SMTP_HOST) {
-    // ── Real SMTP (staging / production) ─────────────────────────────────────
     _transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT ?? 587),
-      secure: process.env.SMTP_SECURE === "true", // true → port 465; false → STARTTLS
+      secure: process.env.SMTP_SECURE === "true",
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
-      // Pool connections in production for throughput
       pool: !isDev,
       maxConnections: isDev ? 1 : 5,
     });
@@ -32,7 +28,6 @@ async function getTransporter() {
       port: process.env.SMTP_PORT ?? 587,
     });
   } else {
-    // ── Ethereal fallback (development only) ──────────────────────────────────
     if (!isDev) {
       throw new Error(
         "SMTP_HOST is required in production. " +
@@ -66,12 +61,17 @@ async function getTransporter() {
 const DEFAULT_FROM =
   process.env.EMAIL_FROM ?? "Wanderlust <no-reply@wanderlust.com>";
 
-async function sendMail({ to, subject, html, text, from = DEFAULT_FROM }) {
+export async function sendMail({
+  to,
+  subject,
+  html,
+  text,
+  from = DEFAULT_FROM,
+}) {
   const transporter = await getTransporter();
 
   const info = await transporter.sendMail({ from, to, subject, html, text });
 
-  // In dev, log the Ethereal preview URL so engineers can inspect the email
   if (process.env.NODE_ENV !== "production") {
     const previewUrl = nodemailer.getTestMessageUrl(info);
     if (previewUrl) {
@@ -87,19 +87,27 @@ async function sendMail({ to, subject, html, text, from = DEFAULT_FROM }) {
   return info;
 }
 
-// ── Specific email templates ──────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-async function sendPasswordResetEmail({
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// ── Password reset email ──────────────────────────────────────────────────────
+
+export async function sendPasswordResetEmail({
   to,
   username,
   resetToken,
   expiresInMinutes = 60,
 }) {
   const frontendBase = process.env.FRONTEND_URL ?? "http://localhost:5173";
-
-  // The React app's reset-password page must accept `?token=<raw>&email=<email>`
   const resetUrl = `${frontendBase}/reset-password?token=${encodeURIComponent(resetToken)}&email=${encodeURIComponent(to)}`;
-
   const subject = "Reset your Wanderlust password";
 
   const html = `
@@ -120,7 +128,6 @@ async function sendPasswordResetEmail({
     .body p.greeting { font-size: 17px; font-weight: 600; color: #261f1a; }
     .cta-wrapper { text-align: center; margin: 32px 0; }
     .cta { display: inline-block; background: #ff5a5f; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
-    .cta:hover { background: #e04e53; }
     .divider { border: none; border-top: 1px solid #f0ebe8; margin: 28px 0; }
     .fallback { background: #faf8f6; border-radius: 8px; padding: 16px; word-break: break-all; }
     .fallback code { font-size: 12px; color: #6b5f58; }
@@ -130,35 +137,23 @@ async function sendPasswordResetEmail({
 </head>
 <body>
   <div class="wrapper">
-    <div class="header">
-      <h1>🌍 Wanderlust</h1>
-      <p>Your travel companion</p>
-    </div>
+    <div class="header"><h1>🌍 Wanderlust</h1><p>Your travel companion</p></div>
     <div class="body">
       <p class="greeting">Hi ${escapeHtml(username)},</p>
       <p>We received a request to reset the password for your Wanderlust account. Click the button below to choose a new password.</p>
-
-      <div class="cta-wrapper">
-        <a href="${resetUrl}" class="cta">Reset my password</a>
-      </div>
-
-      <p>This link will expire in <strong>${expiresInMinutes} minutes</strong>. If you did not request a password reset, you can safely ignore this email — your password will not change.</p>
-
+      <div class="cta-wrapper"><a href="${resetUrl}" class="cta">Reset my password</a></div>
+      <p>This link will expire in <strong>${expiresInMinutes} minutes</strong>. If you did not request a password reset, you can safely ignore this email.</p>
       <hr class="divider" />
-
       <p style="font-size:13px;color:#7a6f68;">If the button above doesn't work, copy and paste this URL into your browser:</p>
-      <div class="fallback">
-        <code>${resetUrl}</code>
-      </div>
+      <div class="fallback"><code>${resetUrl}</code></div>
     </div>
     <div class="footer">
       <p>© ${new Date().getFullYear()} Wanderlust. All rights reserved.<br />
-      This email was sent to ${escapeHtml(to)} because a password reset was requested for your account.</p>
+      This email was sent to ${escapeHtml(to)} because a password reset was requested.</p>
     </div>
   </div>
 </body>
-</html>
-  `.trim();
+</html>`.trim();
 
   const text =
     `Hi ${username},\n\n` +
@@ -170,19 +165,16 @@ async function sendPasswordResetEmail({
   return sendMail({ to, subject, html, text });
 }
 
-// ── Verification email template ───────────────────────────────────────────────
+// ── Email verification email ──────────────────────────────────────────────────
 
-async function sendEmailVerificationEmail({
+export async function sendEmailVerificationEmail({
   to,
   username,
   verificationToken,
   expiresInHours = 24,
 }) {
   const frontendBase = process.env.FRONTEND_URL ?? "http://localhost:5173";
-
-  // The React app's verify-email page must accept ?token=<raw>&email=<email>
   const verifyUrl = `${frontendBase}/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(to)}`;
-
   const subject = "Verify your Wanderlust email address";
 
   const html = `
@@ -203,7 +195,6 @@ async function sendEmailVerificationEmail({
     .body p.greeting { font-size: 17px; font-weight: 600; color: #261f1a; }
     .cta-wrapper { text-align: center; margin: 32px 0; }
     .cta { display: inline-block; background: #ff5a5f; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600; letter-spacing: 0.2px; }
-    .cta:hover { background: #e04e53; }
     .divider { border: none; border-top: 1px solid #f0ebe8; margin: 28px 0; }
     .fallback { background: #faf8f6; border-radius: 8px; padding: 16px; word-break: break-all; }
     .fallback code { font-size: 12px; color: #6b5f58; }
@@ -213,26 +204,15 @@ async function sendEmailVerificationEmail({
 </head>
 <body>
   <div class="wrapper">
-    <div class="header">
-      <h1>🌍 Wanderlust</h1>
-      <p>Your travel companion</p>
-    </div>
+    <div class="header"><h1>🌍 Wanderlust</h1><p>Your travel companion</p></div>
     <div class="body">
       <p class="greeting">Hi ${escapeHtml(username)},</p>
-      <p>Thanks for joining Wanderlust! Please verify your email address to unlock all features, including creating listings and booking stays.</p>
-
-      <div class="cta-wrapper">
-        <a href="${verifyUrl}" class="cta">Verify my email</a>
-      </div>
-
+      <p>Thanks for joining Wanderlust! Please verify your email address to unlock all features.</p>
+      <div class="cta-wrapper"><a href="${verifyUrl}" class="cta">Verify my email</a></div>
       <p>This link will expire in <strong>${expiresInHours} hours</strong>. If you did not create a Wanderlust account, you can safely ignore this email.</p>
-
       <hr class="divider" />
-
       <p style="font-size:13px;color:#7a6f68;">If the button above doesn't work, copy and paste this URL into your browser:</p>
-      <div class="fallback">
-        <code>${verifyUrl}</code>
-      </div>
+      <div class="fallback"><code>${verifyUrl}</code></div>
     </div>
     <div class="footer">
       <p>© ${new Date().getFullYear()} Wanderlust. All rights reserved.<br />
@@ -240,8 +220,7 @@ async function sendEmailVerificationEmail({
     </div>
   </div>
 </body>
-</html>
-  `.trim();
+</html>`.trim();
 
   const text =
     `Hi ${username},\n\n` +
@@ -253,20 +232,3 @@ async function sendEmailVerificationEmail({
 
   return sendMail({ to, subject, html, text });
 }
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-module.exports = {
-  sendMail,
-  sendPasswordResetEmail,
-  sendEmailVerificationEmail,
-};

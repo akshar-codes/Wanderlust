@@ -1,15 +1,5 @@
-"use strict";
+import Listing from "../models/listing.js";
 
-/**
- * search.service.js
- *
- * Pure query-building + execution logic for listing search.
- * No req/res coupling — mirrors the style of listing.service.js / user.service.js.
- */
-
-const Listing = require("../models/listing.js");
-
-// ── Sort map ──────────────────────────────────────────────────────────────────
 const SORT_MAP = {
   createdAt: { createdAt: -1 },
   price_asc: { price: 1 },
@@ -18,8 +8,7 @@ const SORT_MAP = {
   popular: { bookingCount: -1, wishlistCount: -1 },
 };
 
-// ── Build the Mongoose filter document ────────────────────────────────────────
-const buildSearchFilter = (params = {}) => {
+export const buildSearchFilter = (params = {}) => {
   const {
     q,
     destination,
@@ -35,13 +24,8 @@ const buildSearchFilter = (params = {}) => {
     featured,
   } = params;
 
-  const filter = {
-    // Always constrain to publicly visible listings
-    status: "active",
-    draft: false,
-  };
+  const filter = { status: "active", draft: false };
 
-  // ── Text / destination search ────────────────────────────────────────────
   const searchTerm = (q ?? destination ?? "").trim();
   if (searchTerm) {
     filter.$or = [
@@ -52,31 +36,18 @@ const buildSearchFilter = (params = {}) => {
     ];
   }
 
-  // ── Category ──────────────────────────────────────────────────────────────
-  if (category) {
-    filter.category = category;
-  }
+  if (category) filter.category = category;
 
-  // ── Price range ───────────────────────────────────────────────────────────
   if (minPrice !== undefined || maxPrice !== undefined) {
     filter.price = {};
     if (minPrice !== undefined) filter.price.$gte = minPrice;
     if (maxPrice !== undefined) filter.price.$lte = maxPrice;
   }
 
-  // ── Guest capacity ────────────────────────────────────────────────────────
-  // listing.maxGuests >= requested guests
-  if (guests !== undefined) {
-    filter.maxGuests = { $gte: guests };
-  }
+  if (guests !== undefined) filter.maxGuests = { $gte: guests };
 
-  // ── Amenities (must include ALL requested amenities) ───────────────────────
-  if (amenities && amenities.length > 0) {
-    filter.amenities = { $all: amenities };
-  }
+  if (amenities && amenities.length > 0) filter.amenities = { $all: amenities };
 
-  // ── Map bounds (geo bounding box) ───────────────────────────────────────────
-  // Requires a 2dsphere index on `geometry` (already present on Listing model)
   if (
     swLat !== undefined &&
     swLng !== undefined &&
@@ -86,27 +57,22 @@ const buildSearchFilter = (params = {}) => {
     filter.geometry = {
       $geoWithin: {
         $box: [
-          [swLng, swLat], // SW corner [lng, lat]
-          [neLng, neLat], // NE corner [lng, lat]
+          [swLng, swLat],
+          [neLng, neLat],
         ],
       },
     };
   }
 
-  // ── Featured flag ────────────────────────────────────────────────────────
-  if (featured === true) {
-    filter.featured = true;
-  }
+  if (featured === true) filter.featured = true;
 
   return filter;
 };
 
-// ── Build sort document ────────────────────────────────────────────────────────
-const buildSort = (sortParam = "createdAt") =>
+export const buildSort = (sortParam = "createdAt") =>
   SORT_MAP[sortParam] ?? SORT_MAP.createdAt;
 
-// ── Execute a paginated search ──────────────────────────────────────────────────
-const executeSearch = async (params = {}) => {
+export const executeSearch = async (params = {}) => {
   const { sort = "createdAt", page = 1, limit = 20 } = params;
 
   const filter = buildSearchFilter(params);
@@ -136,8 +102,7 @@ const executeSearch = async (params = {}) => {
   };
 };
 
-// ── Autocomplete suggestions ───────────────────────────────────────────────────
-const getAutocompleteSuggestions = async (q, limit = 8) => {
+export const getAutocompleteSuggestions = async (q, limit = 8) => {
   if (!q || q.trim().length === 0) return [];
 
   const regex = { $regex: q.trim(), $options: "i" };
@@ -188,8 +153,7 @@ const getAutocompleteSuggestions = async (q, limit = 8) => {
   return suggestions.slice(0, limit);
 };
 
-// ── Price histogram ────────────────────────────────────────────────────────────
-const getPriceHistogram = async (params = {}, buckets = 20) => {
+export const getPriceHistogram = async (params = {}, buckets = 20) => {
   const filter = buildSearchFilter({
     ...params,
     minPrice: undefined,
@@ -243,21 +207,17 @@ const getPriceHistogram = async (params = {}, buckets = 20) => {
   };
 };
 
-// ── Aggregated filter facets ───────────────────────────────────────────────────
-const getSearchFacets = async (params = {}) => {
+export const getSearchFacets = async (params = {}) => {
   const baseFilter = buildSearchFilter(params);
 
   const [categoryFacets, amenityFacets, countryFacets, priceStats, totalCount] =
     await Promise.all([
-      // Categories
       Listing.aggregate([
         { $match: baseFilter },
         { $group: { _id: "$category", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $project: { _id: 0, value: "$_id", count: 1 } },
       ]),
-
-      // Amenities (unwind the array)
       Listing.aggregate([
         { $match: baseFilter },
         { $unwind: { path: "$amenities", preserveNullAndEmptyArrays: false } },
@@ -266,16 +226,12 @@ const getSearchFacets = async (params = {}) => {
         { $limit: 30 },
         { $project: { _id: 0, value: "$_id", count: 1 } },
       ]),
-
-      // Countries
       Listing.aggregate([
         { $match: baseFilter },
         { $group: { _id: "$country", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
         { $project: { _id: 0, value: "$_id", count: 1 } },
       ]),
-
-      // Price stats (min/max/avg + approximate percentiles)
       Listing.aggregate([
         { $match: baseFilter },
         { $sort: { price: 1 } },
@@ -310,7 +266,6 @@ const getSearchFacets = async (params = {}) => {
           },
         },
       ]),
-
       Listing.countDocuments(baseFilter),
     ]);
 
@@ -328,13 +283,4 @@ const getSearchFacets = async (params = {}) => {
     },
     totalCount,
   };
-};
-
-module.exports = {
-  buildSearchFilter,
-  buildSort,
-  executeSearch,
-  getAutocompleteSuggestions,
-  getPriceHistogram,
-  getSearchFacets,
 };

@@ -1,9 +1,7 @@
-"use strict";
-
-const listingRepo = require("../repositories/listing.repository.js");
-const { cloudinary } = require("../config/cloudConfig.js");
-const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
-const AppError = require("../utils/AppError.js");
+import mbxGeocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
+import * as listingRepo from "../repositories/listing.repository.js";
+import { cloudinary } from "../config/cloudConfig.js";
+import AppError from "../utils/AppError.js";
 
 const geocodingClient = mbxGeocoding({
   accessToken: process.env.MAP_TOKEN,
@@ -24,9 +22,6 @@ async function geocodeLocation(locationString) {
   return features[0].geometry;
 }
 
-/**
- * Destroy a Cloudinary asset safely (non-fatal on failure).
- */
 async function safeCloudinaryDelete(filename) {
   if (!filename) return;
   try {
@@ -36,9 +31,6 @@ async function safeCloudinaryDelete(filename) {
   }
 }
 
-/**
- * Build a structured images array entry from a Multer file object.
- */
 function fileToImageEntry(file, isPrimary = false) {
   return {
     url: file.path,
@@ -50,7 +42,7 @@ function fileToImageEntry(file, isPrimary = false) {
 
 // ── Read ───────────────────────────────────────────────────────────────────────
 
-const getAllListings = async (filters = {}, paginationOpts = {}) => {
+export const getAllListings = async (filters = {}, paginationOpts = {}) => {
   const { category, featured, propertyType, minPrice, maxPrice, minGuests } =
     filters;
 
@@ -70,7 +62,6 @@ const getAllListings = async (filters = {}, paginationOpts = {}) => {
         ? [{ price: { $lte: Number(maxPrice) } }]
         : []),
     ];
-    // Prefer pricing.nightlyPrice when both could exist
     if (minPrice !== undefined && maxPrice !== undefined) {
       query.$or = [
         { price: { $gte: Number(minPrice), $lte: Number(maxPrice) } },
@@ -87,19 +78,19 @@ const getAllListings = async (filters = {}, paginationOpts = {}) => {
   return listingRepo.findPaginated(query, paginationOpts);
 };
 
-const getListingById = async (id) => {
+export const getListingById = async (id) => {
   const listing = await listingRepo.findByIdWithDetails(id);
   if (!listing) throw AppError.notFound("Listing not found");
   return listing;
 };
 
-const getListingBySlug = async (slug) => {
+export const getListingBySlug = async (slug) => {
   const listing = await listingRepo.findBySlug(slug);
   if (!listing) throw AppError.notFound("Listing not found");
   return listing;
 };
 
-const getListingForEdit = async (id) => {
+export const getListingForEdit = async (id) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
 
@@ -110,17 +101,14 @@ const getListingForEdit = async (id) => {
   return { listing, originalImageUrl };
 };
 
-const getFeaturedListings = async (limit = 10) => {
-  return listingRepo.findFeatured(limit);
-};
+export const getFeaturedListings = async (limit = 10) =>
+  listingRepo.findFeatured(limit);
 
 // ── Write ──────────────────────────────────────────────────────────────────────
 
-const createListing = async (listingData, file, ownerId) => {
-  // Geocode location
+export const createListing = async (listingData, file, ownerId) => {
   const geometry = await geocodeLocation(listingData.location);
 
-  // Build pricing sub-document
   const price = Number(listingData.price) || 0;
   const pricing = {
     nightlyPrice:
@@ -132,12 +120,10 @@ const createListing = async (listingData, file, ownerId) => {
     taxes: Number(listingData.pricing?.taxes ?? 0),
   };
 
-  // Images — at least one required (the upload)
   if (!file) throw AppError.badRequest("At least one image is required");
 
   const primaryImageEntry = fileToImageEntry(file, true);
 
-  // Extract capacity fields
   const capacity = {
     bedrooms: listingData.bedrooms != null ? Number(listingData.bedrooms) : 1,
     bathrooms:
@@ -148,7 +134,6 @@ const createListing = async (listingData, file, ownerId) => {
   };
 
   const newListing = {
-    // Core text fields
     title: listingData.title,
     description: listingData.description,
     shortDescription: listingData.shortDescription ?? null,
@@ -156,34 +141,20 @@ const createListing = async (listingData, file, ownerId) => {
     category: listingData.category,
     location: listingData.location,
     country: listingData.country,
-
-    // Pricing
     price: pricing.nightlyPrice,
     pricing,
-
-    // Capacity
     ...capacity,
-
-    // Amenities & rules
     amenities: Array.isArray(listingData.amenities)
       ? listingData.amenities
       : [],
     houseRules: listingData.houseRules ?? {},
-
-    // Images
     images: [primaryImageEntry],
     image: { url: primaryImageEntry.url, filename: primaryImageEntry.filename },
-
-    // Geo
     geometry,
-
-    // Meta
     owner: ownerId,
     status: listingData.status ?? "active",
     draft: listingData.draft === true || listingData.draft === "true",
     featured: false,
-
-    // Stay limits
     minimumStay:
       listingData.minimumStay != null ? Number(listingData.minimumStay) : 1,
     maximumStay:
@@ -193,39 +164,33 @@ const createListing = async (listingData, file, ownerId) => {
   return listingRepo.create(newListing);
 };
 
-const updateListing = async (id, listingData, file) => {
+export const updateListing = async (id, listingData, file) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
 
   const updates = { ...listingData };
 
-  // Re-geocode if location changed
   if (listingData.location && listingData.location !== listing.location) {
     updates.geometry = await geocodeLocation(listingData.location);
   }
 
-  // Sync pricing ↔ legacy price
   if (updates.pricing?.nightlyPrice != null) {
     updates.price = Number(updates.pricing.nightlyPrice);
   } else if (updates.price != null) {
     updates["pricing.nightlyPrice"] = Number(updates.price);
   }
 
-  // Handle new primary image upload
   if (file) {
     const oldFilename = listing.image?.filename;
     const newImageEntry = fileToImageEntry(file, true);
 
-    // Clear isPrimary on existing images, then add new one
-    updates.$push = { images: newImageEntry };
     updates.$set = {
       ...(updates.$set ?? {}),
       "images.$[].isPrimary": false,
       image: { url: newImageEntry.url, filename: newImageEntry.filename },
     };
-    delete updates.$push; // handled below via repo
 
-    const updated = await listingRepo.updateById(id, {
+    await listingRepo.updateById(id, {
       ...updates,
       "images.$[].isPrimary": false,
     });
@@ -238,7 +203,7 @@ const updateListing = async (id, listingData, file) => {
   return listingRepo.updateById(id, updates);
 };
 
-const partialUpdateListing = async (id, updates) => {
+export const partialUpdateListing = async (id, updates) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
 
@@ -246,7 +211,6 @@ const partialUpdateListing = async (id, updates) => {
     throw AppError.badRequest("No update fields provided");
   }
 
-  // Sync pricing ↔ legacy price
   if (updates.pricing?.nightlyPrice != null) {
     updates.price = Number(updates.pricing.nightlyPrice);
   } else if (updates.price != null && !("pricing" in updates)) {
@@ -256,11 +220,10 @@ const partialUpdateListing = async (id, updates) => {
   return listingRepo.updateById(id, updates);
 };
 
-const deleteListing = async (id) => {
+export const deleteListing = async (id) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
 
-  // Collect all Cloudinary filenames to clean up
   const filenames = [
     ...(listing.images ?? []).map((img) => img.filename).filter(Boolean),
     listing.image?.filename,
@@ -268,31 +231,28 @@ const deleteListing = async (id) => {
 
   await listingRepo.deleteById(id);
 
-  // Clean up all images from Cloudinary after deletion
   await Promise.allSettled(filenames.map(safeCloudinaryDelete));
 };
 
-// ── Status & visibility management ───────────────────────────────────────────
+// ── Status & visibility ───────────────────────────────────────────────────────
 
-const publishListing = async (id, ownerId) => {
+export const publishListing = async (id, ownerId) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
   if (!listing.owner.equals(ownerId))
     throw AppError.forbidden("You do not own this listing");
-
   return listingRepo.updateById(id, { draft: false, status: "active" });
 };
 
-const unpublishListing = async (id, ownerId) => {
+export const unpublishListing = async (id, ownerId) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
   if (!listing.owner.equals(ownerId))
     throw AppError.forbidden("You do not own this listing");
-
   return listingRepo.updateById(id, { draft: true });
 };
 
-const setFeatured = async (id, featured) => {
+export const setFeatured = async (id, featured) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
   return listingRepo.updateById(id, { featured: Boolean(featured) });
@@ -300,16 +260,14 @@ const setFeatured = async (id, featured) => {
 
 // ── Multi-image management ────────────────────────────────────────────────────
 
-const addImages = async (id, files, ownerId) => {
+export const addImages = async (id, files, ownerId) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
   if (!listing.owner.equals(ownerId))
     throw AppError.forbidden("You do not own this listing");
-
   if (!files?.length) throw AppError.badRequest("No images provided");
 
   const hasExistingPrimary = listing.images.some((img) => img.isPrimary);
-
   const imageEntries = files.map((file, i) =>
     fileToImageEntry(file, !hasExistingPrimary && i === 0),
   );
@@ -318,11 +276,10 @@ const addImages = async (id, files, ownerId) => {
   for (const entry of imageEntries) {
     updated = await listingRepo.addImage(id, entry);
   }
-
   return updated;
 };
 
-const removeListingImage = async (listingId, imageId, ownerId) => {
+export const removeListingImage = async (listingId, imageId, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
   if (!listing.owner.equals(ownerId))
@@ -340,18 +297,17 @@ const removeListingImage = async (listingId, imageId, ownerId) => {
   return updated;
 };
 
-const setPrimaryImage = async (listingId, imageId, ownerId) => {
+export const setPrimaryImage = async (listingId, imageId, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
   if (!listing.owner.equals(ownerId))
     throw AppError.forbidden("You do not own this listing");
-
   return listingRepo.setPrimaryImage(listingId, imageId);
 };
 
 // ── Availability ──────────────────────────────────────────────────────────────
 
-const addBlockedDate = async (listingId, blockedDate, ownerId) => {
+export const addBlockedDate = async (listingId, blockedDate, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
   if (!listing.owner.equals(ownerId))
@@ -364,51 +320,18 @@ const addBlockedDate = async (listingId, blockedDate, ownerId) => {
   return listingRepo.addBlockedDate(listingId, blockedDate);
 };
 
-const removeBlockedDate = async (listingId, blockedDateId, ownerId) => {
+export const removeBlockedDate = async (listingId, blockedDateId, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
   if (!listing.owner.equals(ownerId))
     throw AppError.forbidden("You do not own this listing");
-
   return listingRepo.removeBlockedDate(listingId, blockedDateId);
 };
 
-// ── Rating recalculation (called by review service) ──────────────────────────
+// ── Stats ─────────────────────────────────────────────────────────────────────
 
-const recalculateListingRating = async (listingId) => {
-  return listingRepo.recalculateRating(listingId);
-};
+export const recalculateListingRating = async (listingId) =>
+  listingRepo.recalculateRating(listingId);
 
-// ── Wishlist helpers ──────────────────────────────────────────────────────────
-
-const incrementWishlistCount = async (listingId, amount = 1) => {
-  return listingRepo.incrementCounter(listingId, "wishlistCount", amount);
-};
-
-module.exports = {
-  // Read
-  getAllListings,
-  getListingById,
-  getListingBySlug,
-  getListingForEdit,
-  getFeaturedListings,
-  // Write
-  createListing,
-  updateListing,
-  partialUpdateListing,
-  deleteListing,
-  // Visibility
-  publishListing,
-  unpublishListing,
-  setFeatured,
-  // Images
-  addImages,
-  removeListingImage,
-  setPrimaryImage,
-  // Availability
-  addBlockedDate,
-  removeBlockedDate,
-  // Stats
-  recalculateListingRating,
-  incrementWishlistCount,
-};
+export const incrementWishlistCount = async (listingId, amount = 1) =>
+  listingRepo.incrementCounter(listingId, "wishlistCount", amount);

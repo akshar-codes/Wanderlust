@@ -1,14 +1,11 @@
-"use strict";
-
-const userRepo = require("../repositories/user.repository.js");
-const AppError = require("../utils/AppError.js");
-const { cloudinary } = require("../config/cloudConfig.js");
-const User = require("../models/user.js");
+import * as userRepo from "../repositories/user.repository.js";
+import AppError from "../utils/AppError.js";
+import { cloudinary } from "../config/cloudConfig.js";
+import User from "../models/user.js";
 
 // ── Registration ──────────────────────────────────────────────────────────────
 
-const registerUser = async (username, email, password, extras = {}) => {
-  // Check for duplicate email before passport-local-mongoose does it on username
+export const registerUser = async (username, email, password, extras = {}) => {
   const existing = await userRepo.findByEmail(email);
   if (existing) {
     throw AppError.badRequest("An account with that email already exists");
@@ -22,19 +19,18 @@ const registerUser = async (username, email, password, extras = {}) => {
     provider: "local",
   });
 
-  const registeredUser = await userRepo.register(userDoc, password);
-  return registeredUser;
+  return userRepo.register(userDoc, password);
 };
 
 // ── Profile ───────────────────────────────────────────────────────────────────
 
-const getUserProfile = async (username) => {
+export const getUserProfile = async (username) => {
   const user = await userRepo.findByUsername(username);
   if (!user || !user.isActive) throw AppError.notFound("User not found");
   return user;
 };
 
-const updateProfile = async (userId, updates) => {
+export const updateProfile = async (userId, updates) => {
   const allowedFields = ["firstName", "lastName", "bio", "phoneNumber"];
   const sanitized = {};
   for (const key of allowedFields) {
@@ -50,7 +46,7 @@ const updateProfile = async (userId, updates) => {
   return updated;
 };
 
-const updateAvatar = async (userId, file) => {
+export const updateAvatar = async (userId, file) => {
   if (!file) throw AppError.badRequest("Avatar image is required");
 
   const user = await userRepo.findById(userId);
@@ -61,12 +57,11 @@ const updateAvatar = async (userId, file) => {
   const avatarData = {
     url: file.path,
     filename: file.filename,
-    publicId: file.filename, // Cloudinary storage sets filename as the public_id
+    publicId: file.filename,
   };
 
   const updated = await userRepo.updateAvatar(userId, avatarData);
 
-  // Clean up old avatar from Cloudinary (fire-and-forget)
   if (oldPublicId) {
     cloudinary.uploader.destroy(oldPublicId).catch((err) => {
       console.error("[UserService] Cloudinary avatar delete failed:", err);
@@ -76,10 +71,7 @@ const updateAvatar = async (userId, file) => {
   return updated;
 };
 
-/**
- * Remove the user's avatar and fall back to initials.
- */
-const removeAvatar = async (userId) => {
+export const removeAvatar = async (userId) => {
   const user = await userRepo.findById(userId);
   if (!user) throw AppError.notFound("User not found");
 
@@ -102,7 +94,7 @@ const removeAvatar = async (userId) => {
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 
-const updateSettings = async (userId, settings) => {
+export const updateSettings = async (userId, settings) => {
   const updated = await userRepo.updateSettings(userId, settings);
   if (!updated) throw AppError.notFound("User not found");
   return updated;
@@ -110,15 +102,15 @@ const updateSettings = async (userId, settings) => {
 
 // ── Notification preferences ──────────────────────────────────────────────────
 
-const updateNotificationPreferences = async (userId, prefs) => {
+export const updateNotificationPreferences = async (userId, prefs) => {
   const updated = await userRepo.updateNotificationPreferences(userId, prefs);
   if (!updated) throw AppError.notFound("User not found");
   return updated;
 };
 
-// ── Role management (admin only) ──────────────────────────────────────────────
+// ── Role management ───────────────────────────────────────────────────────────
 
-const changeRole = async (targetUserId, newRole) => {
+export const changeRole = async (targetUserId, newRole) => {
   const updated = await userRepo.updateRole(targetUserId, newRole);
   if (!updated) throw AppError.notFound("User not found");
   return updated;
@@ -126,18 +118,16 @@ const changeRole = async (targetUserId, newRole) => {
 
 // ── Account lifecycle ─────────────────────────────────────────────────────────
 
-const deactivateUser = async (userId) => {
+export const deactivateUser = async (userId) => {
   const user = await userRepo.findById(userId);
   if (!user) throw AppError.notFound("User not found");
-
   await userRepo.softDelete(userId);
 };
 
-const deleteUser = async (userId) => {
+export const deleteUser = async (userId) => {
   const user = await userRepo.findById(userId);
   if (!user) throw AppError.notFound("User not found");
 
-  // Clean up avatar from Cloudinary
   if (user.avatar?.publicId) {
     cloudinary.uploader.destroy(user.avatar.publicId).catch(() => {});
   }
@@ -147,23 +137,8 @@ const deleteUser = async (userId) => {
 
 // ── Listings by user ──────────────────────────────────────────────────────────
 
-const getUserListings = async (username) => {
+export const getUserListings = async (username) => {
   const user = await userRepo.findByUsername(username);
   if (!user || !user.isActive) throw AppError.notFound("User not found");
-
   return userRepo.findListingsByOwner(user._id);
-};
-
-module.exports = {
-  registerUser,
-  getUserProfile,
-  updateProfile,
-  updateAvatar,
-  removeAvatar,
-  updateSettings,
-  updateNotificationPreferences,
-  changeRole,
-  deactivateUser,
-  deleteUser,
-  getUserListings,
 };
