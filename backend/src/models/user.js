@@ -1,8 +1,7 @@
-"use strict";
+import mongoose from "mongoose";
+import passportLocalMongoose from "passport-local-mongoose";
 
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const passportLocalMongoose = require("passport-local-mongoose");
+const { Schema } = mongoose;
 
 // ── Notification Preferences Sub-schema ────────────────────────────────────────
 const notificationPreferencesSchema = new Schema(
@@ -53,7 +52,6 @@ const avatarSchema = new Schema(
   {
     url: { type: String, default: null },
     filename: { type: String, default: null },
-    // Cloudinary public_id for deletion; kept separate from filename for clarity
     publicId: { type: String, default: null },
   },
   { _id: false },
@@ -62,7 +60,6 @@ const avatarSchema = new Schema(
 // ── Main User Schema ────────────────────────────────────────────────────────────
 const userSchema = new Schema(
   {
-    // ── Core identity (passport-local-mongoose adds username + hash + salt) ───
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -71,8 +68,6 @@ const userSchema = new Schema(
       lowercase: true,
       match: [/^\S+@\S+\.\S+$/, "Must be a valid email address"],
     },
-
-    // ── Profile fields ─────────────────────────────────────────────────────────
     firstName: {
       type: String,
       trim: true,
@@ -101,8 +96,6 @@ const userSchema = new Schema(
       match: [/^\+?[1-9]\d{7,14}$/, "Must be a valid phone number"],
       default: null,
     },
-
-    // ── Roles & permissions ────────────────────────────────────────────────────
     role: {
       type: String,
       enum: {
@@ -111,8 +104,6 @@ const userSchema = new Schema(
       },
       default: "user",
     },
-
-    // ── Verification & trust ───────────────────────────────────────────────────
     emailVerified: {
       type: Boolean,
       default: false,
@@ -120,25 +111,19 @@ const userSchema = new Schema(
     emailVerificationToken: {
       type: String,
       default: null,
-      select: false, // never returned in queries by default
+      select: false,
     },
     emailVerificationExpires: {
       type: Date,
       default: null,
       select: false,
     },
-
-    // ── Profile completion (0–100, updated by virtual or service layer) ────────
-    // Stored as a cached integer to avoid recomputing on every read.
     profileCompletion: {
       type: Number,
       min: 0,
       max: 100,
       default: 0,
     },
-
-    // ── OAuth providers ────────────────────────────────────────────────────────
-    // `provider` tracks the primary sign-in method; IDs are nullable for local accounts.
     provider: {
       type: String,
       enum: ["local", "google", "github"],
@@ -147,15 +132,13 @@ const userSchema = new Schema(
     googleId: {
       type: String,
       default: null,
-      sparse: true, // sparse index — allows multiple null values
+      sparse: true,
     },
     githubId: {
       type: String,
       default: null,
       sparse: true,
     },
-
-    // ── Preferences ────────────────────────────────────────────────────────────
     notificationPreferences: {
       type: notificationPreferencesSchema,
       default: () => ({}),
@@ -164,8 +147,6 @@ const userSchema = new Schema(
       type: settingsSchema,
       default: () => ({}),
     },
-
-    // ── Soft-delete / status ───────────────────────────────────────────────────
     isActive: {
       type: Boolean,
       default: true,
@@ -174,19 +155,15 @@ const userSchema = new Schema(
       type: Date,
       default: null,
     },
-
-    // ── Hosting metadata (cached counters updated by service layer) ────────────
     totalListings: { type: Number, default: 0 },
     totalReviews: { type: Number, default: 0 },
-
-    // ── Timestamps (via schema option below) ───────────────────────────────────
     lastLoginAt: {
       type: Date,
       default: null,
     },
   },
   {
-    timestamps: true, // adds createdAt + updatedAt
+    timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
@@ -201,7 +178,6 @@ userSchema.index({ createdAt: -1 });
 
 // ── Virtuals ────────────────────────────────────────────────────────────────────
 
-/** Full display name — falls back to username if names are not set */
 userSchema.virtual("displayName").get(function () {
   if (this.firstName || this.lastName) {
     return [this.firstName, this.lastName].filter(Boolean).join(" ");
@@ -209,17 +185,12 @@ userSchema.virtual("displayName").get(function () {
   return this.username ?? null;
 });
 
-/** Convenience flag for host-capable accounts */
 userSchema.virtual("isHost").get(function () {
   return this.role === "host" || this.role === "admin";
 });
 
 // ── Instance Methods ─────────────────────────────────────────────────────────────
 
-/**
- * Recalculate and persist profileCompletion.
- * Call after updating profile fields.
- */
 userSchema.methods.recalculateCompletion = async function () {
   const fields = [
     this.firstName,
@@ -234,10 +205,6 @@ userSchema.methods.recalculateCompletion = async function () {
   return this.save();
 };
 
-/**
- * Safe public-facing serialization — strips sensitive fields.
- * Used by controllers/serializers; mirrors serializeUser() in auth.controller.
- */
 userSchema.methods.toPublicJSON = function () {
   return {
     id: this._id,
@@ -262,7 +229,6 @@ userSchema.methods.toPublicJSON = function () {
 
 // ── Middleware ───────────────────────────────────────────────────────────────────
 
-/** Recompute profileCompletion before every save (non-blocking). */
 userSchema.pre("save", function (next) {
   if (
     this.isModified("firstName") ||
@@ -287,7 +253,7 @@ userSchema.pre("save", function (next) {
 });
 
 // ── Passport-Local-Mongoose plugin ───────────────────────────────────────────────
-// Must be applied AFTER all custom fields to avoid field conflicts.
 userSchema.plugin(passportLocalMongoose);
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+export default User;

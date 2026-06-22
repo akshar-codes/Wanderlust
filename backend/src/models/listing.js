@@ -1,8 +1,6 @@
-"use strict";
+import mongoose from "mongoose";
 
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const Review = require("./review.js");
+const { Schema } = mongoose;
 
 // ── Pricing sub-schema ────────────────────────────────────────────────────────
 const pricingSchema = new Schema(
@@ -59,7 +57,7 @@ const blockedDateSchema = new Schema(
 // ── House rules sub-schema ────────────────────────────────────────────────────
 const houseRulesSchema = new Schema(
   {
-    checkInTime: { type: String, default: "15:00" }, // "HH:MM"
+    checkInTime: { type: String, default: "15:00" },
     checkOutTime: { type: String, default: "11:00" },
     smokingAllowed: { type: Boolean, default: false },
     petsAllowed: { type: Boolean, default: false },
@@ -71,9 +69,9 @@ const houseRulesSchema = new Schema(
   { _id: false },
 );
 
-// ── Main Listing schema ───────────────────────────────────────────────────────
+// ── Enums ─────────────────────────────────────────────────────────────────────
 
-const LISTING_CATEGORIES = [
+export const LISTING_CATEGORIES = [
   "trending",
   "rooms",
   "iconic",
@@ -87,7 +85,7 @@ const LISTING_CATEGORIES = [
   "boats",
 ];
 
-const PROPERTY_TYPES = [
+export const PROPERTY_TYPES = [
   "apartment",
   "house",
   "villa",
@@ -106,7 +104,7 @@ const PROPERTY_TYPES = [
   "other",
 ];
 
-const AMENITIES_LIST = [
+export const AMENITIES_LIST = [
   // Essentials
   "wifi",
   "kitchen",
@@ -175,19 +173,18 @@ const AMENITIES_LIST = [
   "smoking_allowed",
 ];
 
-const LISTING_STATUSES = ["active", "inactive", "suspended", "deleted"];
+export const LISTING_STATUSES = ["active", "inactive", "suspended", "deleted"];
+
+// ── Main Listing schema ───────────────────────────────────────────────────────
 
 const listingSchema = new Schema(
   {
-    // ── Identity ────────────────────────────────────────────────────────────
     title: {
       type: String,
       required: [true, "Title is required"],
       trim: true,
       maxlength: [100, "Title cannot exceed 100 characters"],
     },
-
-    /** Auto-generated from title; unique URL-safe identifier */
     slug: {
       type: String,
       unique: true,
@@ -195,20 +192,16 @@ const listingSchema = new Schema(
       lowercase: true,
       trim: true,
     },
-
     description: {
       type: String,
       trim: true,
     },
-
-    /** ≤ 160 characters — used for cards and SEO meta descriptions */
     shortDescription: {
       type: String,
       trim: true,
       maxlength: [160, "Short description cannot exceed 160 characters"],
       default: null,
     },
-
     propertyType: {
       type: String,
       enum: {
@@ -217,21 +210,14 @@ const listingSchema = new Schema(
       },
       default: "other",
     },
-
-    // ── Legacy price field (kept for backward compatibility) ─────────────────
-    // New code should prefer pricing.nightlyPrice; this is synced by a pre-save hook.
     price: {
       type: Number,
       min: [0, "Price must be 0 or greater"],
     },
-
-    // ── Structured pricing ───────────────────────────────────────────────────
     pricing: {
       type: pricingSchema,
       default: () => ({}),
     },
-
-    // ── Capacity ─────────────────────────────────────────────────────────────
     bedrooms: {
       type: Number,
       min: [0, "Bedrooms cannot be negative"],
@@ -252,8 +238,6 @@ const listingSchema = new Schema(
       min: [1, "Maximum guests must be at least 1"],
       default: 2,
     },
-
-    // ── Amenities ────────────────────────────────────────────────────────────
     amenities: {
       type: [{ type: String }],
       default: [],
@@ -264,25 +248,14 @@ const listingSchema = new Schema(
         message: "One or more amenities are invalid",
       },
     },
-
-    // ── House rules ──────────────────────────────────────────────────────────
     houseRules: {
       type: houseRulesSchema,
       default: () => ({}),
     },
-
-    // ── Images ───────────────────────────────────────────────────────────────
-    /**
-     * Legacy single-image field — kept for backward compatibility.
-     * New listings use `images[]` instead; the first image in `images` with
-     * isPrimary=true is also mirrored here by a pre-save hook.
-     */
     image: {
       url: { type: String },
       filename: { type: String },
     },
-
-    /** Multi-image support — up to 20 images per listing */
     images: {
       type: [imageSchema],
       default: [],
@@ -293,11 +266,8 @@ const listingSchema = new Schema(
         message: "A listing cannot have more than 20 images",
       },
     },
-
-    // ── Location ─────────────────────────────────────────────────────────────
     location: { type: String, trim: true },
     country: { type: String, trim: true },
-
     geometry: {
       type: {
         type: String,
@@ -309,8 +279,6 @@ const listingSchema = new Schema(
         required: true,
       },
     },
-
-    // ── Category ─────────────────────────────────────────────────────────────
     category: {
       type: String,
       enum: {
@@ -319,21 +287,16 @@ const listingSchema = new Schema(
       },
       required: [true, "Category is required"],
     },
-
-    // ── Reviews & relations ──────────────────────────────────────────────────
     reviews: [
       {
         type: Schema.Types.ObjectId,
         ref: "Review",
       },
     ],
-
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-
-    // ── Cached stats (updated by service layer) ──────────────────────────────
     averageRating: {
       type: Number,
       min: 0,
@@ -355,8 +318,6 @@ const listingSchema = new Schema(
       min: 0,
       default: 0,
     },
-
-    // ── Status & visibility ──────────────────────────────────────────────────
     status: {
       type: String,
       enum: {
@@ -366,27 +327,20 @@ const listingSchema = new Schema(
       default: "active",
       index: true,
     },
-
-    /** Listings in draft mode are not publicly visible */
     draft: {
       type: Boolean,
       default: false,
       index: true,
     },
-
-    /** Admin-promoted listings appear in featured sections */
     featured: {
       type: Boolean,
       default: false,
       index: true,
     },
-
-    // ── Availability ─────────────────────────────────────────────────────────
     availabilityCalendar: {
       type: [blockedDateSchema],
       default: [],
     },
-
     minimumStay: {
       type: Number,
       min: [1, "Minimum stay must be at least 1 night"],
@@ -417,7 +371,6 @@ listingSchema.index({ geometry: "2dsphere" });
 
 // ── Virtuals ────────────────────────────────────────────────────────────────────
 
-/** Computed total price for one night including all fees */
 listingSchema.virtual("totalNightlyPrice").get(function () {
   const base = this.pricing?.nightlyPrice ?? this.price ?? 0;
   const cleaning = this.pricing?.cleaningFee ?? 0;
@@ -426,7 +379,6 @@ listingSchema.virtual("totalNightlyPrice").get(function () {
   return base + cleaning + service + taxes;
 });
 
-/** Primary image — first image with isPrimary=true, or first image, or legacy image */
 listingSchema.virtual("primaryImage").get(function () {
   if (this.images?.length) {
     const primary = this.images.find((img) => img.isPrimary);
@@ -437,17 +389,14 @@ listingSchema.virtual("primaryImage").get(function () {
 
 // ── Pre-save hooks ─────────────────────────────────────────────────────────────
 
-/** Auto-generate slug from title if not present */
 listingSchema.pre("save", async function (next) {
   if (!this.isModified("title") && this.slug) return next();
-
   if (!this.slug) {
     this.slug = await generateUniqueSlug(this.title, this._id);
   }
   next();
 });
 
-/** Keep legacy `price` field in sync with pricing.nightlyPrice */
 listingSchema.pre("save", function (next) {
   if (this.pricing?.nightlyPrice != null) {
     this.price = this.pricing.nightlyPrice;
@@ -457,7 +406,6 @@ listingSchema.pre("save", function (next) {
   next();
 });
 
-/** Mirror the primary image (or first image) back into legacy `image` field */
 listingSchema.pre("save", function (next) {
   if (this.images?.length && !this.isModified("image")) {
     const primary = this.images.find((img) => img.isPrimary) ?? this.images[0];
@@ -468,9 +416,9 @@ listingSchema.pre("save", function (next) {
 
 // ── Post hooks ─────────────────────────────────────────────────────────────────
 
-/** Cascade-delete all reviews when a listing is deleted */
 listingSchema.post("findOneAndDelete", async (listing) => {
   if (listing) {
+    const { default: Review } = await import("./review.js");
     await Review.deleteMany({ _id: { $in: listing.reviews } });
   }
 });
@@ -509,8 +457,4 @@ function slugify(str) {
 }
 
 const Listing = mongoose.model("Listing", listingSchema);
-module.exports = Listing;
-module.exports.LISTING_CATEGORIES = LISTING_CATEGORIES;
-module.exports.PROPERTY_TYPES = PROPERTY_TYPES;
-module.exports.AMENITIES_LIST = AMENITIES_LIST;
-module.exports.LISTING_STATUSES = LISTING_STATUSES;
+export default Listing;
