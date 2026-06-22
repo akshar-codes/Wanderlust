@@ -1,13 +1,7 @@
-const hpp = require("hpp");
-
-// ── HPP — HTTP Parameter Pollution protection ─────────────────────────────────
+import hpp from "hpp";
 
 const hppProtection = hpp({
-  whitelist: [
-    "category", // filter bar sends a single value but kept for forward-compat
-    "tags",
-    "features",
-  ],
+  whitelist: ["category", "tags", "features"],
 });
 
-module.exports = hppProtection;
+export default hppProtection;

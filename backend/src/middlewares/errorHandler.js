@@ -1,11 +1,10 @@
-const AppError = require("../utils/AppError");
-const { sendError } = require("../utils/apiResponse");
-const { flattenZodErrors } = require("../validators");
-const logger = require("../utils/logger");
+import AppError from "../utils/AppError.js";
+import { sendError } from "../utils/apiResponse.js";
+import { flattenZodErrors } from "../validators/index.js";
+import logger from "../utils/logger.js";
 
 const IS_PROD = process.env.NODE_ENV === "production";
 
-// ── Structured error log helper ───────────────────────────────────────────────
 function logError(err, req, level = "error") {
   logger[level]({
     message: err.message,
@@ -22,7 +21,7 @@ function logError(err, req, level = "error") {
 function levelFor(err, statusCode) {
   if (statusCode >= 500) return "error";
   if (IS_PROD) return "warn";
-  if (statusCode === 404) return "info"; // dev-only: expected React-SPA 404s
+  if (statusCode === 404) return "info";
   return "warn";
 }
 
@@ -102,4 +101,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
+export default errorHandler;

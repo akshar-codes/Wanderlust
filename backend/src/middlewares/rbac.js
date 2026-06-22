@@ -1,15 +1,13 @@
-"use strict";
-
-const AppError = require("../utils/AppError");
-const { requireVerifiedEmail } = require("./requireVerifiedEmail");
-const {
+import AppError from "../utils/AppError.js";
+import { requireVerifiedEmail } from "./requireVerifiedEmail.js";
+import {
   ROLE_HIERARCHY,
   PERMISSIONS,
   can,
   hasMinimumRole,
-} = require("./permissions");
+} from "./permissions.js";
 
-// ── Internal helper: extract role safely ─────────────────────────────────────
+// ── Internal helper ───────────────────────────────────────────────────────────
 
 function roleOf(req) {
   return req.user?.role ?? null;
@@ -17,7 +15,7 @@ function roleOf(req) {
 
 // ── requireAuth ───────────────────────────────────────────────────────────────
 
-function requireAuth() {
+export function requireAuth() {
   return function requireAuthMiddleware(req, _res, next) {
     if (req.isAuthenticated()) return next();
     return next(AppError.unauthorized("Authentication required"));
@@ -26,11 +24,10 @@ function requireAuth() {
 
 // ── requireRole ───────────────────────────────────────────────────────────────
 
-function requireRole(...roles) {
+export function requireRole(...roles) {
   if (roles.length === 0)
     throw new Error("requireRole: at least one role required");
 
-  // Validate that all supplied roles are known
   const unknown = roles.filter((r) => !ROLE_HIERARCHY.includes(r));
   if (unknown.length)
     throw new Error(`requireRole: unknown roles [${unknown.join(", ")}]`);
@@ -41,10 +38,8 @@ function requireRole(...roles) {
     if (!req.isAuthenticated()) {
       return next(AppError.unauthorized("Authentication required"));
     }
-
     const role = roleOf(req);
     if (allowed.has(role)) return next();
-
     return next(
       AppError.forbidden(
         `This action requires one of the following roles: ${roles.join(", ")}`,
@@ -55,7 +50,7 @@ function requireRole(...roles) {
 
 // ── requireMinRole ────────────────────────────────────────────────────────────
 
-function requireMinRole(minimumRole) {
+export function requireMinRole(minimumRole) {
   if (!ROLE_HIERARCHY.includes(minimumRole)) {
     throw new Error(`requireMinRole: unknown role "${minimumRole}"`);
   }
@@ -64,10 +59,8 @@ function requireMinRole(minimumRole) {
     if (!req.isAuthenticated()) {
       return next(AppError.unauthorized("Authentication required"));
     }
-
     const role = roleOf(req);
     if (hasMinimumRole(role, minimumRole)) return next();
-
     const minIdx = ROLE_HIERARCHY.indexOf(minimumRole);
     const required = ROLE_HIERARCHY.slice(minIdx).join(", ");
     return next(AppError.forbidden(`This action requires one of: ${required}`));
@@ -76,7 +69,7 @@ function requireMinRole(minimumRole) {
 
 // ── requirePermission ─────────────────────────────────────────────────────────
 
-function requirePermission(resource, action) {
+export function requirePermission(resource, action) {
   const allowedSet = PERMISSIONS[resource]?.[action];
   if (!allowedSet) {
     throw new Error(
@@ -84,8 +77,6 @@ function requirePermission(resource, action) {
     );
   }
 
-  // Empty set means the route is public (no role required but auth still checked
-  // by the caller if needed).  We treat it as "always pass" here.
   const isPublic = allowedSet.size === 0;
 
   return function requirePermissionMiddleware(req, _res, next) {
@@ -108,24 +99,21 @@ function requirePermission(resource, action) {
 
 // ── requireSelfOrAdmin ────────────────────────────────────────────────────────
 
-function requireSelfOrAdmin(paramName = "username") {
+export function requireSelfOrAdmin(paramName = "username") {
   return function requireSelfOrAdminMiddleware(req, _res, next) {
     if (!req.isAuthenticated()) {
       return next(AppError.unauthorized("Authentication required"));
     }
-
     const isAdmin = req.user.role === "admin";
     const isSelf = req.user.username === req.params[paramName];
-
     if (isAdmin || isSelf) return next();
-
     return next(AppError.forbidden("You can only modify your own account"));
   };
 }
 
 // ── requireOwnerOrAdmin ───────────────────────────────────────────────────────
 
-function requireOwnerOrAdmin(
+export function requireOwnerOrAdmin(
   fetchFn,
   ownerField = "owner",
   resourceName = "Resource",
@@ -139,13 +127,10 @@ function requireOwnerOrAdmin(
       const doc = await fetchFn(req);
       if (!doc) return next(AppError.notFound(`${resourceName} not found`));
 
-      // Attach for downstream reuse (avoids double fetch in controller)
       req.resource = doc;
 
-      // Admin bypass
       if (req.user.role === "admin") return next();
 
-      // Resolve nested owner field (e.g. "owner._id" or "author")
       const ownerValue = ownerField
         .split(".")
         .reduce((obj, key) => obj?.[key], doc);
@@ -154,7 +139,6 @@ function requireOwnerOrAdmin(
         return next(AppError.forbidden(`${resourceName} has no owner`));
       }
 
-      // Mongoose ObjectId comparison
       const ownerId =
         typeof ownerValue.equals === "function"
           ? ownerValue
@@ -178,9 +162,9 @@ function requireOwnerOrAdmin(
 
 // ── requireActiveAccount ──────────────────────────────────────────────────────
 
-function requireActiveAccount() {
+export function requireActiveAccount() {
   return function requireActiveAccountMiddleware(req, _res, next) {
-    if (!req.isAuthenticated()) return next(); // unauthenticated requests pass through
+    if (!req.isAuthenticated()) return next();
 
     if (req.user.isActive !== true) {
       req.logout((err) => {
@@ -198,9 +182,9 @@ function requireActiveAccount() {
   };
 }
 
-// ── Convenience combinator: requireAuthAndPermission ─────────────────────────
+// ── requireAuthAndPermission ──────────────────────────────────────────────────
 
-function requireAuthAndPermission(resource, action) {
+export function requireAuthAndPermission(resource, action) {
   const authMw = requireAuth();
   const permMw = requirePermission(resource, action);
 
@@ -212,16 +196,5 @@ function requireAuthAndPermission(resource, action) {
   };
 }
 
-// ── Exports ───────────────────────────────────────────────────────────────────
-
-module.exports = {
-  requireAuth,
-  requireRole,
-  requireMinRole,
-  requirePermission,
-  requireSelfOrAdmin,
-  requireOwnerOrAdmin,
-  requireActiveAccount,
-  requireAuthAndPermission,
-  requireVerifiedEmail,
-};
+// Re-export requireVerifiedEmail so rbac is a single import point for routes
+export { requireVerifiedEmail };

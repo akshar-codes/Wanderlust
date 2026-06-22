@@ -1,8 +1,6 @@
-"use strict";
-
-const multer = require("multer");
-const { storage } = require("../config/cloudConfig");
-const AppError = require("../utils/AppError");
+import multer from "multer";
+import { storage } from "../config/cloudConfig.js";
+import AppError from "../utils/AppError.js";
 
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
@@ -29,8 +27,8 @@ const upload = multer({
   fileFilter,
   limits: {
     fileSize: MAX_FILE_SIZE_MB * 1024 * 1024,
-    files: 10, // max 10 files per request (multi-upload endpoints)
+    files: 10,
   },
 });
 
-module.exports = upload;
+export default upload;

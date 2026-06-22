@@ -1,15 +1,13 @@
-const morgan = require("morgan");
-const logger = require("../utils/logger");
+import morgan from "morgan";
+import logger from "../utils/logger.js";
 
 // ── Stream adapter: pipe Morgan output into Winston ───────────────────────────
 const stream = {
   write: (message) => logger.http.info(message.trim()),
 };
 
-// ── Token: log response body size ────────────────────────────────────────────
 morgan.token("body-size", (req, res) => res.getHeader("content-length") ?? "-");
 
-// ── Token: sanitised request body (never log passwords or tokens) ────────────
 const REDACT = new Set([
   "password",
   "newPassword",
@@ -30,7 +28,6 @@ morgan.token("req-body", (req) => {
   return JSON.stringify(safe);
 });
 
-// ── Format strings ────────────────────────────────────────────────────────────
 const DEV_FORMAT =
   ":method :url :status :response-time ms — :res[content-length]";
 
@@ -47,7 +44,6 @@ const PROD_FORMAT = JSON.stringify({
 
 const IS_PROD = process.env.NODE_ENV === "production";
 
-// ── Exported middleware ───────────────────────────────────────────────────────
 const requestLogger = morgan(IS_PROD ? PROD_FORMAT : DEV_FORMAT, { stream });
 
-module.exports = requestLogger;
+export default requestLogger;

@@ -1,11 +1,7 @@
-"use strict";
+import AppError from "../utils/AppError.js";
 
-const AppError = require("../utils/AppError");
-
-
-function requireVerifiedEmail() {
+export function requireVerifiedEmail() {
   return function requireVerifiedEmailMiddleware(req, _res, next) {
-    // Unauthenticated requests are not our concern here — let requireAuth handle them
     if (!req.isAuthenticated()) return next();
 
     if (req.user.emailVerified === true) return next();
@@ -17,5 +13,3 @@ function requireVerifiedEmail() {
     );
   };
 }
-
-module.exports = { requireVerifiedEmail };
