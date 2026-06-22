@@ -1,27 +1,28 @@
-"use strict";
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import methodOverride from "method-override";
+import passport from "passport";
 
-const express = require("express");
-const path = require("path");
-const methodOverride = require("method-override");
-const passport = require("passport");
+import AppError from "./utils/AppError.js";
+import errorHandler from "./middlewares/errorHandler.js";
 
-const AppError = require("./utils/AppError");
-const errorHandler = require("./middlewares/errorHandler");
+import securityHeaders from "./config/helmet.config.js";
+import corsMiddleware from "./config/cors.config.js";
+import { globalLimiter } from "./config/rateLimiter.config.js";
+import hppProtection from "./middlewares/hpp.js";
+import compressionMiddleware from "./middlewares/compression.js";
+import requestLogger from "./middlewares/requestLogger.js";
+import setupSwagger from "./config/swagger.config.js";
 
-const securityHeaders = require("./config/helmet.config");
-const corsMiddleware = require("./config/cors.config");
-const { globalLimiter } = require("./config/rateLimiter.config");
-const hppProtection = require("./middlewares/hpp");
-const compressionMiddleware = require("./middlewares/compression");
-const requestLogger = require("./middlewares/requestLogger");
-const setupSwagger = require("./config/swagger.config");
+import { requireActiveAccount } from "./middlewares/rbac.js";
 
-// ── RBAC active-account guard ─────────────────────────────────────────────
-const { requireActiveAccount } = require("./middlewares/rbac");
+import apiRouter from "./routes/index.js";
 
-const apiRouter = require("./routes");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-function createApp(sessionMiddleware) {
+export default function createApp(sessionMiddleware) {
   const app = express();
 
   // 1. Compression
@@ -61,7 +62,7 @@ function createApp(sessionMiddleware) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // ── 12. RBAC: reject stale sessions for deactivated accounts ─────────────────
+  // 12. RBAC: reject stale sessions for deactivated accounts
   app.use(requireActiveAccount());
 
   // 13. API docs
@@ -78,5 +79,3 @@ function createApp(sessionMiddleware) {
 
   return app;
 }
-
-module.exports = createApp;

@@ -1,15 +1,18 @@
-"use strict";
+// src/server.js
+import "dotenv/config";
 
-require("dotenv").config();
+import mongoose from "mongoose";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
-const mongoose = require("mongoose");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const path = require("path");
-const fs = require("fs");
+import logger from "./utils/logger.js";
+import configurePassport from "./config/passport.js";
 
-const logger = require("./utils/logger");
-const configPassport = require("./config/passport.js");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 8080;
 const DB_URL = process.env.MONGO_URL;
@@ -58,12 +61,11 @@ process.on("uncaughtException", (err) => {
       },
     });
 
-    const createApp = require("./app.js");
+    const { default: createApp } = await import("./app.js");
     const app = createApp(sessionMiddleware);
 
-    configPassport();
+    configurePassport();
 
-    // ── 5. Listen ─────────────────────────────────────────────────────────────
     app.listen(PORT, () =>
       logger.info("Server running", {
         port: PORT,

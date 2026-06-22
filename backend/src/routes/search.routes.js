@@ -1,20 +1,20 @@
-"use strict";
-
-const express = require("express");
-const router = express.Router();
-
-const asyncHandler = require("../utils/asyncHandler");
-
-const { searchQuerySchema, autocompleteQuerySchema } = require("../validators");
-
-const {
+import express from "express";
+import asyncHandler from "../utils/asyncHandler.js";
+import {
+  searchQuerySchema,
+  autocompleteQuerySchema,
+} from "../validators/index.js";
+import {
   searchListings,
   autocomplete,
   getHistogram,
   getFacets,
-} = require("../controllers/search.controller");
+} from "../controllers/search.controller.js";
 
-// ── Query validation middleware ──────────────────────────────────────────────
+const router = express.Router();
+
+// ── Query validation middleware ───────────────────────────────────────────────
+
 const validateQuery = (schema) => (req, res, next) => {
   const result = schema.safeParse(req.query);
 
@@ -34,7 +34,8 @@ const validateQuery = (schema) => (req, res, next) => {
   next();
 };
 
-// ── Routes ───────────────────────────────────────────────────────────────────
+// ── Routes ────────────────────────────────────────────────────────────────────
+
 router.get("/", validateQuery(searchQuerySchema), asyncHandler(searchListings));
 
 router.get(
@@ -55,4 +56,4 @@ router.get(
   asyncHandler(getFacets),
 );
 
-module.exports = router;
+export default router;

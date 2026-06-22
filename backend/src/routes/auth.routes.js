@@ -1,24 +1,23 @@
-"use strict";
+import express from "express";
+import passport from "passport";
 
-const express = require("express");
-const router = express.Router();
-const passport = require("passport");
-
-const asyncHandler = require("../utils/asyncHandler");
-const authCtrl = require("../controllers/auth.controller");
-const validate = require("../middlewares/validate");
-const {
+import asyncHandler from "../utils/asyncHandler.js";
+import * as authCtrl from "../controllers/auth.controller.js";
+import validate from "../middlewares/validate.js";
+import {
   signupBodySchema,
   loginBodySchema,
   forgotPasswordBodySchema,
   resetPasswordBodySchema,
   verifyEmailBodySchema,
-} = require("../validators");
-const { authLimiter } = require("../config/rateLimiter.config");
-const saveRedirectUrl = require("../middlewares/saveRedirectUrl");
-const authFailureLogger = require("../middlewares/authFailureLogger");
-const { requireAuth } = require("../middlewares/rbac");
-const { resendLimiter } = require("../config/rateLimiter.config");
+} from "../validators/index.js";
+import { authLimiter, resendLimiter } from "../config/rateLimiter.config.js";
+import saveRedirectUrl from "../middlewares/saveRedirectUrl.js";
+import authFailureLogger from "../middlewares/authFailureLogger.js";
+import { requireAuth } from "../middlewares/rbac.js";
+import * as userRepo from "../repositories/user.repository.js";
+
+const router = express.Router();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -62,10 +61,7 @@ function oauthCallbackHandler(provider) {
 
         req.logIn(user, async (loginErr) => {
           if (loginErr) return next(loginErr);
-
-          const userRepo = require("../repositories/user.repository");
           userRepo.touchLastLogin(user._id).catch(() => {});
-
           return res.redirect(getFrontendRedirectUrl(req));
         });
       },
@@ -148,7 +144,7 @@ router.get("/github", (req, res, next) => {
 
 router.get("/github/callback", oauthCallbackHandler("github"));
 
-// ── Provider linking (must be authenticated) ──────────────────────────────────
+// ── Provider linking ──────────────────────────────────────────────────────────
 
 router.get(
   "/link/google",
@@ -185,4 +181,4 @@ router.delete(
   asyncHandler(authCtrl.unlinkProvider),
 );
 
-module.exports = router;
+export default router;

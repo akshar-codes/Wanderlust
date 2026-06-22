@@ -1,31 +1,28 @@
-"use strict";
-
-const express = require("express");
-const router = express.Router();
-
-const asyncHandler = require("../utils/asyncHandler");
-const userCtrl = require("../controllers/user.controller");
-const validate = require("../middlewares/validate");
-const upload = require("../middlewares/upload");
-const {
+import express from "express";
+import asyncHandler from "../utils/asyncHandler.js";
+import * as userCtrl from "../controllers/user.controller.js";
+import validate from "../middlewares/validate.js";
+import upload from "../middlewares/upload.js";
+import {
   updateProfileBodySchema,
   updateSettingsBodySchema,
   notificationPreferencesBodySchema,
   changeRoleBodySchema,
-} = require("../validators");
-
-const {
+} from "../validators/index.js";
+import {
   requireAuth,
   requirePermission,
   requireSelfOrAdmin,
-} = require("../middlewares/rbac");
+} from "../middlewares/rbac.js";
+
+const router = express.Router();
 
 // ── Public ────────────────────────────────────────────────────────────────────
 
 router.get("/:username", asyncHandler(userCtrl.profile));
 router.get("/:username/listings", asyncHandler(userCtrl.listings));
 
-// ── Self-only profile mutations ───────────────────────────────────────────────
+// ── Self-only mutations ───────────────────────────────────────────────────────
 
 router.patch(
   "/:username/profile",
@@ -66,7 +63,7 @@ router.patch(
   asyncHandler(userCtrl.updateNotificationPreferences),
 );
 
-// ── Admin-only role management ────────────────────────────────────────────────
+// ── Admin-only ────────────────────────────────────────────────────────────────
 
 router.patch(
   "/:username/role",
@@ -76,7 +73,7 @@ router.patch(
   asyncHandler(userCtrl.changeRole),
 );
 
-// ── Account deletion (self or admin) ─────────────────────────────────────────
+// ── Account deletion ──────────────────────────────────────────────────────────
 
 router.delete(
   "/:username",
@@ -85,4 +82,4 @@ router.delete(
   asyncHandler(userCtrl.destroy),
 );
 
-module.exports = router;
+export default router;

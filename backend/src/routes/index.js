@@ -1,11 +1,11 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import authRoutes from "./auth.routes.js";
+import listingRoutes from "./listing.routes.js";
+import reviewRoutes from "./review.routes.js";
+import userRoutes from "./user.routes.js";
+import searchRoutes from "./search.routes.js";
 
-const authRoutes = require("./auth.routes");
-const listingRoutes = require("./listing.routes");
-const reviewRoutes = require("./review.routes");
-const userRoutes = require("./user.routes");
-const searchRoutes = require("./search.routes");
+const router = express.Router();
 
 router.get("/health", (_req, res) =>
   res.json({
@@ -28,4 +28,4 @@ router.use((_req, res) =>
   }),
 );
 
-module.exports = router;
+export default router;

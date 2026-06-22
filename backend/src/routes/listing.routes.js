@@ -1,37 +1,28 @@
-"use strict";
-
-const express = require("express");
-const router = express.Router();
-
-const asyncHandler = require("../utils/asyncHandler");
-const listingCtrl = require("../controllers/listing.controller");
-const upload = require("../middlewares/upload");
-const validate = require("../middlewares/validate");
-const { requireVerifiedEmail } = require("../middlewares/requireVerifiedEmail");
-const {
+import express from "express";
+import asyncHandler from "../utils/asyncHandler.js";
+import * as listingCtrl from "../controllers/listing.controller.js";
+import upload from "../middlewares/upload.js";
+import validate from "../middlewares/validate.js";
+import { requireVerifiedEmail } from "../middlewares/requireVerifiedEmail.js";
+import {
   listingBodySchema,
   listingPatchSchema,
   blockedDateSchema,
-} = require("../validators");
-const { createLimiter } = require("../config/rateLimiter.config");
-const listingRepo = require("../repositories/listing.repository");
-
-const {
+} from "../validators/index.js";
+import { createLimiter } from "../config/rateLimiter.config.js";
+import * as listingRepo from "../repositories/listing.repository.js";
+import {
   requireAuth,
   requirePermission,
   requireOwnerOrAdmin,
-} = require("../middlewares/rbac");
+} from "../middlewares/rbac.js";
 
-// ── Ownership fetch helper ────────────────────────────────────────────────────
+const router = express.Router();
 
 const fetchListing = (req) => listingRepo.findById(req.params.id);
 
-// ── Collection routes ──────────────────────────────────────────────────────────
+// ── Collection ────────────────────────────────────────────────────────────────
 
-/**
- * GET  /api/listings          → public
- * POST /api/listings          → host | admin only
- */
 router
   .route("/")
   .get(asyncHandler(listingCtrl.index))
@@ -45,19 +36,13 @@ router
     asyncHandler(listingCtrl.create),
   );
 
-// ── Static named routes ────────────────────────────────────────────────────────
+// ── Named static routes ────────────────────────────────────────────────────────
 
 router.get("/featured", asyncHandler(listingCtrl.featured));
 router.get("/slug/:slug", asyncHandler(listingCtrl.showBySlug));
 
-// ── Single-resource routes ─────────────────────────────────────────────────────
+// ── Single resource ────────────────────────────────────────────────────────────
 
-/**
- * GET    /api/listings/:id    → public
- * PUT    /api/listings/:id    → auth + owner (host|admin can update, admin bypasses ownership)
- * PATCH  /api/listings/:id    → auth + owner
- * DELETE /api/listings/:id    → auth + owner
- */
 router
   .route("/:id")
   .get(asyncHandler(listingCtrl.show))
@@ -107,11 +92,11 @@ router.post(
 router.patch(
   "/:id/featured",
   requireAuth(),
-  requirePermission("listing", "feature"), // admin only — no ownership check needed
+  requirePermission("listing", "feature"),
   asyncHandler(listingCtrl.setFeatured),
 );
 
-// ── Multi-image management ─────────────────────────────────────────────────────
+// ── Images ─────────────────────────────────────────────────────────────────────
 
 router.post(
   "/:id/images",
@@ -138,7 +123,7 @@ router.patch(
   asyncHandler(listingCtrl.setPrimaryImage),
 );
 
-// ── Availability calendar ──────────────────────────────────────────────────────
+// ── Availability ───────────────────────────────────────────────────────────────
 
 router.post(
   "/:id/availability",
@@ -157,4 +142,4 @@ router.delete(
   asyncHandler(listingCtrl.removeBlockedDate),
 );
 
-module.exports = router;
+export default router;

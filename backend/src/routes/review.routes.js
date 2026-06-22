@@ -1,30 +1,19 @@
-"use strict";
-
-const express = require("express");
-const router = express.Router({ mergeParams: true });
-
-const asyncHandler = require("../utils/asyncHandler");
-const reviewCtrl = require("../controllers/review.controller");
-const validate = require("../middlewares/validate");
-const { reviewBodySchema } = require("../validators");
-const reviewRepo = require("../repositories/review.repository");
-
-const {
+import express from "express";
+import asyncHandler from "../utils/asyncHandler.js";
+import * as reviewCtrl from "../controllers/review.controller.js";
+import validate from "../middlewares/validate.js";
+import { reviewBodySchema } from "../validators/index.js";
+import * as reviewRepo from "../repositories/review.repository.js";
+import {
   requireAuth,
   requirePermission,
   requireOwnerOrAdmin,
-} = require("../middlewares/rbac");
+} from "../middlewares/rbac.js";
 
-// ── Ownership fetch helper ────────────────────────────────────────────────────
+const router = express.Router({ mergeParams: true });
 
 const fetchReview = (req) => reviewRepo.findById(req.params.reviewId);
 
-// ── Collection: GET + POST ─────────────────────────────────────────────────────
-
-/**
- * GET  /api/listings/:listingId/reviews  → public
- * POST /api/listings/:listingId/reviews  → any authenticated user
- */
 router
   .route("/")
   .get(asyncHandler(reviewCtrl.index))
@@ -35,13 +24,6 @@ router
     asyncHandler(reviewCtrl.create),
   );
 
-// ── Single review: GET + PATCH + DELETE ────────────────────────────────────────
-
-/**
- * GET    /api/listings/:listingId/reviews/:reviewId  → public
- * PATCH  /api/listings/:listingId/reviews/:reviewId  → auth + author (admin bypasses)
- * DELETE /api/listings/:listingId/reviews/:reviewId  → auth + author (admin bypasses)
- */
 router
   .route("/:reviewId")
   .get(asyncHandler(reviewCtrl.show))
@@ -59,4 +41,4 @@ router
     asyncHandler(reviewCtrl.destroy),
   );
 
-module.exports = router;
+export default router;
