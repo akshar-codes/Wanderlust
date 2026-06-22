@@ -1,10 +1,8 @@
-"use strict";
-
-const Listing = require("../models/listing.js");
+import Listing from "../models/listing.js";
 
 // ── Read ───────────────────────────────────────────────────────────────────────
 
-const findAll = (filter = {}, opts = {}) => {
+export const findAll = (filter = {}, opts = {}) => {
   const { includeNonPublic = false, lean = false } = opts;
 
   const query = includeNonPublic
@@ -15,10 +13,7 @@ const findAll = (filter = {}, opts = {}) => {
   return lean ? q.lean() : q;
 };
 
-/**
- * Paginated find — returns documents + total count in one round-trip.
- */
-const findPaginated = async (
+export const findPaginated = async (
   filter = {},
   {
     page = 1,
@@ -41,18 +36,12 @@ const findPaginated = async (
   return { docs, total };
 };
 
-/**
- * Find a listing by ID and populate reviews + owner for detail views.
- */
-const findByIdWithDetails = (id) =>
+export const findByIdWithDetails = (id) =>
   Listing.findById(id)
     .populate({ path: "reviews", populate: { path: "author" } })
     .populate("owner");
 
-/**
- * Find a listing by its slug (public-facing URLs).
- */
-const findBySlug = (slug, opts = {}) => {
+export const findBySlug = (slug, opts = {}) => {
   const { includeNonPublic = false } = opts;
   const filter = includeNonPublic
     ? { slug }
@@ -62,29 +51,30 @@ const findBySlug = (slug, opts = {}) => {
     .populate("owner");
 };
 
-const findById = (id) => Listing.findById(id);
+export const findById = (id) => Listing.findById(id);
 
-const findByOwner = (ownerId) =>
+export const findByOwner = (ownerId) =>
   Listing.find({ owner: ownerId }).sort({ createdAt: -1 });
 
-const findFeatured = (limit = 10) =>
+export const findFeatured = (limit = 10) =>
   Listing.find({ featured: true, status: "active", draft: false })
     .sort({ averageRating: -1 })
     .limit(limit);
 
 // ── Write ──────────────────────────────────────────────────────────────────────
 
-const create = (data) => Listing.create(data);
+export const create = (data) => Listing.create(data);
 
-const updateById = (id, updates) =>
+export const updateById = (id, updates) =>
   Listing.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
 
-const deleteById = (id) => Listing.findByIdAndDelete(id);
+export const deleteById = (id) => Listing.findByIdAndDelete(id);
 
 // ── Stats helpers ──────────────────────────────────────────────────────────────
 
-const recalculateRating = async (listingId) => {
-  const Review = require("../models/review.js");
+export const recalculateRating = async (listingId) => {
+  // Dynamic import avoids circular dependency between listing ↔ review models
+  const { default: Review } = await import("../models/review.js");
   const listing = await Listing.findById(listingId).lean();
   if (!listing) return null;
 
@@ -113,38 +103,26 @@ const recalculateRating = async (listingId) => {
   );
 };
 
-/**
- * Increment a numeric counter field (bookingCount, wishlistCount, etc.).
- */
-const incrementCounter = (id, field, amount = 1) =>
+export const incrementCounter = (id, field, amount = 1) =>
   Listing.findByIdAndUpdate(id, { $inc: { [field]: amount } }, { new: true });
 
 // ── Images ─────────────────────────────────────────────────────────────────────
 
-/**
- * Add an image to the images[] array.
- */
-const addImage = (id, imageData) =>
+export const addImage = (id, imageData) =>
   Listing.findByIdAndUpdate(
     id,
     { $push: { images: imageData } },
     { new: true, runValidators: true },
   );
 
-/**
- * Remove an image from the images[] array by its sub-document _id.
- */
-const removeImage = (id, imageId) =>
+export const removeImage = (id, imageId) =>
   Listing.findByIdAndUpdate(
     id,
     { $pull: { images: { _id: imageId } } },
     { new: true },
   );
 
-/**
- * Set a specific image as primary (clears others first).
- */
-const setPrimaryImage = async (listingId, imageId) => {
+export const setPrimaryImage = async (listingId, imageId) => {
   await Listing.updateOne(
     { _id: listingId },
     { $set: { "images.$[].isPrimary": false } },
@@ -158,36 +136,16 @@ const setPrimaryImage = async (listingId, imageId) => {
 
 // ── Availability ───────────────────────────────────────────────────────────────
 
-const addBlockedDate = (id, blockedDate) =>
+export const addBlockedDate = (id, blockedDate) =>
   Listing.findByIdAndUpdate(
     id,
     { $push: { availabilityCalendar: blockedDate } },
     { new: true, runValidators: true },
   );
 
-const removeBlockedDate = (id, blockedDateId) =>
+export const removeBlockedDate = (id, blockedDateId) =>
   Listing.findByIdAndUpdate(
     id,
     { $pull: { availabilityCalendar: { _id: blockedDateId } } },
     { new: true },
   );
-
-module.exports = {
-  findAll,
-  findPaginated,
-  findByIdWithDetails,
-  findBySlug,
-  findById,
-  findByOwner,
-  findFeatured,
-  create,
-  updateById,
-  deleteById,
-  recalculateRating,
-  incrementCounter,
-  addImage,
-  removeImage,
-  setPrimaryImage,
-  addBlockedDate,
-  removeBlockedDate,
-};
