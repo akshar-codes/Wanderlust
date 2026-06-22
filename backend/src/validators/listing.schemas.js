@@ -1,19 +1,15 @@
-"use strict";
-
-const { z } = require("zod");
-const {
+import { z } from "zod";
+import {
   nonEmptyString,
   coercePositiveInt,
   coerceNonNegativeNumber,
-} = require("./primitives");
-const {
+} from "./primitives.js";
+import {
   LISTING_CATEGORIES,
   PROPERTY_TYPES,
   AMENITIES_LIST,
   LISTING_STATUSES,
-} = require("./enums");
-
-// ── Pricing sub-schema ────────────────────────────────────────────────────────
+} from "./enums.js";
 
 const pricingSchema = z
   .object({
@@ -23,8 +19,6 @@ const pricingSchema = z
     taxes: coerceNonNegativeNumber("Taxes").optional().default(0),
   })
   .optional();
-
-// ── House rules sub-schema ────────────────────────────────────────────────────
 
 const houseRulesSchema = z
   .object({
@@ -39,18 +33,13 @@ const houseRulesSchema = z
   })
   .optional();
 
-// ── Shared boolean preprocessor for "true"/"false" strings ───────────────────
-
 const booleanFromString = z.preprocess(
   (v) => (v === "true" ? true : v === "false" ? false : v),
   z.boolean(),
 );
 
-// ── Listing create (POST /api/listings) ──────────────────────────────────────
-
-const listingBodySchema = z.object({
+export const listingBodySchema = z.object({
   listing: z.object({
-    // ── Required core fields ──────────────────────────────────────────────
     title: nonEmptyString("Title").max(
       100,
       "Title cannot exceed 100 characters",
@@ -62,37 +51,28 @@ const listingBodySchema = z.object({
       required_error: "Category is required",
       message: `Category must be one of: ${LISTING_CATEGORIES.join(", ")}`,
     }),
-
-    // ── Legacy price (required; synced to pricing.nightlyPrice) ──────────
     price: z.preprocess(
       (v) => (v === "" || v === undefined ? undefined : Number(v)),
       z
         .number({ required_error: "Price is required" })
         .min(0, "Price must be 0 or greater"),
     ),
-
-    // ── Optional enriched fields ──────────────────────────────────────────
     shortDescription: z
       .string()
       .trim()
       .max(160, "Short description cannot exceed 160 characters")
       .nullable()
       .optional(),
-
     propertyType: z
       .enum(PROPERTY_TYPES, {
         message: `Property type must be one of: ${PROPERTY_TYPES.join(", ")}`,
       })
       .optional()
       .default("other"),
-
-    // Capacity
     bedrooms: coercePositiveInt("Bedrooms", 0).optional().default(1),
     bathrooms: coerceNonNegativeNumber("Bathrooms").optional().default(1),
     beds: coercePositiveInt("Beds", 0).optional().default(1),
     maxGuests: coercePositiveInt("Max guests", 1).optional().default(2),
-
-    // Amenities
     amenities: z
       .array(
         z.enum(AMENITIES_LIST, {
@@ -101,24 +81,15 @@ const listingBodySchema = z.object({
       )
       .optional()
       .default([]),
-
-    // House rules
     houseRules: houseRulesSchema,
-
-    // Pricing breakdown
     pricing: pricingSchema,
-
-    // Status & visibility
     status: z
       .enum(LISTING_STATUSES, {
         message: `Status must be one of: ${LISTING_STATUSES.join(", ")}`,
       })
       .optional()
       .default("active"),
-
     draft: booleanFromString.optional().default(false),
-
-    // Stay requirements
     minimumStay: coercePositiveInt("Minimum stay", 1).optional().default(1),
     maximumStay: z
       .preprocess(
@@ -127,15 +98,11 @@ const listingBodySchema = z.object({
       )
       .optional()
       .nullable(),
-
-    // Legacy image field (URL string — still accepted; images[] is preferred)
     image: z.string().optional().nullable(),
   }),
 });
 
-// ── Listing partial update (PATCH /api/listings/:id) ─────────────────────────
-
-const listingPatchSchema = z.object({
+export const listingPatchSchema = z.object({
   listing: z
     .object({
       title: nonEmptyString("Title")
@@ -176,9 +143,7 @@ const listingPatchSchema = z.object({
     .default({}),
 });
 
-// ── Availability calendar entry (POST /api/listings/:id/availability) ─────────
-
-const blockedDateSchema = z.object({
+export const blockedDateSchema = z.object({
   startDate: z
     .string()
     .datetime({ message: "startDate must be a valid ISO date" }),
@@ -191,12 +156,4 @@ const blockedDateSchema = z.object({
     .default("blocked"),
 });
 
-module.exports = {
-  // Sub-schemas (exported for composability)
-  pricingSchema,
-  houseRulesSchema,
-  // Top-level schemas
-  listingBodySchema,
-  listingPatchSchema,
-  blockedDateSchema,
-};
+export { pricingSchema, houseRulesSchema };

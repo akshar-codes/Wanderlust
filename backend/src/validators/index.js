@@ -1,17 +1,15 @@
-"use strict";
-
 // ── Primitive helpers ─────────────────────────────────────────────────────────
-const {
+export {
   nonEmptyString,
   coercePositiveInt,
   coerceNonNegativeNumber,
   numericQueryParam,
   commaSeparatedArray,
   flattenZodErrors,
-} = require("./primitives");
+} from "./primitives.js";
 
 // ── Enums / constants ─────────────────────────────────────────────────────────
-const {
+export {
   LISTING_CATEGORIES,
   PROPERTY_TYPES,
   AMENITIES_LIST,
@@ -23,88 +21,35 @@ const {
   PROFILE_VISIBILITY,
   CURRENCIES,
   LANGUAGES,
-} = require("./enums");
+} from "./enums.js";
 
 // ── Domain schemas ────────────────────────────────────────────────────────────
-const {
+export {
   pricingSchema,
   houseRulesSchema,
   listingBodySchema,
   listingPatchSchema,
   blockedDateSchema,
-} = require("./listing.schemas");
+} from "./listing.schemas.js";
 
-const { reviewBodySchema } = require("./review.schemas");
+export { reviewBodySchema } from "./review.schemas.js";
 
-const {
+export {
   signupBodySchema,
   loginBodySchema,
   forgotPasswordBodySchema,
   resetPasswordBodySchema,
   verifyEmailBodySchema,
-} = require("./auth.schemas");
+} from "./auth.schemas.js";
 
-const {
+export {
   updateProfileBodySchema,
   updateSettingsBodySchema,
   notificationPreferencesBodySchema,
   changeRoleBodySchema,
-} = require("./user.schemas");
+} from "./user.schemas.js";
 
-const {
+export {
   searchQuerySchema,
   autocompleteQuerySchema,
-} = require("./search.schemas");
-
-// ── Re-export everything ──────────────────────────────────────────────────────
-module.exports = {
-  // Helpers
-  nonEmptyString,
-  coercePositiveInt,
-  coerceNonNegativeNumber,
-  numericQueryParam,
-  commaSeparatedArray,
-  flattenZodErrors,
-
-  // Enums (re-exported for controllers/docs/models)
-  LISTING_CATEGORIES,
-  PROPERTY_TYPES,
-  AMENITIES_LIST,
-  LISTING_STATUSES,
-  SEARCH_SORT_VALUES,
-  USER_ROLES,
-  PROVIDERS,
-  THEMES,
-  PROFILE_VISIBILITY,
-  CURRENCIES,
-  LANGUAGES,
-
-  // Sub-schemas (exported for composability)
-  pricingSchema,
-  houseRulesSchema,
-
-  // Listing
-  listingBodySchema,
-  listingPatchSchema,
-  blockedDateSchema,
-
-  // Review
-  reviewBodySchema,
-
-  // Auth
-  signupBodySchema,
-  loginBodySchema,
-  forgotPasswordBodySchema,
-  resetPasswordBodySchema,
-  verifyEmailBodySchema,
-
-  // User
-  updateProfileBodySchema,
-  updateSettingsBodySchema,
-  notificationPreferencesBodySchema,
-  changeRoleBodySchema,
-
-  // Search
-  searchQuerySchema,
-  autocompleteQuerySchema,
-};
+} from "./search.schemas.js";

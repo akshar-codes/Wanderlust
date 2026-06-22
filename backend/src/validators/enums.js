@@ -1,8 +1,4 @@
-"use strict";
-
-// ── Listing enums ─────────────────────────────────────────────────────────────
-
-const LISTING_CATEGORIES = [
+export const LISTING_CATEGORIES = [
   "trending",
   "rooms",
   "iconic",
@@ -16,7 +12,7 @@ const LISTING_CATEGORIES = [
   "boats",
 ];
 
-const PROPERTY_TYPES = [
+export const PROPERTY_TYPES = [
   "apartment",
   "house",
   "villa",
@@ -35,8 +31,7 @@ const PROPERTY_TYPES = [
   "other",
 ];
 
-const AMENITIES_LIST = [
-  // Essentials
+export const AMENITIES_LIST = [
   "wifi",
   "kitchen",
   "washer",
@@ -44,29 +39,24 @@ const AMENITIES_LIST = [
   "air_conditioning",
   "heating",
   "dedicated_workspace",
-  // Bedroom & laundry
   "iron",
   "hair_dryer",
   "hangers",
   "bed_linens",
   "extra_pillows_and_blankets",
   "room_darkening_shades",
-  // Bathroom
   "hot_water",
   "shampoo",
   "body_soap",
   "towels",
-  // Safety
   "smoke_alarm",
   "carbon_monoxide_alarm",
   "fire_extinguisher",
   "first_aid_kit",
-  // Entertainment
   "tv",
   "cable_tv",
   "streaming_services",
   "books_and_reading_material",
-  // Outdoor & views
   "pool",
   "hot_tub",
   "bbq_grill",
@@ -80,22 +70,18 @@ const AMENITIES_LIST = [
   "garden",
   "patio",
   "balcony",
-  // Parking & facilities
   "free_parking",
   "paid_parking",
   "ev_charger",
   "gym",
   "elevator",
-  // Family
   "crib",
   "high_chair",
   "children_books_and_toys",
   "children_dinnerware",
-  // Accessibility
   "step_free_access",
   "wide_doorway",
   "accessible_parking",
-  // Services
   "breakfast",
   "cleaning_available",
   "luggage_dropoff",
@@ -104,9 +90,9 @@ const AMENITIES_LIST = [
   "smoking_allowed",
 ];
 
-const LISTING_STATUSES = ["active", "inactive", "suspended", "deleted"];
+export const LISTING_STATUSES = ["active", "inactive", "suspended", "deleted"];
 
-const SEARCH_SORT_VALUES = [
+export const SEARCH_SORT_VALUES = [
   "createdAt",
   "price_asc",
   "price_desc",
@@ -114,25 +100,18 @@ const SEARCH_SORT_VALUES = [
   "popular",
 ];
 
-// ── User enums ────────────────────────────────────────────────────────────────
-
-const USER_ROLES = ["user", "host", "admin"];
-const PROVIDERS = ["local", "google", "github"];
-const THEMES = ["light", "dark", "system"];
-const PROFILE_VISIBILITY = ["public", "private", "hosts_only"];
-const CURRENCIES = ["INR", "USD", "EUR", "GBP", "JPY", "AUD", "CAD", "SGD"];
-const LANGUAGES = ["en", "hi", "es", "fr", "de", "ja", "zh", "ar"];
-
-module.exports = {
-  LISTING_CATEGORIES,
-  PROPERTY_TYPES,
-  AMENITIES_LIST,
-  LISTING_STATUSES,
-  SEARCH_SORT_VALUES,
-  USER_ROLES,
-  PROVIDERS,
-  THEMES,
-  PROFILE_VISIBILITY,
-  CURRENCIES,
-  LANGUAGES,
-};
+export const USER_ROLES = ["user", "host", "admin"];
+export const PROVIDERS = ["local", "google", "github"];
+export const THEMES = ["light", "dark", "system"];
+export const PROFILE_VISIBILITY = ["public", "private", "hosts_only"];
+export const CURRENCIES = [
+  "INR",
+  "USD",
+  "EUR",
+  "GBP",
+  "JPY",
+  "AUD",
+  "CAD",
+  "SGD",
+];
+export const LANGUAGES = ["en", "hi", "es", "fr", "de", "ja", "zh", "ar"];

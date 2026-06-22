@@ -1,16 +1,12 @@
-"use strict";
+import { z } from "zod";
 
-const { z } = require("zod");
-
-// ── Primitive builders ────────────────────────────────────────────────────────
-
-const nonEmptyString = (label) =>
+export const nonEmptyString = (label) =>
   z
     .string({ required_error: `${label} is required` })
     .trim()
     .min(1, `${label} cannot be empty`);
 
-const coercePositiveInt = (label, min = 0) =>
+export const coercePositiveInt = (label, min = 0) =>
   z.preprocess(
     (v) => (v === "" || v === undefined || v === null ? undefined : Number(v)),
     z
@@ -19,13 +15,13 @@ const coercePositiveInt = (label, min = 0) =>
       .min(min, `${label} must be at least ${min}`),
   );
 
-const coerceNonNegativeNumber = (label) =>
+export const coerceNonNegativeNumber = (label) =>
   z.preprocess(
     (v) => (v === "" || v === undefined || v === null ? undefined : Number(v)),
     z.number().min(0, `${label} must be 0 or greater`),
   );
 
-const numericQueryParam = (label, { min, max } = {}) =>
+export const numericQueryParam = (label, { min, max } = {}) =>
   z.preprocess(
     (v) => (v === "" || v === undefined ? undefined : Number(v)),
     z
@@ -45,7 +41,7 @@ const numericQueryParam = (label, { min, max } = {}) =>
       ),
   );
 
-const commaSeparatedArray = z
+export const commaSeparatedArray = z
   .string()
   .optional()
   .transform((v) =>
@@ -57,19 +53,8 @@ const commaSeparatedArray = z
           .filter(Boolean),
   );
 
-// ── Zod error flattener ───────────────────────────────────────────────────────
-
-const flattenZodErrors = (zodError) =>
+export const flattenZodErrors = (zodError) =>
   (zodError.issues ?? zodError.errors ?? []).map((issue) => ({
     field: issue.path.join("."),
     message: issue.message,
   }));
-
-module.exports = {
-  nonEmptyString,
-  coercePositiveInt,
-  coerceNonNegativeNumber,
-  numericQueryParam,
-  commaSeparatedArray,
-  flattenZodErrors,
-};

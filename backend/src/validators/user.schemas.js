@@ -1,17 +1,13 @@
-"use strict";
-
-const { z } = require("zod");
-const {
+import { z } from "zod";
+import {
   THEMES,
   PROFILE_VISIBILITY,
   CURRENCIES,
   LANGUAGES,
   USER_ROLES,
-} = require("./enums");
+} from "./enums.js";
 
-// ── Profile update (PATCH /api/users/:username/profile) ──────────────────────
-
-const updateProfileBodySchema = z.object({
+export const updateProfileBodySchema = z.object({
   firstName: z.string().trim().max(50).optional().nullable(),
   lastName: z.string().trim().max(50).optional().nullable(),
   bio: z.string().trim().max(500).optional().nullable(),
@@ -23,9 +19,7 @@ const updateProfileBodySchema = z.object({
     .nullable(),
 });
 
-// ── Settings update (PATCH /api/users/:username/settings) ────────────────────
-
-const updateSettingsBodySchema = z.object({
+export const updateSettingsBodySchema = z.object({
   language: z.enum(LANGUAGES).optional(),
   currency: z.enum(CURRENCIES).optional(),
   timezone: z.string().trim().max(80).optional(),
@@ -34,11 +28,9 @@ const updateSettingsBodySchema = z.object({
   profileVisibility: z.enum(PROFILE_VISIBILITY).optional(),
 });
 
-// ── Notification preferences (PATCH /api/users/:username/notifications) ───────
-
 const boolOptional = z.boolean().optional();
 
-const notificationPreferencesBodySchema = z.object({
+export const notificationPreferencesBodySchema = z.object({
   email: z
     .object({
       bookingRequests: boolOptional,
@@ -63,18 +55,9 @@ const notificationPreferencesBodySchema = z.object({
     .optional(),
 });
 
-// ── Role change (PATCH /api/users/:username/role — admin only) ────────────────
-
-const changeRoleBodySchema = z.object({
+export const changeRoleBodySchema = z.object({
   role: z.enum(USER_ROLES, {
     required_error: "Role is required",
     message: `Role must be one of: ${USER_ROLES.join(", ")}`,
   }),
 });
-
-module.exports = {
-  updateProfileBodySchema,
-  updateSettingsBodySchema,
-  notificationPreferencesBodySchema,
-  changeRoleBodySchema,
-};

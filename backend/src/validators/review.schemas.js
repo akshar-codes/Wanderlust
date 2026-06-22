@@ -1,11 +1,7 @@
-"use strict";
+import { z } from "zod";
+import { nonEmptyString } from "./primitives.js";
 
-const { z } = require("zod");
-const { nonEmptyString } = require("./primitives");
-
-// ── Review body (POST + PATCH /api/listings/:listingId/reviews) ───────────────
-
-const reviewBodySchema = z.object({
+export const reviewBodySchema = z.object({
   review: z.object({
     rating: z.preprocess(
       (v) => (v === "" || v === undefined ? undefined : Number(v)),
@@ -18,5 +14,3 @@ const reviewBodySchema = z.object({
     comment: nonEmptyString("Comment"),
   }),
 });
-
-module.exports = { reviewBodySchema };
