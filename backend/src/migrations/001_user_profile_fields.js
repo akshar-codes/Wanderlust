@@ -1,12 +1,6 @@
-#!/usr/bin/env node
-
-"use strict";
-
-const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
-
-const mongoose = require("mongoose");
-const User = require("../models/user");
+import "dotenv/config";
+import mongoose from "mongoose";
+import User from "../models/user.js";
 
 const MONGO_URL = process.env.MONGO_URL;
 if (!MONGO_URL) {
@@ -21,7 +15,6 @@ async function runMigration() {
   const db = mongoose.connection.db;
   const usersCollection = db.collection("users");
 
-  // ── Step 1: Backfill missing top-level fields ─────────────────────────────
   console.log("⏳  Backfilling missing fields…");
 
   const defaultsToSet = {
@@ -67,44 +60,33 @@ async function runMigration() {
     "settings.profileVisibility": "public",
   };
 
-  // Build $set only for missing fields (avoids overwriting existing data)
-  const setIfMissing = {};
-  for (const [field, value] of Object.entries({
+  const setIfMissing = {
     ...defaultsToSet,
     ...defaultNotificationPreferences,
     ...defaultSettings,
-  })) {
-    setIfMissing[field] = value;
-  }
+  };
 
-  const result = await usersCollection.updateMany(
-    {}, // all documents
-    [
-      // MongoDB 4.2+ aggregation pipeline update — sets field only if it doesn't exist
-      {
-        $set: Object.fromEntries(
-          Object.entries(setIfMissing).map(([field, defaultVal]) => [
-            field,
-            {
-              $cond: {
-                if: { $eq: [{ $type: `$${field}` }, "missing"] },
-                then: defaultVal,
-                else: `$${field}`,
-              },
+  const result = await usersCollection.updateMany({}, [
+    {
+      $set: Object.fromEntries(
+        Object.entries(setIfMissing).map(([field, defaultVal]) => [
+          field,
+          {
+            $cond: {
+              if: { $eq: [{ $type: `$${field}` }, "missing"] },
+              then: defaultVal,
+              else: `$${field}`,
             },
-          ]),
-        ),
-      },
-    ],
-  );
-
+          },
+        ]),
+      ),
+    },
+  ]);
   console.log(
     `✅  Backfilled ${result.modifiedCount} documents (${result.matchedCount} total)`,
   );
 
-  // ── Step 2: Recalculate profileCompletion for all users ───────────────────
   console.log("⏳  Recalculating profileCompletion…");
-
   await usersCollection.updateMany({}, [
     {
       $set: {
@@ -118,9 +100,7 @@ async function runMigration() {
                     { $cond: [{ $ne: ["$lastName", null] }, 1, 0] },
                     { $cond: [{ $ne: ["$bio", null] }, 1, 0] },
                     { $cond: [{ $ne: ["$phoneNumber", null] }, 1, 0] },
-                    {
-                      $cond: [{ $ne: ["$avatar.url", null] }, 1, 0],
-                    },
+                    { $cond: [{ $ne: ["$avatar.url", null] }, 1, 0] },
                     { $cond: ["$emailVerified", 1, 0] },
                   ],
                 },
@@ -132,19 +112,11 @@ async function runMigration() {
         },
       },
     },
-    // Round to integer
-    {
-      $set: {
-        profileCompletion: { $round: ["$profileCompletion", 0] },
-      },
-    },
+    { $set: { profileCompletion: { $round: ["$profileCompletion", 0] } } },
   ]);
-
   console.log("✅  profileCompletion recalculated");
 
-  // ── Step 3: Ensure indexes ─────────────────────────────────────────────────
   console.log("⏳  Ensuring indexes…");
-
   await usersCollection.createIndex(
     { googleId: 1 },
     { sparse: true, background: true },
@@ -155,10 +127,8 @@ async function runMigration() {
   );
   await usersCollection.createIndex({ role: 1 }, { background: true });
   await usersCollection.createIndex({ createdAt: -1 }, { background: true });
-
   console.log("✅  Indexes ensured");
 
-  // ── Done ───────────────────────────────────────────────────────────────────
   console.log("\n✅  Migration 001_user_profile_fields complete");
   await mongoose.disconnect();
 }

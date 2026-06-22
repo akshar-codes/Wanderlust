@@ -1,10 +1,5 @@
-#!/usr/bin/env node
-"use strict";
-
-const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
-
-const mongoose = require("mongoose");
+import "dotenv/config";
+import mongoose from "mongoose";
 
 const MONGO_URL = process.env.MONGO_URL;
 if (!MONGO_URL) {
@@ -18,11 +13,9 @@ async function run() {
 
   const db = mongoose.connection.db;
 
-  // ── Step 1: Ensure collection exists ──────────────────────────────────────
   const collections = await db
     .listCollections({ name: "emailverificationtokens" })
     .toArray();
-
   if (collections.length === 0) {
     await db.createCollection("emailverificationtokens");
     console.log("✅  Collection 'emailverificationtokens' created");
@@ -34,50 +27,30 @@ async function run() {
 
   const col = db.collection("emailverificationtokens");
 
-  // ── Step 2: TTL index on expiresAt ────────────────────────────────────────
   await col.createIndex(
     { expiresAt: 1 },
-    {
-      expireAfterSeconds: 0,
-      name: "ttl_expiresAt",
-      background: true,
-    },
+    { expireAfterSeconds: 0, name: "ttl_expiresAt", background: true },
   );
   console.log("✅  TTL index 'ttl_expiresAt' ensured on expiresAt");
 
-  // ── Step 3: Unique index on tokenHash ─────────────────────────────────────
   await col.createIndex(
     { tokenHash: 1 },
-    {
-      unique: true,
-      name: "unique_tokenHash",
-      background: true,
-    },
+    { unique: true, name: "unique_tokenHash", background: true },
   );
   console.log("✅  Unique index 'unique_tokenHash' ensured on tokenHash");
 
-  // ── Step 4: Compound lookup index ─────────────────────────────────────────
   await col.createIndex(
     { userId: 1, usedAt: 1, expiresAt: 1 },
-    {
-      name: "userId_usedAt_expiresAt",
-      background: true,
-    },
+    { name: "userId_usedAt_expiresAt", background: true },
   );
   console.log("✅  Compound index 'userId_usedAt_expiresAt' ensured");
 
-  // ── Step 5: IP abuse-detection index ──────────────────────────────────────
   await col.createIndex(
     { requestIp: 1, createdAt: -1 },
-    {
-      name: "requestIp_createdAt",
-      background: true,
-      sparse: true, // requestIp can be null for internal/automated calls
-    },
+    { name: "requestIp_createdAt", background: true, sparse: true },
   );
   console.log("✅  Index 'requestIp_createdAt' ensured");
 
-  // ── Step 6: Backfill emailVerified:false on all existing users ─────────────
   const usersCol = db.collection("users");
   const backfillResult = await usersCol.updateMany(
     { emailVerified: { $exists: false } },
@@ -87,7 +60,6 @@ async function run() {
     `✅  Backfilled emailVerified:false on ${backfillResult.modifiedCount} user(s)`,
   );
 
-  // ── Step 7: Index on users.emailVerified for middleware queries ────────────
   await usersCol.createIndex(
     { emailVerified: 1 },
     { name: "emailVerified", background: true },

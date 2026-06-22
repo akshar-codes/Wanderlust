@@ -1,9 +1,3 @@
-"use strict";
-
-// ── Seed review data — plain objects only, no Mongoose models ────────────────
-// The Review model is registered in src/models/review.js; importing or
-// re-registering it here causes an OverwriteModelError at startup.
-
 const reviews = [
   {
     comment:
@@ -239,4 +233,4 @@ const reviews = [
   },
 ];
 
-module.exports = { data: reviews };
+export const data = reviews;

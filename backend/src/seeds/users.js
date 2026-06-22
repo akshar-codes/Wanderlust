@@ -1,17 +1,6 @@
-"use strict";
+export const SEED_PASSWORD = "Wanderlust@2025";
 
-/**
- * Seed user templates — hosts (own listings) and travelers (write reviews only).
- *
- * NOTE: SEED_PASSWORD is a shared, dev-only password for every generated
- * account below. It is never read from .env on purpose — these accounts only
- * ever exist in local/dev databases. The real admin account still uses
- * ADMIN_PASS from your .env file.
- */
-
-const SEED_PASSWORD = "Wanderlust@2025";
-
-const hosts = [
+export const hosts = [
   {
     username: "coastalhost",
     email: "maria.host@wanderlust.com",
@@ -62,7 +51,7 @@ const hosts = [
   },
 ];
 
-const travelers = [
+export const travelers = [
   {
     username: "wanderingjess",
     email: "jess.traveler@example.com",
@@ -128,5 +117,3 @@ const travelers = [
     role: "user",
   },
 ];
-
-module.exports = { SEED_PASSWORD, hosts, travelers };

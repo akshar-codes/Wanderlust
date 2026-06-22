@@ -1,17 +1,19 @@
-"use strict";
+import "dotenv/config";
+import mongoose from "mongoose";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
-const mongoose = require("mongoose");
-const path = require("path");
-const fs = require("fs");
-require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
+import Listing from "../models/listing.js";
+import Review from "../models/review.js";
+import User from "../models/user.js";
+import { data as listingData } from "./data.js";
+import { data as reviewData } from "./reviews.js";
+import * as userData from "./users.js";
+import { cloudinary } from "../config/cloudConfig.js";
 
-const Listing = require("../models/listing.js");
-const Review = require("../models/review.js");
-const User = require("../models/user.js");
-const initData = require("./data.js");
-const reviewData = require("./reviews.js");
-const userData = require("./users.js");
-const { cloudinary } = require("../config/cloudConfig.js");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MONGO_URL = process.env.MONGO_URL;
 const ADMIN_PASS = process.env.ADMIN_PASS;
@@ -21,33 +23,10 @@ if (!ADMIN_PASS) throw new Error("ADMIN_PASS is undefined");
 if (!process.env.CLOUD_NAME) throw new Error("CLOUD_NAME is undefined");
 
 if (!Array.isArray(userData.hosts) || !Array.isArray(userData.travelers)) {
-  throw new Error(
-    "seeds/users.js did not export `hosts`/`travelers` arrays. " +
-      "Check that the file ends with `module.exports = { SEED_PASSWORD, hosts, travelers };`",
-  );
+  throw new Error("seeds/users.js did not export `hosts`/`travelers` arrays.");
 }
 
-// ── Connection ─────────────────────────────────────────────────────────────
-
-async function main() {
-  // FIX: removed deprecated useNewUrlParser and useUnifiedTopology options —
-  // Mongoose 7+ accepts neither and will throw on unrecognised options.
-  await mongoose.connect(MONGO_URL);
-  console.log("✅ MongoDB connected");
-}
-
-// Delete old Cloudinary folder to avoid duplicates
-async function clearCloudinary() {
-  try {
-    await cloudinary.api.delete_resources_by_prefix("wanderlust_DEV");
-    await cloudinary.api.delete_folder("wanderlust_DEV");
-    console.log("✅ Old Cloudinary folder deleted");
-  } catch (err) {
-    console.error("❌ Failed to delete Cloudinary folder:", err.message);
-  }
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -57,14 +36,12 @@ function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/** Spread review createdAt timestamps over the last N days instead of "now". */
 function randomPastDate(maxDaysAgo) {
   const date = new Date();
   date.setDate(date.getDate() - randomInt(0, maxDaysAgo));
   return date;
 }
 
-/** Register a batch of seed users (hosts or travelers) and return the saved docs. */
 async function registerSeedUsers(templates) {
   const created = [];
   for (const tmpl of templates) {
@@ -76,7 +53,7 @@ async function registerSeedUsers(templates) {
       bio: tmpl.bio,
       role: tmpl.role,
       provider: "local",
-      emailVerified: true, // seed accounts are pre-verified for convenience
+      emailVerified: true,
     });
     const registered = await User.register(userDoc, userData.SEED_PASSWORD);
     created.push(registered);
@@ -84,7 +61,19 @@ async function registerSeedUsers(templates) {
   return created;
 }
 
-// ── Initialize database with users, listings, and reviews ──────────────────
+// ── Cloudinary cleanup ────────────────────────────────────────────────────────
+
+async function clearCloudinary() {
+  try {
+    await cloudinary.api.delete_resources_by_prefix("wanderlust_DEV");
+    await cloudinary.api.delete_folder("wanderlust_DEV");
+    console.log("✅ Old Cloudinary folder deleted");
+  } catch (err) {
+    console.error("❌ Failed to delete Cloudinary folder:", err.message);
+  }
+}
+
+// ── Database seeding ──────────────────────────────────────────────────────────
 
 async function initDB() {
   await Listing.deleteMany({});
@@ -92,7 +81,7 @@ async function initDB() {
   await User.deleteMany({});
   console.log("✅ Old database entries deleted");
 
-  // ── 1. Users ──────────────────────────────────────────────────────────
+  // 1. Users
   const adminUser = new User({
     username: "AdminUser",
     email: "admin.user@wanderlust.com",
@@ -111,21 +100,18 @@ async function initDB() {
   const travelers = await registerSeedUsers(userData.travelers);
   console.log(`✅ ${travelers.length} traveler accounts created`);
 
-  // Anyone (host or traveler) can leave a review on a listing they don't own
   const reviewerPool = [...hosts, ...travelers];
-
-  // Track counters so we can backfill the cached User stats afterward
   const listingCountByOwner = new Map();
   const reviewCountByAuthor = new Map();
 
-  // ── 2. Listings + reviews ────────────────────────────────────────────
+  // 2. Listings + reviews
   let hostIndex = 0;
 
-  for (const listingData of initData.data) {
+  for (const listing of listingData) {
     const owner = hosts[hostIndex % hosts.length];
     hostIndex++;
 
-    const newListing = new Listing(listingData);
+    const newListing = new Listing(listing);
     newListing.owner = owner._id;
 
     listingCountByOwner.set(
@@ -133,9 +119,8 @@ async function initDB() {
       (listingCountByOwner.get(owner._id.toString()) ?? 0) + 1,
     );
 
-    // Optional: upload a local image to Cloudinary if one was provided on disk
-    if (listingData.imagePath && fs.existsSync(listingData.imagePath)) {
-      const result = await cloudinary.uploader.upload(listingData.imagePath, {
+    if (listing.imagePath && fs.existsSync(listing.imagePath)) {
+      const result = await cloudinary.uploader.upload(listing.imagePath, {
         folder: "wanderlust_DEV",
       });
       newListing.image = {
@@ -144,13 +129,10 @@ async function initDB() {
       };
     }
 
-    // Random batch of reviews (3–7), authored by anyone except the listing's own owner
     const eligibleAuthors = reviewerPool.filter(
       (u) => !u._id.equals(owner._id),
     );
-    const shuffledReviews = [...reviewData.data].sort(
-      () => 0.5 - Math.random(),
-    );
+    const shuffledReviews = [...reviewData].sort(() => 0.5 - Math.random());
     const selectedReviews = shuffledReviews.slice(0, randomInt(3, 7));
 
     let ratingTotal = 0;
@@ -161,7 +143,7 @@ async function initDB() {
       const review = new Review({
         ...reviewDatum,
         author: author._id,
-        createdAt: randomPastDate(180), // spread over the last ~6 months
+        createdAt: randomPastDate(180),
       });
       await review.save();
 
@@ -185,7 +167,7 @@ async function initDB() {
 
   console.log("✅ Listings and reviews seeded successfully");
 
-  // ── 3. Backfill cached User counters ────────────────────────────────
+  // 3. Backfill cached counters
   for (const [userId, count] of listingCountByOwner) {
     await User.findByIdAndUpdate(userId, { $set: { totalListings: count } });
   }
@@ -195,8 +177,12 @@ async function initDB() {
   console.log("✅ User stats (totalListings / totalReviews) backfilled");
 }
 
+// ── Entry point ───────────────────────────────────────────────────────────────
+
 async function run() {
-  await main();
+  await mongoose.connect(MONGO_URL);
+  console.log("✅ MongoDB connected");
+
   await clearCloudinary();
   await initDB();
 

@@ -1,23 +1,11 @@
-#!/usr/bin/env node
-/**
- * scripts/validate-openapi.js
- *
- * Validates docs/openapi.yaml against the OpenAPI 3.0 spec.
- *
- * Usage:
- *   node scripts/validate-openapi.js
- *   # or as an npm script: "validate:api": "node scripts/validate-openapi.js"
- *
- * Requires:
- *   npm install --save-dev @apidevtools/swagger-parser
- */
+import path from "path";
+import { fileURLToPath } from "url";
+import SwaggerParser from "@apidevtools/swagger-parser";
 
-"use strict";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const path = require("path");
-const SwaggerParser = require("@apidevtools/swagger-parser");
-
-const SPEC_PATH = path.resolve(__dirname, "../docs/openapi.yaml");
+const SPEC_PATH = path.resolve(__dirname, "../../../docs/openapi.yaml");
 
 (async () => {
   try {
