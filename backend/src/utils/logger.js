@@ -1,9 +1,12 @@
-"use strict";
-
-const { createLogger, format, transports } = require("winston");
-const path = require("path");
+import { createLogger, format, transports } from "winston";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const { combine, timestamp, errors, json, colorize, printf } = format;
+
+// ESM equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ── Log directory (project root /logs) ────────────────────────────────────────
 const LOG_DIR = path.resolve(__dirname, "../../logs");
@@ -44,7 +47,6 @@ const loggerTransports = [
     maxFiles: 7,
     tailable: true,
   }),
-
   new transports.File({
     filename: path.join(LOG_DIR, "auth.log"),
     level: "info",
@@ -67,13 +69,12 @@ loggerTransports.push(
 const logger = createLogger({
   level: process.env.LOG_LEVEL ?? (IS_PROD ? "info" : "debug"),
   transports: loggerTransports,
-  // Don't crash the process on unhandled logger errors
   exitOnError: false,
 });
 
-// ── Convenience child loggers (add a "context" field to every entry) ──────────
+// ── Convenience child loggers ─────────────────────────────────────────────────
 logger.auth = logger.child({ context: "auth" });
 logger.http = logger.child({ context: "http" });
 logger.db = logger.child({ context: "db" });
 
-module.exports = logger;
+export default logger;

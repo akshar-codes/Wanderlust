@@ -1,4 +1,4 @@
-class AppError extends Error {
+export class AppError extends Error {
   constructor(statusCode, message, { code, details } = {}) {
     super(message);
     this.name = "AppError";
@@ -49,4 +49,4 @@ function deriveCode(status) {
   return map[status] ?? "ERROR";
 }
 
-module.exports = AppError;
+export default AppError;

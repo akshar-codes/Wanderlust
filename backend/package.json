@@ -6,6 +6,7 @@
   "version": "2.0.0",
   "description": "Wanderlust — Travel Listing Platform",
   "main": "src/server.js",
+  "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
