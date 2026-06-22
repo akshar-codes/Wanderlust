@@ -1,13 +1,10 @@
-"use strict";
+import * as reviewService from "../services/review.service.js";
+import * as reviewRepo from "../repositories/review.repository.js";
+import * as listingRepo from "../repositories/listing.repository.js";
+import AppError from "../utils/AppError.js";
+import { sendSuccess } from "../utils/apiResponse.js";
 
-const reviewService = require("../services/review.service");
-const reviewRepo = require("../repositories/review.repository");
-const listingRepo = require("../repositories/listing.repository");
-const AppError = require("../utils/AppError");
-const { sendSuccess } = require("../utils/apiResponse");
-
-// ── GET /api/listings/:listingId/reviews ──────────────────────────────────────
-const index = async (req, res) => {
+export const index = async (req, res) => {
   const { listingId } = req.params;
   const listing = await listingRepo.findByIdWithDetails(listingId);
 
@@ -20,15 +17,13 @@ const index = async (req, res) => {
   return sendSuccess(res, { reviews: listing.reviews });
 };
 
-// ── GET /api/listings/:listingId/reviews/:reviewId ────────────────────────────
-const show = async (req, res, next) => {
+export const show = async (req, res, next) => {
   const review = await reviewRepo.findById(req.params.reviewId);
   if (!review) return next(AppError.notFound("Review not found"));
   return sendSuccess(res, { review });
 };
 
-// ── POST /api/listings/:listingId/reviews ─────────────────────────────────────
-const create = async (req, res) => {
+export const create = async (req, res) => {
   const { listingId } = req.params;
   const review = await reviewService.createReview(
     listingId,
@@ -38,8 +33,7 @@ const create = async (req, res) => {
   return sendSuccess(res, { review }, 201);
 };
 
-// ── PATCH /api/listings/:listingId/reviews/:reviewId ──────────────────────────
-const update = async (req, res, next) => {
+export const update = async (req, res, next) => {
   const review = req.review ?? (await reviewRepo.findById(req.params.reviewId));
   if (!review) return next(AppError.notFound("Review not found"));
 
@@ -51,11 +45,8 @@ const update = async (req, res, next) => {
   return sendSuccess(res, { review });
 };
 
-// ── DELETE /api/listings/:listingId/reviews/:reviewId ─────────────────────────
-const destroy = async (req, res) => {
+export const destroy = async (req, res) => {
   const { listingId, reviewId } = req.params;
   await reviewService.deleteReview(listingId, reviewId, req.user._id);
   return sendSuccess(res, { message: "Review deleted successfully" });
 };
-
-module.exports = { index, show, create, update, destroy };

@@ -1,11 +1,8 @@
-"use strict";
+import * as listingService from "../services/listing.service.js";
+import AppError from "../utils/AppError.js";
+import { sendSuccess } from "../utils/apiResponse.js";
 
-const listingService = require("../services/listing.service");
-const AppError = require("../utils/AppError");
-const { sendSuccess } = require("../utils/apiResponse");
-
-// ── GET /api/listings ─────────────────────────────────────────────────────────
-const index = async (req, res) => {
+export const index = async (req, res) => {
   const {
     category,
     featured,
@@ -46,29 +43,25 @@ const index = async (req, res) => {
   });
 };
 
-// ── GET /api/listings/featured ────────────────────────────────────────────────
-const featured = async (req, res) => {
+export const featured = async (req, res) => {
   const { limit = 10 } = req.query;
   const listings = await listingService.getFeaturedListings(Number(limit));
   return sendSuccess(res, { listings });
 };
 
-// ── GET /api/listings/slug/:slug ──────────────────────────────────────────────
-const showBySlug = async (req, res, next) => {
+export const showBySlug = async (req, res, next) => {
   const listing = await listingService.getListingBySlug(req.params.slug);
   if (!listing) return next(AppError.notFound("Listing not found"));
   return sendSuccess(res, { listing });
 };
 
-// ── GET /api/listings/:id ─────────────────────────────────────────────────────
-const show = async (req, res, next) => {
+export const show = async (req, res, next) => {
   const listing = await listingService.getListingById(req.params.id);
   if (!listing) return next(AppError.notFound("Listing not found"));
   return sendSuccess(res, { listing });
 };
 
-// ── POST /api/listings ────────────────────────────────────────────────────────
-const create = async (req, res, next) => {
+export const create = async (req, res, next) => {
   if (!req.file)
     return next(AppError.badRequest("At least one image is required"));
 
@@ -81,8 +74,7 @@ const create = async (req, res, next) => {
   return sendSuccess(res, { listing }, 201);
 };
 
-// ── PUT /api/listings/:id (full replace) ──────────────────────────────────────
-const update = async (req, res) => {
+export const update = async (req, res) => {
   const listing = await listingService.updateListing(
     req.params.id,
     req.body.listing,
@@ -91,8 +83,7 @@ const update = async (req, res) => {
   return sendSuccess(res, { listing });
 };
 
-// ── PATCH /api/listings/:id (partial update) ──────────────────────────────────
-const partialUpdate = async (req, res, next) => {
+export const partialUpdate = async (req, res, next) => {
   const updates = req.body.listing ?? req.body;
 
   if (!updates || Object.keys(updates).length === 0) {
@@ -106,14 +97,12 @@ const partialUpdate = async (req, res, next) => {
   return sendSuccess(res, { listing });
 };
 
-// ── DELETE /api/listings/:id ──────────────────────────────────────────────────
-const destroy = async (req, res) => {
+export const destroy = async (req, res) => {
   await listingService.deleteListing(req.params.id);
   return sendSuccess(res, { message: "Listing deleted successfully" });
 };
 
-// ── POST /api/listings/:id/publish ───────────────────────────────────────────
-const publish = async (req, res) => {
+export const publish = async (req, res) => {
   const listing = await listingService.publishListing(
     req.params.id,
     req.user._id,
@@ -121,8 +110,7 @@ const publish = async (req, res) => {
   return sendSuccess(res, { listing, message: "Listing published" });
 };
 
-// ── POST /api/listings/:id/unpublish ─────────────────────────────────────────
-const unpublish = async (req, res) => {
+export const unpublish = async (req, res) => {
   const listing = await listingService.unpublishListing(
     req.params.id,
     req.user._id,
@@ -130,8 +118,7 @@ const unpublish = async (req, res) => {
   return sendSuccess(res, { listing, message: "Listing moved to drafts" });
 };
 
-// ── PATCH /api/listings/:id/featured (admin only) ────────────────────────────
-const setFeatured = async (req, res, next) => {
+export const setFeatured = async (req, res, next) => {
   if (req.user.role !== "admin") {
     return next(AppError.forbidden("Only admins can feature listings"));
   }
@@ -146,12 +133,10 @@ const setFeatured = async (req, res, next) => {
   });
 };
 
-// ── POST /api/listings/:id/images ─────────────────────────────────────────────
-const addImages = async (req, res, next) => {
+export const addImages = async (req, res, next) => {
   if (!req.files?.length) {
     return next(AppError.badRequest("No images provided"));
   }
-
   const listing = await listingService.addImages(
     req.params.id,
     req.files,
@@ -164,8 +149,7 @@ const addImages = async (req, res, next) => {
   );
 };
 
-// ── DELETE /api/listings/:id/images/:imageId ──────────────────────────────────
-const removeImage = async (req, res) => {
+export const removeImage = async (req, res) => {
   const listing = await listingService.removeListingImage(
     req.params.id,
     req.params.imageId,
@@ -174,8 +158,7 @@ const removeImage = async (req, res) => {
   return sendSuccess(res, { listing, message: "Image removed successfully" });
 };
 
-// ── PATCH /api/listings/:id/images/:imageId/primary ──────────────────────────
-const setPrimaryImage = async (req, res) => {
+export const setPrimaryImage = async (req, res) => {
   const listing = await listingService.setPrimaryImage(
     req.params.id,
     req.params.imageId,
@@ -184,8 +167,7 @@ const setPrimaryImage = async (req, res) => {
   return sendSuccess(res, { listing, message: "Primary image updated" });
 };
 
-// ── POST /api/listings/:id/availability ──────────────────────────────────────
-const addBlockedDate = async (req, res) => {
+export const addBlockedDate = async (req, res) => {
   const listing = await listingService.addBlockedDate(
     req.params.id,
     req.body,
@@ -198,31 +180,11 @@ const addBlockedDate = async (req, res) => {
   );
 };
 
-// ── DELETE /api/listings/:id/availability/:blockedDateId ──────────────────────
-const removeBlockedDate = async (req, res) => {
+export const removeBlockedDate = async (req, res) => {
   const listing = await listingService.removeBlockedDate(
     req.params.id,
     req.params.blockedDateId,
     req.user._id,
   );
   return sendSuccess(res, { listing, message: "Blocked date removed" });
-};
-
-module.exports = {
-  index,
-  featured,
-  showBySlug,
-  show,
-  create,
-  update,
-  partialUpdate,
-  destroy,
-  publish,
-  unpublish,
-  setFeatured,
-  addImages,
-  removeImage,
-  setPrimaryImage,
-  addBlockedDate,
-  removeBlockedDate,
 };

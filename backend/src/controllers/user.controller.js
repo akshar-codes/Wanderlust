@@ -1,13 +1,10 @@
-"use strict";
-
-const userService = require("../services/user.service.js");
-const userRepo = require("../repositories/user.repository.js");
-const AppError = require("../utils/AppError.js");
-const { sendSuccess } = require("../utils/apiResponse.js");
+import * as userService from "../services/user.service.js";
+import * as userRepo from "../repositories/user.repository.js";
+import AppError from "../utils/AppError.js";
+import { sendSuccess } from "../utils/apiResponse.js";
 
 // ── Serialization helpers ─────────────────────────────────────────────────────
 
-/** Full profile for the authenticated user themselves (includes settings etc.) */
 function serializeFullProfile(user) {
   return {
     id: user._id,
@@ -33,7 +30,6 @@ function serializeFullProfile(user) {
   };
 }
 
-/** Trimmed public shape — visible to anyone viewing a user's profile */
 function serializePublicProfile(user) {
   return {
     id: user._id,
@@ -55,10 +51,9 @@ function serializePublicProfile(user) {
 
 // ── GET /api/users/:username ──────────────────────────────────────────────────
 
-const profile = async (req, res, next) => {
+export const profile = async (req, res, next) => {
   const user = await userService.getUserProfile(req.params.username);
 
-  // Authenticated users requesting their own profile get the full shape
   const isSelf =
     req.isAuthenticated() && req.user.username === req.params.username;
 
@@ -69,14 +64,14 @@ const profile = async (req, res, next) => {
 
 // ── PATCH /api/users/:username/profile ────────────────────────────────────────
 
-const updateProfile = async (req, res, next) => {
+export const updateProfile = async (req, res, next) => {
   const user = await userService.updateProfile(req.user._id, req.body);
   return sendSuccess(res, { user: serializeFullProfile(user) });
 };
 
 // ── PUT /api/users/:username/avatar ──────────────────────────────────────────
 
-const updateAvatar = async (req, res, next) => {
+export const updateAvatar = async (req, res, next) => {
   const user = await userService.updateAvatar(req.user._id, req.file);
   return sendSuccess(res, {
     user: serializeFullProfile(user),
@@ -86,7 +81,7 @@ const updateAvatar = async (req, res, next) => {
 
 // ── DELETE /api/users/:username/avatar ───────────────────────────────────────
 
-const removeAvatar = async (req, res, next) => {
+export const removeAvatar = async (req, res, next) => {
   const user = await userService.removeAvatar(req.user._id);
   return sendSuccess(res, {
     user: serializeFullProfile(user),
@@ -96,7 +91,7 @@ const removeAvatar = async (req, res, next) => {
 
 // ── PATCH /api/users/:username/settings ──────────────────────────────────────
 
-const updateSettings = async (req, res, next) => {
+export const updateSettings = async (req, res, next) => {
   const user = await userService.updateSettings(req.user._id, req.body);
   return sendSuccess(res, {
     settings: user.settings,
@@ -106,7 +101,7 @@ const updateSettings = async (req, res, next) => {
 
 // ── PATCH /api/users/:username/notifications ──────────────────────────────────
 
-const updateNotificationPreferences = async (req, res, next) => {
+export const updateNotificationPreferences = async (req, res, next) => {
   const user = await userService.updateNotificationPreferences(
     req.user._id,
     req.body,
@@ -117,10 +112,9 @@ const updateNotificationPreferences = async (req, res, next) => {
   });
 };
 
-// ── PATCH /api/users/:username/role  (admin only) ─────────────────────────────
+// ── PATCH /api/users/:username/role (admin only) ──────────────────────────────
 
-const changeRole = async (req, res, next) => {
-  // Guard: only admins can change roles
+export const changeRole = async (req, res, next) => {
   if (req.user.role !== "admin") {
     return next(AppError.forbidden("Only admins can change user roles"));
   }
@@ -137,17 +131,16 @@ const changeRole = async (req, res, next) => {
 
 // ── GET /api/users/:username/listings ─────────────────────────────────────────
 
-const listings = async (req, res, next) => {
+export const listings = async (req, res, next) => {
   const userListings = await userService.getUserListings(req.params.username);
   return sendSuccess(res, { listings: userListings });
 };
 
-// ── DELETE /api/users/:username  (account deletion) ──────────────────────────
+// ── DELETE /api/users/:username ───────────────────────────────────────────────
 
-const destroy = async (req, res, next) => {
+export const destroy = async (req, res, next) => {
   const { username } = req.params;
 
-  // Only the account owner or an admin may delete it
   if (req.user.username !== username && req.user.role !== "admin") {
     return next(AppError.forbidden("You can only delete your own account"));
   }
@@ -159,16 +152,4 @@ const destroy = async (req, res, next) => {
   });
 
   return sendSuccess(res, { message: "Account deleted successfully" });
-};
-
-module.exports = {
-  profile,
-  updateProfile,
-  updateAvatar,
-  removeAvatar,
-  updateSettings,
-  updateNotificationPreferences,
-  changeRole,
-  listings,
-  destroy,
 };

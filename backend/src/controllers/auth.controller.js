@@ -1,16 +1,14 @@
-"use strict";
-
-const userService = require("../services/user.service.js");
-const userRepo = require("../repositories/user.repository.js");
-const passwordResetService = require("../services/passwordReset.service.js");
-const emailVerificationService = require("../services/emailVerification.service");
-const AppError = require("../utils/AppError.js");
-const { sendSuccess, sendError } = require("../utils/apiResponse.js");
-const logger = require("../utils/logger.js");
+import * as userService from "../services/user.service.js";
+import * as userRepo from "../repositories/user.repository.js";
+import * as passwordResetService from "../services/passwordReset.service.js";
+import * as emailVerificationService from "../services/emailVerification.service.js";
+import AppError from "../utils/AppError.js";
+import { sendSuccess, sendError } from "../utils/apiResponse.js";
+import logger from "../utils/logger.js";
 
 // ── POST /api/auth/signup ─────────────────────────────────────────────────────
 
-const signup = async (req, res, next) => {
+export const signup = async (req, res, next) => {
   const { username, email, password, firstName, lastName } = req.body;
 
   let registeredUser;
@@ -29,7 +27,7 @@ const signup = async (req, res, next) => {
 
   emailVerificationService
     .sendVerificationEmail(registeredUser, req.ip)
-    .catch(() => {}); // fire-and-forget
+    .catch(() => {});
 
   return sendSuccess(
     res,
@@ -43,7 +41,7 @@ const signup = async (req, res, next) => {
 
 // ── POST /api/auth/login ──────────────────────────────────────────────────────
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   userRepo.touchLastLogin(req.user._id).catch(() => {});
   return sendSuccess(res, {
     message: "Logged in successfully",
@@ -53,16 +51,14 @@ const login = async (req, res) => {
 
 // ── POST /api/auth/verify-email ───────────────────────────────────────────────
 
-const verifyEmail = async (req, res, next) => {
-  const { token } = req.body; // validated by verifyEmailBodySchema
+export const verifyEmail = async (req, res, next) => {
+  const { token } = req.body;
 
   const user = await emailVerificationService.verifyEmail({
     token,
     consumedByIp: req.ip,
   });
 
-  // Refresh the session user object so req.user reflects emailVerified: true
-  // without requiring the user to log out and back in.
   if (req.isAuthenticated()) {
     await new Promise((resolve, reject) => {
       req.login(user, (err) => (err ? reject(err) : resolve()));
@@ -77,7 +73,7 @@ const verifyEmail = async (req, res, next) => {
 
 // ── POST /api/auth/resend-verification ───────────────────────────────────────
 
-const resendVerification = async (req, res, next) => {
+export const resendVerification = async (req, res, next) => {
   const result = await emailVerificationService.resendVerificationEmail(
     req.user,
     req.ip,
@@ -87,7 +83,6 @@ const resendVerification = async (req, res, next) => {
     message: "A new verification email has been sent. Please check your inbox.",
   };
 
-  // Expose raw token in non-production for integration / e2e testing
   if (result._devToken) {
     responsePayload._devToken = result._devToken;
   }
@@ -97,7 +92,7 @@ const resendVerification = async (req, res, next) => {
 
 // ── POST /api/auth/logout ─────────────────────────────────────────────────────
 
-const logout = async (req, res, next) => {
+export const logout = async (req, res, next) => {
   await new Promise((resolve, reject) => {
     req.logout((err) => (err ? reject(err) : resolve()));
   });
@@ -106,7 +101,7 @@ const logout = async (req, res, next) => {
 
 // ── GET /api/auth/me ──────────────────────────────────────────────────────────
 
-const me = (req, res, next) => {
+export const me = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return next(AppError.unauthorized("Not authenticated"));
   }
@@ -115,7 +110,7 @@ const me = (req, res, next) => {
 
 // ── DELETE /api/auth/unlink/:provider ─────────────────────────────────────────
 
-const unlinkProvider = async (req, res, next) => {
+export const unlinkProvider = async (req, res, next) => {
   const { provider } = req.params;
   const SUPPORTED = ["google", "github"];
 
@@ -134,7 +129,6 @@ const unlinkProvider = async (req, res, next) => {
     );
   }
 
-  // Safety check — ensure the user won't be locked out
   const otherProviders = SUPPORTED.filter((p) => p !== provider);
   const hasOtherOAuth = otherProviders.some((p) => user[`${p}Id`]);
   const hasLocalPassword = !!user.hash;
@@ -164,8 +158,8 @@ const unlinkProvider = async (req, res, next) => {
 
 // ── POST /api/auth/forgot-password ───────────────────────────────────────────
 
-const forgotPassword = async (req, res, next) => {
-  const { email } = req.body; // validated by forgotPasswordBodySchema
+export const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
 
   const result = await passwordResetService.initiateForgotPassword({
     email,
@@ -177,7 +171,6 @@ const forgotPassword = async (req, res, next) => {
       "If that email address is registered, you will receive a password reset link shortly.",
   };
 
-  // Expose raw token in non-production for integration/e2e testing convenience
   if (result._devToken) {
     responsePayload._devToken = result._devToken;
   }
@@ -187,8 +180,8 @@ const forgotPassword = async (req, res, next) => {
 
 // ── POST /api/auth/reset-password ────────────────────────────────────────────
 
-const resetPassword = async (req, res, next) => {
-  const { token, password } = req.body; // validated by resetPasswordBodySchema
+export const resetPassword = async (req, res, next) => {
+  const { token, password } = req.body;
 
   try {
     await passwordResetService.consumeResetToken({
@@ -197,7 +190,7 @@ const resetPassword = async (req, res, next) => {
       consumedByIp: req.ip,
     });
   } catch (err) {
-    return next(err); // AppError from service layer — passed straight through
+    return next(err);
   }
 
   return sendSuccess(res, {
@@ -206,7 +199,7 @@ const resetPassword = async (req, res, next) => {
   });
 };
 
-// ── Serializer helper (never expose hash / salt / tokens) ────────────────────
+// ── Serializer ────────────────────────────────────────────────────────────────
 
 function serializeUser(user) {
   const obj = typeof user.toObject === "function" ? user.toObject() : user;
@@ -235,15 +228,3 @@ function serializeUser(user) {
     lastLoginAt: obj.lastLoginAt,
   };
 }
-
-module.exports = {
-  signup,
-  login,
-  verifyEmail,
-  resendVerification,
-  logout,
-  me,
-  unlinkProvider,
-  forgotPassword,
-  resetPassword,
-};
