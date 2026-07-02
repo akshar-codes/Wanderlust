@@ -1,9 +1,9 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 
-import Listing from "../src/models/listing.js";
-import Review from "../src/models/review.js";
-import User from "../src/models/user.js";
+import Listing from "../models/listing.js";
+import Review from "../models/review.js";
+import User from "../models/user.js";
 
 import { buildCityQuotas } from "../../seeder/utils/cityQuotas.js";
 import {
