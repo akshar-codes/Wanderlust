@@ -2,6 +2,16 @@ import mbxGeocoding from "@mapbox/mapbox-sdk/services/geocoding.js";
 import * as listingRepo from "../repositories/listing.repository.js";
 import { cloudinary } from "../config/cloudConfig.js";
 import AppError from "../utils/AppError.js";
+import withTimeout, { isNetworkError } from "../utils/withTimeout.js";
+import logger from "../utils/logger.js";
+
+const GEOCODING_TIMEOUT_MS = 8000;
+
+if (!process.env.MAP_TOKEN) {
+  logger.warn(
+    "[ListingService] MAP_TOKEN is not set — geocoding requests will fail on every listing create/update.",
+  );
+}
 
 const geocodingClient = mbxGeocoding({
   accessToken: process.env.MAP_TOKEN,
@@ -10,9 +20,35 @@ const geocodingClient = mbxGeocoding({
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 async function geocodeLocation(locationString) {
-  const geoResponse = await geocodingClient
-    .forwardGeocode({ query: locationString, limit: 1 })
-    .send();
+  let geoResponse;
+
+  try {
+    geoResponse = await withTimeout(
+      geocodingClient
+        .forwardGeocode({ query: locationString, limit: 1 })
+        .send(),
+      GEOCODING_TIMEOUT_MS,
+      "Geocoding request timed out",
+    );
+  } catch (err) {
+    if (isNetworkError(err)) {
+      logger.error("[ListingService] Geocoding network/timeout failure", {
+        location: locationString,
+        code: err.code ?? err.name,
+        message: err.message,
+      });
+      throw AppError.serviceUnavailable(
+        "We couldn't reach the location service to verify this address. Please check your connection and try again.",
+      );
+    }
+    // Non-network SDK error (e.g. bad token → 401, malformed query) — let it
+    // surface as-is so the real cause isn't masked.
+    logger.error("[ListingService] Geocoding request failed", {
+      location: locationString,
+      message: err.message,
+    });
+    throw err;
+  }
 
   const features = geoResponse.body.features;
   if (!features?.length) {

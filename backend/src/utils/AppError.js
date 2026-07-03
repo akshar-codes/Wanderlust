@@ -32,6 +32,18 @@ export class AppError extends Error {
       details,
     });
   }
+
+  /**
+   * Use when a request fails because a downstream dependency (geocoding,
+   * image storage, email, etc.) is unreachable or timed out — as opposed to
+   * a problem with the request itself. Signals to the client that retrying
+   * later is appropriate.
+   */
+  static serviceUnavailable(
+    message = "A dependent service is temporarily unavailable. Please try again shortly.",
+  ) {
+    return new AppError(503, message, { code: "SERVICE_UNAVAILABLE" });
+  }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -45,6 +57,7 @@ function deriveCode(status) {
     409: "CONFLICT",
     422: "VALIDATION_ERROR",
     500: "INTERNAL_ERROR",
+    503: "SERVICE_UNAVAILABLE",
   };
   return map[status] ?? "ERROR";
 }

@@ -1,6 +1,7 @@
 import AppError from "../utils/AppError.js";
 import { sendError } from "../utils/apiResponse.js";
 import { flattenZodErrors } from "../validators/index.js";
+import { isNetworkError } from "../utils/withTimeout.js";
 import logger from "../utils/logger.js";
 
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -91,7 +92,32 @@ const errorHandler = (err, req, res, next) => {
     return sendError(res, err.message, 403, { code: "FORBIDDEN" });
   }
 
-  // ── 7. Unknown / programmer errors ────────────────────────────────────────
+  // ── 7. Network / upstream connectivity errors ─────────────────────────────
+  // Catches raw ETIMEDOUT/ENOTFOUND/ECONNREFUSED (and AggregateErrors that
+  // wrap them, e.g. from Node's dual-stack connector) bubbling up from
+  // unguarded external calls (Mapbox, Cloudinary, SMTP, etc.) so the client
+  // gets a real 503 + message instead of an empty-message 500.
+  if (isNetworkError(err)) {
+    logError(
+      {
+        message:
+          err.message || `Network error (${err.code ?? err.name ?? "unknown"})`,
+        statusCode: 503,
+        code: "SERVICE_UNAVAILABLE",
+        stack: err.stack,
+      },
+      req,
+      "error",
+    );
+    return sendError(
+      res,
+      "A dependent external service is unreachable right now. Please try again shortly.",
+      503,
+      { code: "SERVICE_UNAVAILABLE" },
+    );
+  }
+
+  // ── 8. Unknown / programmer errors ────────────────────────────────────────
   logError(err, req, "error");
 
   const message = IS_PROD ? "Something went wrong" : err.message;
