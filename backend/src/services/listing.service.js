@@ -211,6 +211,10 @@ export const partialUpdateListing = async (id, updates) => {
     throw AppError.badRequest("No update fields provided");
   }
 
+  if (updates.location && updates.location !== listing.location) {
+    updates.geometry = await geocodeLocation(updates.location);
+  }
+
   if (updates.pricing?.nightlyPrice != null) {
     updates.price = Number(updates.pricing.nightlyPrice);
   } else if (updates.price != null && !("pricing" in updates)) {
