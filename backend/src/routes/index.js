@@ -2,8 +2,11 @@ import express from "express";
 import authRoutes from "./auth.routes.js";
 import listingRoutes from "./listing.routes.js";
 import reviewRoutes from "./review.routes.js";
+import myReviewsRoutes from "./myReviews.routes.js";
 import userRoutes from "./user.routes.js";
 import searchRoutes from "./search.routes.js";
+import wishlistRoutes from "./wishlist.routes.js";
+import bookingRoutes from "./booking.routes.js";
 
 const router = express.Router();
 
@@ -18,7 +21,10 @@ router.use("/search", searchRoutes);
 router.use("/auth", authRoutes);
 router.use("/listings", listingRoutes);
 router.use("/listings/:listingId/reviews", reviewRoutes);
+router.use("/reviews", myReviewsRoutes);
 router.use("/users", userRoutes);
+router.use("/wishlist", wishlistRoutes);
+router.use("/bookings", bookingRoutes);
 
 router.use((_req, res) =>
   res.status(404).json({

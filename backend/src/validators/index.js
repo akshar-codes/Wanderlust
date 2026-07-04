@@ -53,3 +53,8 @@ export {
   searchQuerySchema,
   autocompleteQuerySchema,
 } from "./search.schemas.js";
+
+export {
+  createBookingBodySchema,
+  cancelBookingBodySchema,
+} from "./booking.schemas.js";
