@@ -15,6 +15,12 @@ export const reviewsService = {
     return res.data.data; // { reviews, pagination }
   },
 
+  /** GET /api/reviews/mine — reviews authored by the current user */
+  getMine: async ({ page = 1, limit = 10 } = {}) => {
+    const res = await api.get("/reviews/mine", { params: { page, limit } });
+    return res.data.data; // { reviews, pagination }
+  },
+
   /** GET /api/listings/:listingId/reviews/stats */
   getStats: async (listingId) => {
     const res = await api.get(`/listings/${listingId}/reviews/stats`);
