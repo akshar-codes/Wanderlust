@@ -22,6 +22,7 @@ import ListingsPage from "./pages/ListingsPage";
 import ListingShowPage from "./pages/ListingShowPage";
 import NewListingPage from "./pages/NewListingPage";
 import EditListingPage from "./pages/EditListingPage";
+import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -81,6 +82,16 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <EditListingPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ── User dashboard (protected) ─────────────────────────── */}
+                  <Route
+                    path="dashboard/:section?"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardPage />
                       </ProtectedRoute>
                     }
                   />
