@@ -80,3 +80,33 @@ export const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
 });
+
+// ── Profile (dashboard "Profile Management" section) ──────────────────────────
+// Mirrors backend/src/validators/user.schemas.js::updateProfileBodySchema —
+// keep both in sync if either changes.
+export const profileSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .max(50, "First name cannot exceed 50 characters")
+    .optional()
+    .or(z.literal("")),
+  lastName: z
+    .string()
+    .trim()
+    .max(50, "Last name cannot exceed 50 characters")
+    .optional()
+    .or(z.literal("")),
+  bio: z
+    .string()
+    .trim()
+    .max(500, "Bio cannot exceed 500 characters")
+    .optional()
+    .or(z.literal("")),
+  phoneNumber: z
+    .string()
+    .trim()
+    .regex(/^\+?[1-9]\d{7,14}$/, "Enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+});

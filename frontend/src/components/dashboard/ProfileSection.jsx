@@ -9,7 +9,7 @@ import { Input, Textarea } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { Skeleton } from "../ui/Skeleton";
 import { Badge } from "../ui/Badge";
-import { profileSchema } from "../../schemas/profile";
+import { profileSchema } from "../../schemas";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import {
   useUserProfile,
