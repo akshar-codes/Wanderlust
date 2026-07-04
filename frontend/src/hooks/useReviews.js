@@ -7,10 +7,12 @@ import toast from "react-hot-toast";
 
 export const REVIEWS_KEY = "reviews";
 export const REVIEW_STATS_KEY = "review-stats";
+export const MY_REVIEWS_KEY = "reviews-mine";
 
 export const reviewKeys = {
   list: (listingId, opts) => [REVIEWS_KEY, listingId, opts],
   stats: (listingId) => [REVIEW_STATS_KEY, listingId],
+  mine: (opts) => [MY_REVIEWS_KEY, opts],
 };
 
 // ── Queries ───────────────────────────────────────────────────────────────────
@@ -37,6 +39,16 @@ export function useReviewStats(listingId) {
   });
 }
 
+/** Reviews authored by the current user, across all listings — dashboard */
+export function useMyReviews(opts = {}) {
+  return useQuery({
+    queryKey: reviewKeys.mine(opts),
+    queryFn: () => reviewsService.getMine(opts),
+    staleTime: 1000 * 60 * 2,
+    keepPreviousData: true,
+  });
+}
+
 // ── Mutations ─────────────────────────────────────────────────────────────────
 
 export function useCreateReview(listingId) {
@@ -47,6 +59,7 @@ export function useCreateReview(listingId) {
       qc.invalidateQueries({ queryKey: [REVIEWS_KEY, listingId] });
       qc.invalidateQueries({ queryKey: reviewKeys.stats(listingId) });
       qc.invalidateQueries({ queryKey: [LISTING_KEY, listingId] });
+      qc.invalidateQueries({ queryKey: [MY_REVIEWS_KEY] });
       toast.success("Review posted!");
     },
     onError: (err) => toast.error(err.message),
@@ -58,6 +71,28 @@ export function useDeleteReview(listingId) {
   return useMutation({
     mutationFn: (reviewId) => reviewsService.delete(listingId, reviewId),
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [REVIEWS_KEY, listingId] });
+      qc.invalidateQueries({ queryKey: reviewKeys.stats(listingId) });
+      qc.invalidateQueries({ queryKey: [LISTING_KEY, listingId] });
+      qc.invalidateQueries({ queryKey: [MY_REVIEWS_KEY] });
+      toast.success("Review deleted.");
+    },
+    onError: (err) => toast.error(err.message),
+  });
+}
+
+/**
+ * Delete a review from the dashboard's "My Reviews" list, where the listing
+ * isn't known ahead of time (unlike useDeleteReview, which is scoped to a
+ * single listing page).
+ */
+export function useDeleteMyReview() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ listingId, reviewId }) =>
+      reviewsService.delete(listingId, reviewId),
+    onSuccess: (_data, { listingId }) => {
+      qc.invalidateQueries({ queryKey: [MY_REVIEWS_KEY] });
       qc.invalidateQueries({ queryKey: [REVIEWS_KEY, listingId] });
       qc.invalidateQueries({ queryKey: reviewKeys.stats(listingId) });
       qc.invalidateQueries({ queryKey: [LISTING_KEY, listingId] });
