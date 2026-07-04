@@ -39,6 +39,29 @@ export const index = async (req, res) => {
   });
 };
 
+// ── GET /api/reviews/mine — reviews authored by the current user ─────────────
+
+export const mine = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+
+  const result = await reviewService.getMyReviews(req.user._id, {
+    page: Number(page),
+    limit: Math.min(Number(limit), 50),
+  });
+
+  return sendSuccess(res, {
+    reviews: result.docs,
+    pagination: {
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages,
+      hasNext: result.page < result.totalPages,
+      hasPrev: result.page > 1,
+    },
+  });
+};
+
 // ── GET /api/listings/:listingId/reviews/stats ────────────────────────────────
 
 export const stats = async (req, res) => {

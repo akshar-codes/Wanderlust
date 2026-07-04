@@ -67,6 +67,34 @@ export const findPaginated = async (
   };
 };
 
+// ── Reviews authored by a given user (across all listings) ───────────────────
+// Powers the "My Reviews" section of the user dashboard.
+
+export const findByAuthor = async (authorId, { page = 1, limit = 10 } = {}) => {
+  const filter = { author: authorId };
+  const skip = (page - 1) * limit;
+
+  const [docs, total] = await Promise.all([
+    Review.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: "listing",
+        select: "title location country image slug",
+      }),
+    Review.countDocuments(filter),
+  ]);
+
+  return {
+    docs,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
 // ── Statistics aggregation ────────────────────────────────────────────────────
 
 export const getStats = async (listingId) => {

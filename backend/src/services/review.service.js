@@ -50,6 +50,11 @@ export const getListingReviews = async (listingId, opts = {}) => {
   return reviewRepo.findPaginated(listing._id, opts);
 };
 
+// ── Reviews authored by a user — powers the dashboard "My Reviews" section ───
+
+export const getMyReviews = (authorId, opts = {}) =>
+  reviewRepo.findByAuthor(authorId, opts);
+
 // ── Host reply ────────────────────────────────────────────────────────────────
 
 export const upsertHostReply = async (listingId, reviewId, text, hostId) => {
