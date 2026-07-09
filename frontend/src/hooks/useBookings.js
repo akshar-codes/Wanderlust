@@ -4,10 +4,11 @@ import { bookingsService } from "../services/bookings.service";
 
 export const BOOKINGS_KEY = "bookings";
 
-export function useMyBookings(params = {}) {
+export function useMyBookings({ enabled = true, ...params } = {}) {
   return useQuery({
     queryKey: [BOOKINGS_KEY, params],
     queryFn: () => bookingsService.getAll(params),
+    enabled,
     staleTime: 1000 * 60,
     keepPreviousData: true,
   });

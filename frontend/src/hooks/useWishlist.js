@@ -4,10 +4,11 @@ import { wishlistService } from "../services/wishlist.service";
 
 export const WISHLIST_KEY = "wishlist";
 
-export function useWishlist(params = {}) {
+export function useWishlist({ enabled = true, ...params } = {}) {
   return useQuery({
     queryKey: [WISHLIST_KEY, params],
     queryFn: () => wishlistService.getAll(params),
+    enabled,
     staleTime: 1000 * 60,
     keepPreviousData: true,
   });
