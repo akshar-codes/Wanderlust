@@ -1,4 +1,6 @@
 import * as userRepo from "../repositories/user.repository.js";
+import * as listingRepo from "../repositories/listing.repository.js";
+import * as reviewService from "./review.service.js";
 import AppError from "../utils/AppError.js";
 import { cloudinary } from "../config/cloudConfig.js";
 import User from "../models/user.js";
@@ -28,6 +30,38 @@ export const getUserProfile = async (username) => {
   const user = await userRepo.findByUsername(username);
   if (!user || !user.isActive) throw AppError.notFound("User not found");
   return user;
+};
+
+export const getHostStats = async (username) => {
+  const user = await userRepo.findByUsername(username);
+  if (!user || !user.isActive) throw AppError.notFound("User not found");
+
+  const [listings, reviewSummary] = await Promise.all([
+    listingRepo.findByOwner(user._id),
+    reviewService.getHostReviewSummary(user._id),
+  ]);
+
+  const publishedListings = listings.filter(
+    (l) => !l.draft && l.status === "active",
+  );
+
+  const totalWishlisted = listings.reduce(
+    (sum, l) => sum + (l.wishlistCount ?? 0),
+    0,
+  );
+  const totalBookings = listings.reduce(
+    (sum, l) => sum + (l.bookingCount ?? 0),
+    0,
+  );
+
+  return {
+    totalListings: publishedListings.length,
+    totalReviews: reviewSummary.totalReviews,
+    averageRating: reviewSummary.averageRating,
+    totalWishlisted,
+    totalBookings,
+    memberSince: user.createdAt,
+  };
 };
 
 export const updateProfile = async (userId, updates) => {

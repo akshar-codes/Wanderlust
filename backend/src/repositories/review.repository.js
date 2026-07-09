@@ -95,7 +95,80 @@ export const findByAuthor = async (authorId, { page = 1, limit = 10 } = {}) => {
   };
 };
 
-// ── Statistics aggregation ────────────────────────────────────────────────────
+// ── Reviews received on a host's listings (across all their listings) ────────
+// Powers the public/self "Reviews" section on the user profile page.
+
+export const findByListingOwnerPaginated = async (
+  ownerId,
+  { page = 1, limit = 10 } = {},
+) => {
+  const ownedListingIds = await Listing.find(
+    { owner: ownerId },
+    { _id: 1 },
+  ).lean();
+  const ids = ownedListingIds.map((l) => l._id);
+
+  if (ids.length === 0) {
+    return { docs: [], total: 0, page, limit, totalPages: 0 };
+  }
+
+  const filter = { listing: { $in: ids } };
+  const skip = (page - 1) * limit;
+
+  const [docs, total] = await Promise.all([
+    Review.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("author", "username firstName lastName avatar")
+      .populate({ path: "listing", select: "title slug image" }),
+    Review.countDocuments(filter),
+  ]);
+
+  return {
+    docs,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
+/**
+ * Aggregate rating/count summary across every listing a user owns.
+ * Used for the profile page's host statistics cards.
+ */
+export const getHostReviewSummary = async (ownerId) => {
+  const ownedListingIds = await Listing.find(
+    { owner: ownerId },
+    { _id: 1 },
+  ).lean();
+  const ids = ownedListingIds.map((l) => l._id);
+
+  if (ids.length === 0) {
+    return { totalReviews: 0, averageRating: 0 };
+  }
+
+  const [result] = await Review.aggregate([
+    { $match: { listing: { $in: ids } } },
+    {
+      $group: {
+        _id: null,
+        totalReviews: { $sum: 1 },
+        averageRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+
+  return {
+    totalReviews: result?.totalReviews ?? 0,
+    averageRating: result?.averageRating
+      ? Math.round(result.averageRating * 10) / 10
+      : 0,
+  };
+};
+
+// ── Statistics aggregation (single listing) ───────────────────────────────────
 
 export const getStats = async (listingId) => {
   const [stats] = await Review.aggregate([

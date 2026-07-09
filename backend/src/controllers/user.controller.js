@@ -1,5 +1,6 @@
 import * as userService from "../services/user.service.js";
 import * as userRepo from "../repositories/user.repository.js";
+import * as reviewService from "../services/review.service.js";
 import AppError from "../utils/AppError.js";
 import { sendSuccess } from "../utils/apiResponse.js";
 
@@ -53,12 +54,14 @@ function serializePublicProfile(user) {
 
 export const profile = async (req, res, next) => {
   const user = await userService.getUserProfile(req.params.username);
+  const hostStats = await userService.getHostStats(req.params.username);
 
   const isSelf =
     req.isAuthenticated() && req.user.username === req.params.username;
 
   return sendSuccess(res, {
     user: isSelf ? serializeFullProfile(user) : serializePublicProfile(user),
+    hostStats,
   });
 };
 
@@ -134,6 +137,34 @@ export const changeRole = async (req, res, next) => {
 export const listings = async (req, res, next) => {
   const userListings = await userService.getUserListings(req.params.username);
   return sendSuccess(res, { listings: userListings });
+};
+
+// ── GET /api/users/:username/reviews-received ─────────────────────────────────
+
+export const reviewsReceived = async (req, res, next) => {
+  const { page = 1, limit = 10 } = req.query;
+
+  const user = await userRepo.findByUsername(req.params.username);
+  if (!user || !user.isActive) {
+    return next(AppError.notFound("User not found"));
+  }
+
+  const result = await reviewService.getReviewsReceivedByHost(user._id, {
+    page: Number(page),
+    limit: Math.min(Number(limit), 50),
+  });
+
+  return sendSuccess(res, {
+    reviews: result.docs,
+    pagination: {
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages,
+      hasNext: result.page < result.totalPages,
+      hasPrev: result.page > 1,
+    },
+  });
 };
 
 // ── DELETE /api/users/:username ───────────────────────────────────────────────

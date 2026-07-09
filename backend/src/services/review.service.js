@@ -55,6 +55,18 @@ export const getListingReviews = async (listingId, opts = {}) => {
 export const getMyReviews = (authorId, opts = {}) =>
   reviewRepo.findByAuthor(authorId, opts);
 
+// ── Reviews received on a host's listings — powers the profile page ──────────
+
+export const getReviewsReceivedByHost = (ownerId, opts = {}) =>
+  reviewRepo.findByListingOwnerPaginated(ownerId, opts);
+
+/**
+ * Aggregate rating/count summary across every listing a user owns. Used by
+ * the profile page's statistics cards (avoids N+1 per-listing lookups).
+ */
+export const getHostReviewSummary = (ownerId) =>
+  reviewRepo.getHostReviewSummary(ownerId);
+
 // ── Host reply ────────────────────────────────────────────────────────────────
 
 export const upsertHostReply = async (listingId, reviewId, text, hostId) => {
