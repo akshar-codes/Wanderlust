@@ -7,6 +7,12 @@ export const userService = {
     return res.data.data.user;
   },
 
+  /** GET /api/users/:username — same endpoint as getProfile, but returns the */
+  getProfileFull: async (username) => {
+    const res = await api.get(`/users/${username}`);
+    return res.data.data; // { user, hostStats }
+  },
+
   /** PATCH /api/users/:username/profile */
   updateProfile: async (username, data) => {
     const res = await api.patch(`/users/${username}/profile`, data);
@@ -45,6 +51,14 @@ export const userService = {
   getUserListings: async (username) => {
     const res = await api.get(`/users/${username}/listings`);
     return res.data.data.listings;
+  },
+
+  /** GET /api/users/:username/reviews-received — paginated reviews across*/
+  getReviewsReceived: async (username, { page = 1, limit = 10 } = {}) => {
+    const res = await api.get(`/users/${username}/reviews-received`, {
+      params: { page, limit },
+    });
+    return res.data.data; // { reviews, pagination }
   },
 };
 

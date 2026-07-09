@@ -21,6 +21,10 @@ const router = express.Router();
 
 router.get("/:username", asyncHandler(userCtrl.profile));
 router.get("/:username/listings", asyncHandler(userCtrl.listings));
+router.get(
+  "/:username/reviews-received",
+  asyncHandler(userCtrl.reviewsReceived),
+);
 
 // ── Self-only mutations ───────────────────────────────────────────────────────
 
