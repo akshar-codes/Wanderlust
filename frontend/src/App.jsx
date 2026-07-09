@@ -23,6 +23,7 @@ import ListingShowPage from "./pages/ListingShowPage";
 import NewListingPage from "./pages/NewListingPage";
 import EditListingPage from "./pages/EditListingPage";
 import DashboardPage from "./pages/DashboardPage";
+import UserProfilePage from "./pages/UserProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -67,6 +68,9 @@ export default function App() {
                   <Route index element={<HomePage />} />
                   <Route path="listings" element={<ListingsPage />} />
                   <Route path="listings/:id" element={<ListingShowPage />} />
+
+                  {/* ── User profile (public — self gets editable sections) ── */}
+                  <Route path="users/:username" element={<UserProfilePage />} />
 
                   {/* ── Protected — authenticated + email verified ────────── */}
                   <Route

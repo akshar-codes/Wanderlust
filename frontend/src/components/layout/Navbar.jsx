@@ -410,7 +410,11 @@ function UserMenu({ user, onLogout, isPending }) {
   }, []);
 
   const items = [
-    { icon: <User size={15} />, label: "Profile", to: "#" },
+    {
+      icon: <User size={15} />,
+      label: "Profile",
+      to: `/users/${user?.username}`,
+    },
     { icon: <Heart size={15} />, label: "Wishlist", to: "#" },
     { icon: <Sparkles size={15} />, label: "My listings", to: "#" },
     null,
@@ -664,6 +668,11 @@ function MobileDrawer({
 
   const navItems = isAuthenticated
     ? [
+        {
+          icon: <User size={18} />,
+          label: "Profile",
+          to: `/users/${user?.username}`,
+        },
         {
           icon: <PlusCircle size={18} />,
           label: "List your home",
