@@ -39,11 +39,11 @@ export function useReviewStats(listingId) {
   });
 }
 
-/** Reviews authored by the current user, across all listings — dashboard */
-export function useMyReviews(opts = {}) {
+export function useMyReviews({ enabled = true, ...opts } = {}) {
   return useQuery({
     queryKey: reviewKeys.mine(opts),
     queryFn: () => reviewsService.getMine(opts),
+    enabled,
     staleTime: 1000 * 60 * 2,
     keepPreviousData: true,
   });
