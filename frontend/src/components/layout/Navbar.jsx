@@ -418,7 +418,7 @@ function UserMenu({ user, onLogout, isPending }) {
     { icon: <Heart size={15} />, label: "Wishlist", to: "#" },
     { icon: <Sparkles size={15} />, label: "My listings", to: "#" },
     null,
-    { icon: <Settings size={15} />, label: "Settings", to: "#" },
+    { icon: <Settings size={15} />, label: "Settings", to: "/settings" },
     { icon: <HelpCircle size={15} />, label: "Help", to: "#" },
     { icon: <Globe size={15} />, label: "Language · EN", to: "#" },
     null,
@@ -680,7 +680,7 @@ function MobileDrawer({
         },
         { icon: <Heart size={18} />, label: "Wishlist", to: "#" },
         { icon: <Sparkles size={18} />, label: "My listings", to: "#" },
-        { icon: <Settings size={18} />, label: "Settings", to: "#" },
+        { icon: <Settings size={18} />, label: "Settings", to: "/settings" },
         { icon: <HelpCircle size={18} />, label: "Help centre", to: "#" },
       ]
     : [

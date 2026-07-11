@@ -23,6 +23,7 @@ import ListingShowPage from "./pages/ListingShowPage";
 import NewListingPage from "./pages/NewListingPage";
 import EditListingPage from "./pages/EditListingPage";
 import DashboardPage from "./pages/DashboardPage";
+import SettingsPage from "./pages/SettingsPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
@@ -96,6 +97,16 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <DashboardPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ── Account settings (protected) ───────────────────────── */}
+                  <Route
+                    path="settings/:section?"
+                    element={
+                      <ProtectedRoute>
+                        <SettingsPage />
                       </ProtectedRoute>
                     }
                   />
