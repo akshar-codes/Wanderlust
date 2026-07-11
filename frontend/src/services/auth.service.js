@@ -52,4 +52,12 @@ export const authService = {
     const res = await api.post("/auth/resend-verification");
     return res.data.data;
   },
+
+  /**
+   * DELETE /api/auth/unlink/:provider
+   */
+  unlinkProvider: async (provider) => {
+    const res = await api.delete(`/auth/unlink/${provider}`);
+    return res.data.data;
+  },
 };

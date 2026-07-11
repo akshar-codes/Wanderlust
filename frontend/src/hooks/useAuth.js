@@ -110,3 +110,21 @@ export function useResendVerification() {
       toast.error(err.message || "Failed to resend — please try again later"),
   });
 }
+
+// ── Unlink OAuth provider ─────────────────────────────────────────────────────
+
+export function useUnlinkProvider() {
+  const { refreshUser } = useAuthStore();
+
+  return useMutation({
+    mutationFn: (provider) => authService.unlinkProvider(provider),
+    onSuccess: async (_data, provider) => {
+      await refreshUser();
+      toast.success(
+        `${provider === "google" ? "Google" : "GitHub"} account disconnected`,
+      );
+    },
+    onError: (err) =>
+      toast.error(err.message || "Failed to disconnect account"),
+  });
+}
