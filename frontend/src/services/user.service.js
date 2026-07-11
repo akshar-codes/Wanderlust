@@ -60,6 +60,16 @@ export const userService = {
     });
     return res.data.data; // { reviews, pagination }
   },
+
+  /**
+   * DELETE /api/users/:username
+   * Permanently deletes the account (self, or admin acting on another
+   * account). Backend cascades avatar cleanup on Cloudinary.
+   */
+  deleteAccount: async (username) => {
+    const res = await api.delete(`/users/${username}`);
+    return res.data.data;
+  },
 };
 
 export default userService;

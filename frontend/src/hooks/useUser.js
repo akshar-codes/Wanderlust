@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { userService } from "../services/user.service";
 import { useAuthStore } from "../store/auth.store";
@@ -56,7 +57,7 @@ export function useUserReviewsReceived(
   });
 }
 
-// ── Mutations ─────────────────────────────────────────────────────────────────
+// ── Profile mutations ───────────────────────────────────────────────────────
 
 export function useUpdateProfile() {
   const qc = useQueryClient();
@@ -105,5 +106,60 @@ export function useRemoveAvatar() {
       toast.success("Profile photo removed");
     },
     onError: (err) => toast.error(err.message || "Failed to remove photo"),
+  });
+}
+
+// ── Settings (theme, language, currency, privacy, 2FA preference) ────────────
+
+export function useUpdateSettings() {
+  const qc = useQueryClient();
+  const refreshUser = useAuthStore((s) => s.refreshUser);
+
+  return useMutation({
+    mutationFn: ({ username, settings }) =>
+      userService.updateSettings(username, settings),
+    onSuccess: async (_updated, { username }) => {
+      await refreshUser();
+      qc.invalidateQueries({ queryKey: [USER_PROFILE_FULL_KEY, username] });
+      toast.success("Settings updated");
+    },
+    onError: (err) => toast.error(err.message || "Failed to update settings"),
+  });
+}
+
+// ── Notification preferences ──────────────────────────────────────────────────
+
+export function useUpdateNotificationPreferences() {
+  const refreshUser = useAuthStore((s) => s.refreshUser);
+
+  return useMutation({
+    mutationFn: ({ username, prefs }) =>
+      userService.updateNotificationPreferences(username, prefs),
+    onSuccess: async () => {
+      await refreshUser();
+      toast.success("Notification preferences updated");
+    },
+    onError: (err) =>
+      toast.error(err.message || "Failed to update notification preferences"),
+  });
+}
+
+// ── Account deletion ──────────────────────────────────────────────────────────
+
+export function useDeleteAccount() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (username) => userService.deleteAccount(username),
+    onSuccess: () => {
+      // Session is destroyed server-side (req.logout inside the controller);
+      // clear local auth + cache immediately rather than waiting on a /me roundtrip.
+      useAuthStore.setState({ user: null, isAuthenticated: false });
+      qc.clear();
+      toast.success("Your account has been deleted");
+      navigate("/", { replace: true });
+    },
+    onError: (err) => toast.error(err.message || "Failed to delete account"),
   });
 }
