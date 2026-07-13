@@ -6,6 +6,7 @@ import myReviewsRoutes from "./myReviews.routes.js";
 import userRoutes from "./user.routes.js";
 import searchRoutes from "./search.routes.js";
 import wishlistRoutes from "./wishlist.routes.js";
+import wishlistCollectionRoutes from "./wishlistCollection.routes.js";
 import bookingRoutes from "./booking.routes.js";
 
 const router = express.Router();
@@ -24,6 +25,8 @@ router.use("/listings/:listingId/reviews", reviewRoutes);
 router.use("/reviews", myReviewsRoutes);
 router.use("/users", userRoutes);
 router.use("/wishlist", wishlistRoutes);
+router.use("/wishlists", wishlistCollectionRoutes);
+
 router.use("/bookings", bookingRoutes);
 
 router.use((_req, res) =>

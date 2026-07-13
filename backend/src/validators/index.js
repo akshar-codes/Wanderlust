@@ -58,3 +58,10 @@ export {
   createBookingBodySchema,
   cancelBookingBodySchema,
 } from "./booking.schemas.js";
+
+export {
+  createCollectionBodySchema,
+  updateCollectionBodySchema,
+  toggleWishlistBodySchema,
+  moveWishlistItemBodySchema,
+} from "./wishlist.schemas.js";
