@@ -1,34 +1,48 @@
 import Wishlist from "../models/wishlist.js";
 
-// ── Basic lookups ─────────────────────────────────────────────────────────────
-
-export const find = (userId, listingId) =>
-  Wishlist.findOne({ user: userId, listing: listingId });
-
-export const create = (userId, listingId) =>
-  Wishlist.create({ user: userId, listing: listingId });
-
-export const deleteOne = (userId, listingId) =>
-  Wishlist.findOneAndDelete({ user: userId, listing: listingId });
-
-export const exists = (userId, listingId) =>
-  Wishlist.exists({ user: userId, listing: listingId });
-
-// ── Paginated listing ─────────────────────────────────────────────────────────
-
 const LISTING_PROJECTION =
   "title location country price image category averageRating reviewCount status draft slug";
 
-export const findPaginated = async (userId, { page = 1, limit = 12 } = {}) => {
+// ── Basic lookups ─────────────────────────────────────────────────────────────
+
+export const findInCollection = (collectionId, listingId) =>
+  Wishlist.findOne({ collection: collectionId, listing: listingId });
+
+/** Every saved-item row for this (user, listing) pair, across all of the
+ * user's collections — used to compute which wishlists a listing is in. */
+export const findAnyForUserListing = (userId, listingId) =>
+  Wishlist.find({ user: userId, listing: listingId }).select("collection");
+
+export const create = (data) => Wishlist.create(data);
+
+export const deleteOne = (collectionId, listingId) =>
+  Wishlist.findOneAndDelete({ collection: collectionId, listing: listingId });
+
+export const deleteAllForCollection = (collectionId) =>
+  Wishlist.deleteMany({ collection: collectionId });
+
+export const moveItem = (itemId, toCollectionId) =>
+  Wishlist.findByIdAndUpdate(
+    itemId,
+    { $set: { collection: toCollectionId } },
+    { new: true },
+  );
+
+// ── Paginated reads ────────────────────────────────────────────────────────────
+
+export const findPaginatedByCollection = async (
+  collectionId,
+  { page = 1, limit = 12 } = {},
+) => {
   const skip = (page - 1) * limit;
 
   const [docs, total] = await Promise.all([
-    Wishlist.find({ user: userId })
+    Wishlist.find({ collection: collectionId })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate({ path: "listing", select: LISTING_PROJECTION }),
-    Wishlist.countDocuments({ user: userId }),
+    Wishlist.countDocuments({ collection: collectionId }),
   ]);
 
   return {
