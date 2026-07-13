@@ -2,10 +2,8 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-// ── Wishlist schema ───────────────────────────────────────────────────────────
-// One document per (user, listing) pair. Uniqueness is enforced at the DB
-// level so concurrent toggle requests can't create duplicate saves.
-const wishlistSchema = new Schema(
+// ── Wishlist (item) schema ────────────────────────────────────────────────────
+const wishlistItemSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -19,13 +17,30 @@ const wishlistSchema = new Schema(
       required: true,
       index: true,
     },
+    collection: {
+      type: Schema.Types.ObjectId,
+      ref: "WishlistCollection",
+      required: true,
+      index: true,
+    },
+    note: {
+      type: String,
+      trim: true,
+      maxlength: [280, "Note cannot exceed 280 characters"],
+      default: null,
+    },
   },
   { timestamps: true },
 );
 
 // ── Indexes ────────────────────────────────────────────────────────────────────
-wishlistSchema.index({ user: 1, listing: 1 }, { unique: true });
-wishlistSchema.index({ user: 1, createdAt: -1 });
+// A listing can only appear once within a given collection.
+wishlistItemSchema.index({ collection: 1, listing: 1 }, { unique: true });
+// Fast "is this listing saved anywhere by this user?" lookups.
+wishlistItemSchema.index({ user: 1, listing: 1 });
+// Fast paginated reads of a single collection's contents.
+wishlistItemSchema.index({ collection: 1, createdAt: -1 });
 
-const Wishlist = mongoose.model("Wishlist", wishlistSchema);
+const Wishlist = mongoose.model("Wishlist", wishlistItemSchema);
+
 export default Wishlist;
