@@ -25,6 +25,9 @@ import EditListingPage from "./pages/EditListingPage";
 import DashboardPage from "./pages/DashboardPage";
 import SettingsPage from "./pages/SettingsPage";
 import UserProfilePage from "./pages/UserProfilePage";
+import WishlistPage from "./pages/WishlistPage";
+import WishlistCollectionPage from "./pages/WishlistCollectionPage";
+import SharedWishlistPage from "./pages/SharedWishlistPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -107,6 +110,29 @@ export default function App() {
                     element={
                       <ProtectedRoute>
                         <SettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ── Wishlists ────────────────────────────────────────────
+                      Public shared view first: a static "shared" segment ────── */}
+                  <Route
+                    path="wishlist/shared/:token"
+                    element={<SharedWishlistPage />}
+                  />
+                  <Route
+                    path="wishlist"
+                    element={
+                      <ProtectedRoute>
+                        <WishlistPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="wishlist/:id"
+                    element={
+                      <ProtectedRoute>
+                        <WishlistCollectionPage />
                       </ProtectedRoute>
                     }
                   />

@@ -1,44 +1,57 @@
-import { useState } from "react";
-import { Box, Typography, Pagination } from "@mui/material";
-import { Heart } from "lucide-react";
-
+import { Box, Typography } from "@mui/material";
+import { Heart, FolderHeart } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Card, ListingCard } from "../ui/Card";
 import { EmptyState } from "../ui/EmptyState";
 import { Skeleton } from "../ui/Skeleton";
-import { IconButton } from "../ui/Button";
+import { Button, IconButton } from "../ui/Button";
 import { useWishlist, useRemoveFromWishlist } from "../../hooks/useWishlist";
 import { neutral } from "../../theme/tokens";
 
-const PAGE_LIMIT = 12;
+const PREVIEW_LIMIT = 8;
 
 export default function WishlistSection() {
-  const [page, setPage] = useState(1);
-  const { data, isLoading } = useWishlist({ page, limit: PAGE_LIMIT });
+  const { data, isLoading } = useWishlist({ page: 1, limit: PREVIEW_LIMIT });
   const {
     mutate: removeFromWishlist,
     isPending: removing,
     variables,
   } = useRemoveFromWishlist();
 
+  const collection = data?.collection;
   const items = (data?.items ?? []).filter((item) => item.listing);
-  const pagination = data?.pagination;
 
   return (
     <Card variant="raised">
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
-        <Typography
+        <Box
           sx={{
-            fontWeight: 700,
-            fontSize: "1.0625rem",
-            color: neutral[800],
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 1.5,
             mb: 2.5,
           }}
         >
-          Wishlist
-        </Typography>
+          <Typography
+            sx={{ fontWeight: 700, fontSize: "1.0625rem", color: neutral[800] }}
+          >
+            Wishlist
+          </Typography>
+          <Button
+            component={Link}
+            to="/wishlist"
+            variant="ghost"
+            size="sm"
+            startIcon={<FolderHeart size={15} />}
+          >
+            Manage all wishlists
+          </Button>
+        </Box>
 
         {isLoading ? (
-          <Skeleton.Grid count={6} />
+          <Skeleton.Grid count={4} />
         ) : items.length === 0 ? (
           <EmptyState variant="wishlist" />
         ) : (
@@ -50,7 +63,8 @@ export default function WishlistSection() {
             }}
           >
             {items.map((item) => {
-              const removingThis = removing && variables === item.listing._id;
+              const removingThis =
+                removing && variables?.listingId === item.listing._id;
               return (
                 <ListingCard
                   key={item._id}
@@ -64,7 +78,10 @@ export default function WishlistSection() {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        removeFromWishlist(item.listing._id);
+                        removeFromWishlist({
+                          listingId: item.listing._id,
+                          collectionId: collection?._id,
+                        });
                       }}
                       sx={{
                         bgcolor: "rgba(255,255,255,0.92)",
@@ -78,18 +95,6 @@ export default function WishlistSection() {
                 />
               );
             })}
-          </Box>
-        )}
-
-        {pagination?.totalPages > 1 && (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-            <Pagination
-              count={pagination.totalPages}
-              page={page}
-              onChange={(_, p) => setPage(p)}
-              shape="rounded"
-              color="primary"
-            />
           </Box>
         )}
       </Box>
