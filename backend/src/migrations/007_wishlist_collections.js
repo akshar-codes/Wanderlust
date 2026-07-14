@@ -7,6 +7,39 @@ if (!MONGO_URL) {
   process.exit(1);
 }
 
+/**
+ * Creates `keyPattern` on `col` with `options` unless an index with the
+ * exact same key pattern already exists (regardless of its name).
+ */
+async function ensureIndex(col, keyPattern, options) {
+  const desiredKeyStr = JSON.stringify(keyPattern);
+  const existing = await col.indexes();
+  const match = existing.find(
+    (idx) => JSON.stringify(idx.key) === desiredKeyStr,
+  );
+
+  if (match) {
+    const wantsUnique = Boolean(options.unique);
+    const hasUnique = Boolean(match.unique);
+
+    if (wantsUnique === hasUnique) {
+      console.log(
+        `ℹ️   Index on ${desiredKeyStr} already exists as '${match.name}' — skipping`,
+      );
+      return;
+    }
+
+    console.log(
+      `⚠️   Index on ${desiredKeyStr} exists as '${match.name}' with unique=${hasUnique}, ` +
+        `expected unique=${wantsUnique} — dropping and recreating`,
+    );
+    await col.dropIndex(match.name);
+  }
+
+  await col.createIndex(keyPattern, options);
+  console.log(`✅  Index '${options.name}' ensured on ${desiredKeyStr}`);
+}
+
 async function run() {
   await mongoose.connect(MONGO_URL);
   console.log("✅  Connected to MongoDB");
@@ -90,17 +123,21 @@ async function run() {
     `\n✅  Migrated legacy wishlist items for ${migratedUsers} user(s)`,
   );
 
-  // ── Step 2: Rebuild indexes for the new per-collection uniqueness rule ─────
+  // ── Step 2: Ensure indexes for the per-collection uniqueness rule ──────────
   console.log("⏳  Ensuring wishlists indexes…");
-  await wishlistsCol.createIndex(
+
+  await ensureIndex(
+    wishlistsCol,
     { collection: 1, listing: 1 },
     { unique: true, name: "collection_listing_unique", background: true },
   );
-  await wishlistsCol.createIndex(
+  await ensureIndex(
+    wishlistsCol,
     { user: 1, listing: 1 },
     { name: "user_listing", background: true },
   );
-  await wishlistsCol.createIndex(
+  await ensureIndex(
+    wishlistsCol,
     { collection: 1, createdAt: -1 },
     { name: "collection_createdAt", background: true },
   );
@@ -116,15 +153,19 @@ async function run() {
   console.log("✅  wishlists indexes ensured");
 
   console.log("⏳  Ensuring wishlistcollections indexes…");
-  await collectionsCol.createIndex(
+
+  await ensureIndex(
+    collectionsCol,
     { owner: 1, isDefault: 1 },
     { name: "owner_isDefault", background: true },
   );
-  await collectionsCol.createIndex(
+  await ensureIndex(
+    collectionsCol,
     { owner: 1, createdAt: -1 },
     { name: "owner_createdAt", background: true },
   );
-  await collectionsCol.createIndex(
+  await ensureIndex(
+    collectionsCol,
     { shareToken: 1 },
     { unique: true, sparse: true, name: "unique_shareToken", background: true },
   );
@@ -134,7 +175,12 @@ async function run() {
   await mongoose.disconnect();
 }
 
-run().catch((err) => {
+run().catch(async (err) => {
   console.error("❌  Migration failed:", err);
+  try {
+    await mongoose.disconnect();
+  } catch {
+    /* ignore */
+  }
   process.exit(1);
 });

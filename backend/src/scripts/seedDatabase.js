@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import Listing from "../models/listing.js";
 import Review from "../models/review.js";
 import User from "../models/user.js";
+import Wishlist from "../models/wishlist.js";
+import WishlistCollection from "../models/wishlistCollection.js";
 
 import { buildCityQuotas } from "../../seeder/utils/cityQuotas.js";
 import {
@@ -17,6 +19,7 @@ import {
   summarizeReviews,
 } from "../../seeder/generators/generateReviews.js";
 import { buildAvailabilityCalendar } from "../../seeder/generators/generateAvailability.js";
+import { buildWishlistsForUsers } from "../../seeder/generators/generateWishlists.js";
 import { batches, randomInt, pickRange } from "../../seeder/utils/random.js";
 
 // ── Config ───────────────────────────────────────────────────────────────
@@ -47,9 +50,17 @@ function formatDuration(ms) {
 
 async function clearSeedData() {
   logPhase("Clearing previous seed data");
-  const [listingsDeleted, reviewsDeleted, hostsDeleted] = await Promise.all([
+  const [
+    listingsDeleted,
+    reviewsDeleted,
+    wishlistItemsDeleted,
+    wishlistCollectionsDeleted,
+    hostsDeleted,
+  ] = await Promise.all([
     Listing.deleteMany({}),
     Review.deleteMany({}),
+    Wishlist.deleteMany({}),
+    WishlistCollection.deleteMany({}),
     User.deleteMany({
       email: {
         $regex: /@wanderlust-(hosts|travelers)\.com$/,
@@ -59,6 +70,7 @@ async function clearSeedData() {
   console.log(
     `✅  Removed ${listingsDeleted.deletedCount} listings, ` +
       `${reviewsDeleted.deletedCount} reviews, ` +
+      `${wishlistItemsDeleted.deletedCount} saved listings across ${wishlistCollectionsDeleted.deletedCount} wishlists, ` +
       `${hostsDeleted.deletedCount} generated hosts/travelers`,
   );
 }
@@ -272,6 +284,69 @@ async function seedAvailability(insertedListings) {
   console.log(`\n✅  Availability calendars refreshed for ${updated} listings`);
 }
 
+// ── Phase: wishlists ──────────────────────────────────────────────────────
+
+async function seedWishlists(insertedListings, hostRecords, travelerRecords) {
+  logPhase("Generating wishlists");
+
+  // Hosts and travelers alike browse and save listings — mirrors real usage.
+  const allUsers = [...hostRecords, ...travelerRecords];
+
+  const { collections, items, wishlistCountByListing } = buildWishlistsForUsers(
+    { users: allUsers, listings: insertedListings },
+  );
+
+  console.log(
+    `Plan: ${collections.length} wishlists with ${items.length} saved listings`,
+  );
+
+  let collectionsInserted = 0;
+  for (const batch of batches(collections, LISTING_INSERT_BATCH_SIZE)) {
+    const inserted = await WishlistCollection.insertMany(batch, {
+      ordered: false,
+    });
+    collectionsInserted += inserted.length;
+    process.stdout.write(
+      `\r  Wishlists: ${collectionsInserted}/${collections.length} inserted`,
+    );
+  }
+  console.log(`\n✅  ${collectionsInserted} wishlists inserted`);
+
+  let itemsInserted = 0;
+  for (const batch of batches(items, REVIEW_INSERT_BATCH_SIZE)) {
+    const inserted = await Wishlist.insertMany(batch, { ordered: false });
+    itemsInserted += inserted.length;
+    process.stdout.write(
+      `\r  Saved listings: ${itemsInserted}/${items.length} inserted`,
+    );
+  }
+  console.log(`\n✅  ${itemsInserted} saved-listing records inserted`);
+
+  // ── Sync Listing.wishlistCount with the actual saved-listing data ─────────
+  logPhase("Syncing listing wishlist counts");
+
+  const bulkOps = insertedListings.map((listing) => ({
+    updateOne: {
+      filter: { _id: listing._id },
+      update: {
+        $set: {
+          wishlistCount: wishlistCountByListing.get(String(listing._id)) ?? 0,
+        },
+      },
+    },
+  }));
+
+  let synced = 0;
+  for (const batch of batches(bulkOps, LISTING_INSERT_BATCH_SIZE)) {
+    const result = await Listing.bulkWrite(batch, { ordered: false });
+    synced += result.modifiedCount ?? 0;
+    process.stdout.write(`\r  Synced ${synced}/${bulkOps.length} listings`);
+  }
+  console.log(`\n✅  Wishlist counts synced for ${synced} listings`);
+
+  return { collectionsInserted, itemsInserted };
+}
+
 // ── Phase: user listing/review counters ──────────────────────────────────
 
 async function backfillHostCounters(insertedListings, insertedReviews) {
@@ -320,11 +395,20 @@ async function backfillHostCounters(insertedListings, insertedReviews) {
 async function printSummary(startedAt) {
   logPhase("Summary");
 
-  const [listingCount, reviewCount, hostCount, userCount] = await Promise.all([
+  const [
+    listingCount,
+    reviewCount,
+    hostCount,
+    userCount,
+    wishlistCollectionCount,
+    wishlistItemCount,
+  ] = await Promise.all([
     Listing.countDocuments(),
     Review.countDocuments(),
     User.countDocuments({ role: "host" }),
     User.countDocuments(),
+    WishlistCollection.countDocuments(),
+    Wishlist.countDocuments(),
   ]);
 
   const byCountry = await Listing.aggregate([
@@ -337,6 +421,9 @@ async function printSummary(startedAt) {
   );
   console.log(
     `   📊 ${userCount} users (${hostCount} hosts) · ${listingCount} listings · ${reviewCount} reviews`,
+  );
+  console.log(
+    `   📌 ${wishlistItemCount} saved listings across ${wishlistCollectionCount} wishlists`,
   );
   console.log(`   🔑 Host/traveler login password: ${SEED_PASSWORD}`);
   console.log(`\n   Listings by country:`);
@@ -365,6 +452,7 @@ async function run() {
     travelerRecords,
   );
   await seedAvailability(insertedListings);
+  await seedWishlists(insertedListings, hostRecords, travelerRecords);
   await backfillHostCounters(insertedListings, insertedReviews);
   await printSummary(startedAt);
 
