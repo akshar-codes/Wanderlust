@@ -1,10 +1,17 @@
 import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Tabs, Tab, useMediaQuery, useTheme } from "@mui/material";
-import { User, Home, MessageSquare, Heart, CalendarCheck } from "lucide-react";
+import {
+  User,
+  Home,
+  MessageSquare,
+  Heart,
+  CalendarCheck,
+  ClipboardList,
+} from "lucide-react";
 
 import { PageHeader } from "../components/layout/PageHeader";
-import { useCurrentUser } from "../hooks/useCurrentUser";
+import { useCurrentUser, useIsHost } from "../hooks/useCurrentUser";
 import { neutral, brand, radii } from "../theme/tokens";
 
 import ProfileSection from "../components/dashboard/ProfileSection";
@@ -12,8 +19,9 @@ import MyListingsSection from "../components/dashboard/MyListingsSection";
 import MyReviewsSection from "../components/dashboard/MyReviewsSection";
 import WishlistSection from "../components/dashboard/WishlistSection";
 import BookingHistorySection from "../components/dashboard/BookingHistorySection";
+import HostBookingsSection from "../components/dashboard/HostBookingsSection";
 
-const SECTIONS = [
+const BASE_SECTIONS = [
   { key: "profile", label: "Profile", icon: User, Component: ProfileSection },
   {
     key: "listings",
@@ -41,14 +49,29 @@ const SECTIONS = [
   },
 ];
 
-const DEFAULT_SECTION = SECTIONS[0].key;
+// Only shown to users with the host (or admin) role — lets them accept,
+// decline, and complete reservations made on their own listings.
+const HOST_SECTION = {
+  key: "host-bookings",
+  label: "Booking Requests",
+  icon: ClipboardList,
+  Component: HostBookingsSection,
+};
 
 export default function DashboardPage() {
   const { section } = useParams();
   const navigate = useNavigate();
   const user = useCurrentUser();
+  const isHost = useIsHost();
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+
+  const SECTIONS = useMemo(
+    () => (isHost ? [...BASE_SECTIONS, HOST_SECTION] : BASE_SECTIONS),
+    [isHost],
+  );
+
+  const DEFAULT_SECTION = SECTIONS[0].key;
 
   const activeKey = SECTIONS.some((s) => s.key === section)
     ? section
@@ -57,7 +80,7 @@ export default function DashboardPage() {
   const ActiveComponent = useMemo(
     () =>
       SECTIONS.find((s) => s.key === activeKey)?.Component ?? ProfileSection,
-    [activeKey],
+    [activeKey, SECTIONS],
   );
 
   const goTo = (key) => navigate(`/dashboard/${key}`, { replace: true });
