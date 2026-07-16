@@ -17,7 +17,7 @@ export const findById = (id) =>
   Booking.findById(id)
     .populate({
       path: "listing",
-      select: "title location country image slug price",
+      select: "title location country image slug price owner",
     })
     .populate("guest", "username firstName lastName avatar email")
     .populate("host", "username firstName lastName avatar email");
@@ -87,6 +87,39 @@ export const findPaginatedForHost = async (
         path: "guest",
         select: "username firstName lastName avatar",
       }),
+    Booking.countDocuments(filter),
+  ]);
+
+  return {
+    docs,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
+/**
+ * Platform-wide paginated lookup used by the admin booking console.
+ * `filter` may include any combination of: status, listing, guest, host.
+ */
+export const findAllPaginated = async (
+  filter = {},
+  { page = 1, limit = 20 } = {},
+) => {
+  const skip = (page - 1) * limit;
+
+  const [docs, total] = await Promise.all([
+    Booking.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({
+        path: "listing",
+        select: "title location country image slug",
+      })
+      .populate("guest", "username firstName lastName avatar email")
+      .populate("host", "username firstName lastName avatar email"),
     Booking.countDocuments(filter),
   ]);
 
