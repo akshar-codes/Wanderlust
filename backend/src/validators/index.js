@@ -57,6 +57,8 @@ export {
 export {
   createBookingBodySchema,
   cancelBookingBodySchema,
+  hostDeclineBodySchema,
+  adminUpdateStatusBodySchema,
 } from "./booking.schemas.js";
 
 export {

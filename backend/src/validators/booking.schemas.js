@@ -35,3 +35,19 @@ export const createBookingBodySchema = z
 export const cancelBookingBodySchema = z.object({
   reason: z.string().trim().max(500).optional(),
 });
+
+// ── Host workflow ──────────────────────────────────────────────────────────
+
+export const hostDeclineBodySchema = z.object({
+  reason: z.string().trim().max(500).optional(),
+});
+
+// ── Admin ────────────────────────────────────────────────────────────────────
+
+export const adminUpdateStatusBodySchema = z.object({
+  status: z.enum(["pending", "confirmed", "cancelled", "completed"], {
+    required_error: "status is required",
+    message: "status must be one of: pending, confirmed, cancelled, completed",
+  }),
+  reason: z.string().trim().max(500).optional(),
+});

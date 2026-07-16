@@ -56,8 +56,13 @@ const bookingSchema = new Schema(
         values: BOOKING_STATUSES,
         message: `Status must be one of: ${BOOKING_STATUSES.join(", ")}`,
       },
-      default: "confirmed",
+      default: "pending",
       index: true,
+    },
+
+    blockedDateId: {
+      type: Schema.Types.ObjectId,
+      default: null,
     },
     cancelledAt: { type: Date, default: null },
     cancelledBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
@@ -84,6 +89,7 @@ const bookingSchema = new Schema(
 // ── Indexes ────────────────────────────────────────────────────────────────────
 bookingSchema.index({ guest: 1, createdAt: -1 });
 bookingSchema.index({ host: 1, createdAt: -1 });
+bookingSchema.index({ host: 1, status: 1, checkOut: 1 });
 bookingSchema.index({ listing: 1, checkIn: 1, checkOut: 1 });
 
 // ── Virtuals ────────────────────────────────────────────────────────────────────
