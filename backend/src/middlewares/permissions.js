@@ -32,6 +32,13 @@ const _raw = {
     deleteAny: [ROLES.ADMIN],
     moderate: [ROLES.ADMIN],
   },
+  booking: {
+    create: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],
+    readOwn: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],
+    cancelOwn: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],
+    manageAsHost: [ROLES.HOST, ROLES.ADMIN],
+    manageAny: [ROLES.ADMIN],
+  },
   user: {
     readPublic: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],
     readOwn: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],

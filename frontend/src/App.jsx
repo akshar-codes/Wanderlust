@@ -28,6 +28,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import WishlistPage from "./pages/WishlistPage";
 import WishlistCollectionPage from "./pages/WishlistCollectionPage";
 import SharedWishlistPage from "./pages/SharedWishlistPage";
+import AdminBookingsPage from "./pages/AdminBookingsPage";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -111,6 +112,16 @@ export default function App() {
                       <ProtectedRoute>
                         <SettingsPage />
                       </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ── Admin (protected, admin role only) ─────────────────── */}
+                  <Route
+                    path="admin/bookings"
+                    element={
+                      <RoleRoute roles={["admin"]}>
+                        <AdminBookingsPage />
+                      </RoleRoute>
                     }
                   />
 

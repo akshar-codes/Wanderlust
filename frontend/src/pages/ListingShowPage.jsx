@@ -46,6 +46,7 @@ import { useListing } from "../hooks/useListings";
 import { useListings } from "../hooks/useListings";
 import { useAuthStore } from "../store/auth.store";
 import ListingMap from "../components/map/ListingMap";
+import BookingWidget from "../components/booking/BookingWidget";
 import { reviewsService } from "../services/reviews.service";
 import { useCreateReview, useDeleteReview } from "../hooks/useReviews";
 import { useForm } from "react-hook-form";
@@ -834,242 +835,6 @@ function ReviewCard({ review, listingId }) {
   );
 }
 
-// ─── Booking Card ─────────────────────────────────────────────────────────────
-function BookingCard({ listing, isSticky }) {
-  const { isAuthenticated } = useAuthStore();
-  const navigate = useNavigate();
-  const [nights, setNights] = useState(3);
-  const price = listing?.price ?? 0;
-  const cleaningFee = listing?.pricing?.cleaningFee ?? 0;
-  const serviceFee = listing?.pricing?.serviceFee ?? 0;
-  const subtotal = price * nights;
-  const total = subtotal + cleaningFee + serviceFee;
-  const gstAmount = Math.round(total * 0.18);
-  const grandTotal = total + gstAmount;
-
-  const handleBook = () => {
-    if (!isAuthenticated) {
-      navigate("/login", { state: { from: window.location.pathname } });
-      return;
-    }
-    toast.success("Booking flow coming soon!", { icon: "🗓️" });
-  };
-
-  return (
-    <div
-      style={{
-        background: "#fff",
-        border: "1.5px solid #ebe7e3",
-        borderRadius: 20,
-        padding: "24px",
-        boxShadow: isSticky
-          ? "0 12px 48px rgba(61,43,26,0.12), 0 2px 8px rgba(61,43,26,0.06)"
-          : "0 4px 16px rgba(61,43,26,0.08)",
-      }}
-    >
-      {/* Price */}
-      <div style={{ marginBottom: 20 }}>
-        <span
-          style={{
-            fontFamily: "'DM Serif Display', Georgia, serif",
-            fontSize: "2rem",
-            fontWeight: 400,
-            color: "#261f1a",
-          }}
-        >
-          ₹{price.toLocaleString("en-IN")}
-        </span>
-        <span
-          style={{ fontSize: "0.9375rem", color: "#8a8179", marginLeft: 4 }}
-        >
-          {" "}
-          / night
-        </span>
-        {listing?.averageRating > 0 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              marginTop: 4,
-            }}
-          >
-            <Star size={13} fill="#f59e0b" stroke="none" />
-            <span
-              style={{
-                fontSize: "0.8125rem",
-                fontWeight: 700,
-                color: "#3d3630",
-              }}
-            >
-              {Number(listing.averageRating).toFixed(1)}
-            </span>
-            <span style={{ fontSize: "0.8125rem", color: "#b8b0a8" }}>
-              ({listing.reviewCount || 0} reviews)
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Nights selector */}
-      <div
-        style={{
-          border: "1.5px solid #d6d0ca",
-          borderRadius: 12,
-          marginBottom: 14,
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{ padding: "12px 14px", borderBottom: "1px solid #ebe7e3" }}
-        >
-          <p
-            style={{
-              fontSize: "0.6875rem",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "#8a8179",
-              margin: "0 0 2px",
-            }}
-          >
-            Duration
-          </p>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.9375rem",
-                fontWeight: 600,
-                color: "#261f1a",
-              }}
-            >
-              {nights} {nights === 1 ? "night" : "nights"}
-            </span>
-            <div style={{ display: "flex", gap: 6 }}>
-              {[1, 2, 3, 5, 7, 14].map((n) => (
-                <motion.button
-                  key={n}
-                  whileTap={{ scale: 0.92 }}
-                  onClick={() => setNights(n)}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 8,
-                    border: `1.5px solid ${nights === n ? "#ff5a5f" : "#ebe7e3"}`,
-                    background:
-                      nights === n ? "rgba(255,90,95,0.08)" : "transparent",
-                    color: nights === n ? "#ff5a5f" : "#5c544c",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  {n}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div style={{ padding: "12px 14px" }}>
-          <p
-            style={{
-              fontSize: "0.6875rem",
-              fontWeight: 700,
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "#8a8179",
-              margin: "0 0 2px",
-            }}
-          >
-            Guests
-          </p>
-          <p
-            style={{
-              fontSize: "0.9375rem",
-              fontWeight: 600,
-              color: "#261f1a",
-              margin: 0,
-            }}
-          >
-            1 guest · up to {listing?.maxGuests ?? 2} max
-          </p>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <motion.button
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={handleBook}
-        style={{
-          width: "100%",
-          padding: "14px",
-          background: "linear-gradient(135deg, #ff5a5f 0%, #e84040 100%)",
-          border: "none",
-          borderRadius: 12,
-          color: "#fff",
-          fontSize: "1rem",
-          fontWeight: 700,
-          cursor: "pointer",
-          fontFamily: "inherit",
-          boxShadow: "0 4px 18px rgba(255,90,95,0.35)",
-          marginBottom: 16,
-        }}
-      >
-        Reserve
-      </motion.button>
-
-      {/* Price breakdown */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {[
-          {
-            label: `₹${price.toLocaleString("en-IN")} × ${nights} nights`,
-            value: subtotal,
-          },
-          { label: "Cleaning fee", value: cleaningFee },
-          { label: "Service fee", value: serviceFee },
-          { label: "GST (18%)", value: gstAmount },
-        ].map(
-          ({ label, value }) =>
-            value > 0 && (
-              <div
-                key={label}
-                style={{ display: "flex", justifyContent: "space-between" }}
-              >
-                <span style={{ fontSize: "0.875rem", color: "#5c544c" }}>
-                  {label}
-                </span>
-                <span
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "#3d3630",
-                    fontWeight: 500,
-                  }}
-                >
-                  ₹{value.toLocaleString("en-IN")}
-                </span>
-              </div>
-            ),
-        )}
-        <div style={{ height: 1, background: "#ebe7e3", margin: "4px 0" }} />
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={{ fontWeight: 700, color: "#261f1a" }}>Total</span>
-          <span style={{ fontWeight: 700, color: "#261f1a", fontSize: "1rem" }}>
-            ₹{grandTotal.toLocaleString("en-IN")}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 function ShowPageSkeleton() {
   return (
@@ -1123,22 +888,9 @@ export default function ListingShowPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
-  const [isSticky, setIsSticky] = useState(false);
 
   const bookingRef = useRef(null);
   const headerRef = useRef(null);
-
-  // Sticky booking card on scroll
-  useEffect(() => {
-    const sentinel = headerRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsSticky(!entry.isIntersecting),
-      { threshold: 0 },
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [listing]);
 
   if (isLoading) return <ShowPageSkeleton />;
 
@@ -2421,31 +2173,28 @@ export default function ListingShowPage() {
 
           {/* ── RIGHT COLUMN — Sticky booking card ─────────────────── */}
           <div>
-            <div style={{ position: "sticky", top: 88 }}>
-              <BookingCard listing={listing} isSticky={isSticky} />
+            <BookingWidget listing={listing} />
 
-              {/* Min stay / cancellation note */}
-              {listing.minimumStay > 1 && (
-                <p
-                  style={{
-                    textAlign: "center",
-                    fontSize: "0.8125rem",
-                    color: "#b8b0a8",
-                    marginTop: 12,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 5,
-                  }}
-                >
-                  <CalendarDays size={13} />
-                  Minimum {listing.minimumStay}-night stay
-                  {listing.maximumStay
-                    ? ` · Max ${listing.maximumStay} nights`
-                    : ""}
-                </p>
-              )}
-            </div>
+            {listing.minimumStay > 1 && (
+              <p
+                style={{
+                  textAlign: "center",
+                  fontSize: "0.8125rem",
+                  color: "#b8b0a8",
+                  marginTop: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 5,
+                }}
+              >
+                <CalendarDays size={13} />
+                Minimum {listing.minimumStay}-night stay
+                {listing.maximumStay
+                  ? ` · Max ${listing.maximumStay} nights`
+                  : ""}
+              </p>
+            )}
           </div>
         </div>
       </motion.div>
