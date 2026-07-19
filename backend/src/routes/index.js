@@ -8,6 +8,7 @@ import searchRoutes from "./search.routes.js";
 import wishlistRoutes from "./wishlist.routes.js";
 import wishlistCollectionRoutes from "./wishlistCollection.routes.js";
 import bookingRoutes from "./booking.routes.js";
+import analyticsRoutes from "./analytics.routes.js";
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.use("/wishlist", wishlistRoutes);
 router.use("/wishlists", wishlistCollectionRoutes);
 
 router.use("/bookings", bookingRoutes);
+router.use("/analytics", analyticsRoutes);
 
 router.use((_req, res) =>
   res.status(404).json({

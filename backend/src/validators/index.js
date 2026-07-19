@@ -67,3 +67,8 @@ export {
   toggleWishlistBodySchema,
   moveWishlistItemBodySchema,
 } from "./wishlist.schemas.js";
+
+export {
+  ANALYTICS_RANGE_VALUES,
+  analyticsQuerySchema,
+} from "./analytics.schemas.js";

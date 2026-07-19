@@ -39,6 +39,9 @@ const _raw = {
     manageAsHost: [ROLES.HOST, ROLES.ADMIN],
     manageAny: [ROLES.ADMIN],
   },
+  analytics: {
+    readOwn: [ROLES.HOST, ROLES.ADMIN],
+  },
   user: {
     readPublic: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],
     readOwn: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],
