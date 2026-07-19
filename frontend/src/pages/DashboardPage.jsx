@@ -8,6 +8,7 @@ import {
   Heart,
   CalendarCheck,
   ClipboardList,
+  BarChart3,
 } from "lucide-react";
 
 import { PageHeader } from "../components/layout/PageHeader";
@@ -20,6 +21,7 @@ import MyReviewsSection from "../components/dashboard/MyReviewsSection";
 import WishlistSection from "../components/dashboard/WishlistSection";
 import BookingHistorySection from "../components/dashboard/BookingHistorySection";
 import HostBookingsSection from "../components/dashboard/HostBookingsSection";
+import HostAnalyticsDashboard from "../components/dashboard/HostAnalyticsDashboard";
 
 const BASE_SECTIONS = [
   { key: "profile", label: "Profile", icon: User, Component: ProfileSection },
@@ -49,14 +51,21 @@ const BASE_SECTIONS = [
   },
 ];
 
-// Only shown to users with the host (or admin) role — lets them accept,
-// decline, and complete reservations made on their own listings.
-const HOST_SECTION = {
-  key: "host-bookings",
-  label: "Booking Requests",
-  icon: ClipboardList,
-  Component: HostBookingsSection,
-};
+// Only shown to users with the host (or admin) role.
+const HOST_SECTIONS = [
+  {
+    key: "analytics",
+    label: "Analytics",
+    icon: BarChart3,
+    Component: HostAnalyticsDashboard,
+  },
+  {
+    key: "host-bookings",
+    label: "Booking Requests",
+    icon: ClipboardList,
+    Component: HostBookingsSection,
+  },
+];
 
 export default function DashboardPage() {
   const { section } = useParams();
@@ -67,7 +76,7 @@ export default function DashboardPage() {
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
 
   const SECTIONS = useMemo(
-    () => (isHost ? [...BASE_SECTIONS, HOST_SECTION] : BASE_SECTIONS),
+    () => (isHost ? [...BASE_SECTIONS, ...HOST_SECTIONS] : BASE_SECTIONS),
     [isHost],
   );
 
