@@ -145,6 +145,58 @@ export const softDelete = (id) =>
 
 export const hardDelete = (id) => User.findByIdAndDelete(id);
 
+// ── Admin: user management ────────────────────────────────────────────────────
+
+/**
+ * Paginated, filterable, searchable user list for the Admin User Management
+ * screen. Excludes password hash/salt from the response.
+ */
+export const findPaginatedAdmin = async ({
+  page = 1,
+  limit = 20,
+  search,
+  role,
+  status,
+} = {}) => {
+  const filter = {};
+  if (role) filter.role = role;
+  if (status === "active") filter.isActive = true;
+  if (status === "suspended") filter.isActive = false;
+  if (search) {
+    const regex = { $regex: search.trim(), $options: "i" };
+    filter.$or = [
+      { username: regex },
+      { email: regex },
+      { firstName: regex },
+      { lastName: regex },
+    ];
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [docs, total] = await Promise.all([
+    User.find(filter)
+      .select("-hash -salt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    User.countDocuments(filter),
+  ]);
+
+  return { docs, total, page, limit, totalPages: Math.ceil(total / limit) };
+};
+
+/**
+ * Sets a user's active/suspended status directly. Used by both the admin
+ * suspend/reactivate action and by report resolution (`user_suspended`).
+ */
+export const setActiveStatus = (id, isActive) =>
+  User.findByIdAndUpdate(
+    id,
+    { $set: { isActive, deactivatedAt: isActive ? null : new Date() } },
+    { new: true },
+  );
+
 // ── Listings owned by user ────────────────────────────────────────────────────
 
 export const findListingsByOwner = async (userId) => {

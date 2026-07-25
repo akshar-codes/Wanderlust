@@ -61,6 +61,42 @@ export const findFeatured = (limit = 10) =>
     .sort({ averageRating: -1 })
     .limit(limit);
 
+// ── Admin: listing moderation ──────────────────────────────────────────────────
+
+/**
+ * Paginated, filterable, searchable listing list for the Admin Listing
+ * Moderation screen. Unlike the public-facing `findPaginated`, this
+ * includes drafts and every status by default so admins can moderate
+ * anything on the platform.
+ */
+export const findPaginatedAdmin = async ({
+  page = 1,
+  limit = 20,
+  search,
+  status,
+  category,
+  featured,
+} = {}) => {
+  const filter = {};
+  if (status) filter.status = status;
+  if (category) filter.category = category;
+  if (featured !== undefined) filter.featured = featured;
+  if (search) filter.title = { $regex: search.trim(), $options: "i" };
+
+  const skip = (page - 1) * limit;
+
+  const [docs, total] = await Promise.all([
+    Listing.find(filter)
+      .populate("owner", "username email firstName lastName")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Listing.countDocuments(filter),
+  ]);
+
+  return { docs, total, page, limit, totalPages: Math.ceil(total / limit) };
+};
+
 // ── Write ──────────────────────────────────────────────────────────────────────
 
 export const create = (data) => Listing.create(data);

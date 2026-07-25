@@ -11,6 +11,12 @@ export const create = (data) => Review.create(data);
 export const deleteByIdAndAuthor = (reviewId, authorId) =>
   Review.findOneAndDelete({ _id: reviewId, author: authorId });
 
+/**
+ * Admin-only hard delete, bypassing author ownership. Used by review
+ * moderation and by report resolution (`content_removed` on a review).
+ */
+export const deleteById = (id) => Review.findByIdAndDelete(id);
+
 export const addReviewToListing = (listingId, reviewId) =>
   Listing.findByIdAndUpdate(listingId, { $push: { reviews: reviewId } });
 
@@ -166,6 +172,37 @@ export const getHostReviewSummary = async (ownerId) => {
       ? Math.round(result.averageRating * 10) / 10
       : 0,
   };
+};
+
+// ── Admin: review moderation ──────────────────────────────────────────────────
+
+/**
+ * Paginated, filterable, searchable review list across the entire platform
+ * for the Admin Review Moderation screen.
+ */
+export const findPaginatedAdmin = async ({
+  page = 1,
+  limit = 20,
+  rating,
+  search,
+} = {}) => {
+  const filter = {};
+  if (rating) filter.rating = Number(rating);
+  if (search) filter.comment = { $regex: search.trim(), $options: "i" };
+
+  const skip = (page - 1) * limit;
+
+  const [docs, total] = await Promise.all([
+    Review.find(filter)
+      .populate("author", "username email firstName lastName")
+      .populate({ path: "listing", select: "title slug owner" })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Review.countDocuments(filter),
+  ]);
+
+  return { docs, total, page, limit, totalPages: Math.ceil(total / limit) };
 };
 
 // ── Statistics aggregation (single listing) ───────────────────────────────────
