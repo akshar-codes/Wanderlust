@@ -18,6 +18,7 @@
     "migrate:005": "node src/migrations/005_search_indexes.js",
     "migrate:006": "node src/migrations/006_review_upgrade.js",
     "migrate:007": "node src/migrations/007_wishlist_collections.js",
+    "migrate:008": "node src/migrations/008_reports.js",
     "test": "node tests/rbac.test.js",
     "test:email-verification": "node tests/emailVerification.test.js",
     "validate:api": "node src/scripts/validate-openapi.js"
