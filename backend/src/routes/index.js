@@ -1,42 +1,92 @@
-import express from "express";
-import authRoutes from "./auth.routes.js";
-import listingRoutes from "./listing.routes.js";
-import reviewRoutes from "./review.routes.js";
-import myReviewsRoutes from "./myReviews.routes.js";
-import userRoutes from "./user.routes.js";
-import searchRoutes from "./search.routes.js";
-import wishlistRoutes from "./wishlist.routes.js";
-import wishlistCollectionRoutes from "./wishlistCollection.routes.js";
-import bookingRoutes from "./booking.routes.js";
-import analyticsRoutes from "./analytics.routes.js";
+// ── Primitive helpers ─────────────────────────────────────────────────────────
+export {
+  nonEmptyString,
+  coercePositiveInt,
+  coerceNonNegativeNumber,
+  numericQueryParam,
+  commaSeparatedArray,
+  flattenZodErrors,
+} from "./primitives.js";
 
-const router = express.Router();
+// ── Enums / constants ─────────────────────────────────────────────────────────
+export {
+  LISTING_CATEGORIES,
+  PROPERTY_TYPES,
+  AMENITIES_LIST,
+  LISTING_STATUSES,
+  SEARCH_SORT_VALUES,
+  USER_ROLES,
+  PROVIDERS,
+  THEMES,
+  PROFILE_VISIBILITY,
+  CURRENCIES,
+  LANGUAGES,
+} from "./enums.js";
 
-router.get("/health", (_req, res) =>
-  res.json({
-    success: true,
-    data: { status: "ok", ts: new Date().toISOString() },
-  }),
-);
+// ── Domain schemas ────────────────────────────────────────────────────────────
+export {
+  pricingSchema,
+  houseRulesSchema,
+  listingBodySchema,
+  listingPatchSchema,
+  blockedDateSchema,
+} from "./listing.schemas.js";
 
-router.use("/search", searchRoutes);
-router.use("/auth", authRoutes);
-router.use("/listings", listingRoutes);
-router.use("/listings/:listingId/reviews", reviewRoutes);
-router.use("/reviews", myReviewsRoutes);
-router.use("/users", userRoutes);
-router.use("/wishlist", wishlistRoutes);
-router.use("/wishlists", wishlistCollectionRoutes);
+export { reviewBodySchema } from "./review.schemas.js";
 
-router.use("/bookings", bookingRoutes);
-router.use("/analytics", analyticsRoutes);
+export {
+  signupBodySchema,
+  loginBodySchema,
+  forgotPasswordBodySchema,
+  resetPasswordBodySchema,
+  verifyEmailBodySchema,
+} from "./auth.schemas.js";
 
-router.use((_req, res) =>
-  res.status(404).json({
-    success: false,
-    message: "API endpoint not found",
-    code: "NOT_FOUND",
-  }),
-);
+export {
+  updateProfileBodySchema,
+  updateSettingsBodySchema,
+  notificationPreferencesBodySchema,
+  changeRoleBodySchema,
+} from "./user.schemas.js";
 
-export default router;
+export {
+  searchQuerySchema,
+  autocompleteQuerySchema,
+} from "./search.schemas.js";
+
+export {
+  createBookingBodySchema,
+  cancelBookingBodySchema,
+  hostDeclineBodySchema,
+  adminUpdateStatusBodySchema,
+} from "./booking.schemas.js";
+
+export {
+  createCollectionBodySchema,
+  updateCollectionBodySchema,
+  toggleWishlistBodySchema,
+  moveWishlistItemBodySchema,
+} from "./wishlist.schemas.js";
+
+export {
+  ANALYTICS_RANGE_VALUES,
+  analyticsQuerySchema,
+} from "./analytics.schemas.js";
+
+// ── Admin ──────────────────────────────────────────────────────────────────────
+export {
+  adminUsersQuerySchema,
+  updateUserStatusBodySchema,
+  adminListingsQuerySchema,
+  updateListingStatusBodySchema,
+  adminReviewsQuerySchema,
+  ADMIN_ANALYTICS_RANGE_VALUES,
+  adminAnalyticsQuerySchema,
+  adminReportsQuerySchema,
+} from "./admin.schemas.js";
+
+// ── Reports (moderation) ────────────────────────────────────────────────────────
+export {
+  createReportBodySchema,
+  resolveReportBodySchema,
+} from "./report.schemas.js";
