@@ -28,7 +28,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import WishlistPage from "./pages/WishlistPage";
 import WishlistCollectionPage from "./pages/WishlistCollectionPage";
 import SharedWishlistPage from "./pages/SharedWishlistPage";
-import AdminBookingsPage from "./pages/AdminBookingsPage";
+import AdminLayout from "./pages/admin/AdminLayout";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
@@ -115,12 +115,15 @@ export default function App() {
                     }
                   />
 
-                  {/* ── Admin (protected, admin role only) ─────────────────── */}
+                  {/* ── Admin dashboard (protected, admin role only) ───────── */}
+                  {/* Covers: User Management, Listing Moderation, Review     */}
+                  {/* Moderation, Booking Management, Analytics, Platform     */}
+                  {/* Statistics, Reports, and the Moderation Queue.          */}
                   <Route
-                    path="admin/bookings"
+                    path="admin/:section?"
                     element={
                       <RoleRoute roles={["admin"]}>
-                        <AdminBookingsPage />
+                        <AdminLayout />
                       </RoleRoute>
                     }
                   />
