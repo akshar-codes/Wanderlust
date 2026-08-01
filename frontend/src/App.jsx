@@ -18,15 +18,12 @@ import {
 
 // Pages
 import HomePage from "./pages/HomePage";
-import ListingsPage from "./pages/ListingsPage";
-import ListingShowPage from "./pages/ListingShowPage";
 import NewListingPage from "./pages/NewListingPage";
 import EditListingPage from "./pages/EditListingPage";
 import DashboardPage from "./pages/DashboardPage";
 import SettingsPage from "./pages/SettingsPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WishlistPage from "./pages/WishlistPage";
-import WishlistCollectionPage from "./pages/WishlistCollectionPage";
 import SharedWishlistPage from "./pages/SharedWishlistPage";
 import AdminLayout from "./pages/admin/AdminLayout";
 import LoginPage from "./pages/auth/LoginPage";
@@ -37,6 +34,16 @@ import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
 import { PrivacyPage, TermsPage } from "./pages/LegalPages";
 import NotFoundPage from "./pages/NotFoundPage";
 import DesignSystemPage from "./pages/DesignSystemPage";
+
+// Mobile-aware responsive wrappers — pick the mobile-optimized page below
+// the breakpoint and the existing desktop page above it, sharing the same
+// data hooks either way (see components/mobile/Responsive*.jsx).
+import {
+  ResponsiveListingsPage,
+  ResponsiveListingShowPage,
+  ResponsiveWishlistCollectionPage,
+} from "./components/mobile";
+import MobileProfilePage from "./pages/mobile/MobileProfilePage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,8 +78,8 @@ export default function App() {
                 <Route path="/" element={<AppLayout />}>
                   {/* ── Public ───────────────────────────────────────────── */}
                   <Route index element={<HomePage />} />
-                  <Route path="listings" element={<ListingsPage />} />
-                  <Route path="listings/:id" element={<ListingShowPage />} />
+                  <Route path="listings" element={<ResponsiveListingsPage />} />
+                  <Route path="listings/:id" element={<ResponsiveListingShowPage />} />
 
                   {/* ── User profile (public — self gets editable sections) ── */}
                   <Route path="users/:username" element={<UserProfilePage />} />
@@ -105,6 +112,16 @@ export default function App() {
                     }
                   />
 
+                  {/* ── Mobile account hub (Airbnb-style "Profile" tab) ────── */}
+                  <Route
+                    path="account"
+                    element={
+                      <ProtectedRoute>
+                        <MobileProfilePage />
+                      </ProtectedRoute>
+                    }
+                  />
+
                   {/* ── Account settings (protected) ───────────────────────── */}
                   <Route
                     path="settings/:section?"
@@ -116,9 +133,6 @@ export default function App() {
                   />
 
                   {/* ── Admin dashboard (protected, admin role only) ───────── */}
-                  {/* Covers: User Management, Listing Moderation, Review     */}
-                  {/* Moderation, Booking Management, Analytics, Platform     */}
-                  {/* Statistics, Reports, and the Moderation Queue.          */}
                   <Route
                     path="admin/:section?"
                     element={
@@ -128,8 +142,7 @@ export default function App() {
                     }
                   />
 
-                  {/* ── Wishlists ────────────────────────────────────────────
-                      Public shared view first: a static "shared" segment ────── */}
+                  {/* ── Wishlists ──────────────────────────────────────────── */}
                   <Route
                     path="wishlist/shared/:token"
                     element={<SharedWishlistPage />}
@@ -146,7 +159,7 @@ export default function App() {
                     path="wishlist/:id"
                     element={
                       <ProtectedRoute>
-                        <WishlistCollectionPage />
+                        <ResponsiveWishlistCollectionPage />
                       </ProtectedRoute>
                     }
                   />
