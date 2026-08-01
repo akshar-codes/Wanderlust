@@ -72,3 +72,21 @@ export {
   ANALYTICS_RANGE_VALUES,
   analyticsQuerySchema,
 } from "./analytics.schemas.js";
+
+// ── Admin ──────────────────────────────────────────────────────────────────────
+export {
+  adminUsersQuerySchema,
+  updateUserStatusBodySchema,
+  adminListingsQuerySchema,
+  updateListingStatusBodySchema,
+  adminReviewsQuerySchema,
+  ADMIN_ANALYTICS_RANGE_VALUES,
+  adminAnalyticsQuerySchema,
+  adminReportsQuerySchema,
+} from "./admin.schemas.js";
+
+// ── Reports (moderation) ────────────────────────────────────────────────────────
+export {
+  createReportBodySchema,
+  resolveReportBodySchema,
+} from "./report.schemas.js";

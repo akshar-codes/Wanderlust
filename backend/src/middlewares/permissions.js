@@ -66,6 +66,10 @@ const _raw = {
     manageListings: [ROLES.ADMIN],
     viewLogs: [ROLES.ADMIN],
   },
+  report: {
+    create: [ROLES.USER, ROLES.HOST, ROLES.ADMIN],
+    manageAny: [ROLES.ADMIN],
+  },
 };
 
 // ── Convert arrays → frozen Sets ─────────────────────────────────────────────

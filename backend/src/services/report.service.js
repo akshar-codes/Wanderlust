@@ -1,23 +1,57 @@
-import api from "./api";
+import * as reportRepo from "../repositories/report.repository.js";
+import AppError from "../utils/AppError.js";
+import logger from "../utils/logger.js";
 
-export const reportService = {
-  /** POST /api/reports — report a listing, review, or user */
-  create: async (payload) => {
-    const res = await api.post("/reports", payload);
-    return res.data.data;
-  },
+export const createReport = async (userId, payload) => {
+  const exists = await reportRepo.existsForUserAndTarget(
+    payload.targetType,
+    payload.targetId,
+    userId
+  );
+  if (exists) {
+    throw AppError.conflict("You have already reported this item");
+  }
 
-  /** GET /api/reports — moderation queue (admin) */
-  getAll: async (params = {}) => {
-    const res = await api.get("/reports", { params });
-    return res.data.data;
-  },
+  const report = await reportRepo.create({
+    ...payload,
+    reportedBy: userId,
+  });
 
-  /** PATCH /api/reports/:id/resolve (admin) */
-  resolve: async (id, payload) => {
-    const res = await api.patch(`/reports/${id}/resolve`, payload);
-    return res.data.data;
-  },
+  logger.info("New report submitted", {
+    reportId: report._id,
+    targetType: report.targetType,
+    targetId: report.targetId,
+  });
+
+  return report;
 };
 
-export default reportService;
+export const getReports = async (filter, options) => {
+  return reportRepo.findPaginated(filter, options);
+};
+
+export const resolveReport = async (id, payload, adminId) => {
+  const report = await reportRepo.findById(id);
+  if (!report) {
+    throw AppError.notFound("Report not found");
+  }
+
+  if (report.status !== "pending") {
+    throw AppError.badRequest(`Report is already ${report.status}`);
+  }
+
+  const updated = await reportRepo.updateResolution(id, {
+    status: payload.status,
+    resolutionNotes: payload.resolutionNotes,
+    resolvedBy: adminId,
+    resolvedAt: new Date(),
+  });
+
+  logger.info("Report resolved", {
+    reportId: id,
+    status: payload.status,
+    adminId,
+  });
+
+  return updated;
+};
