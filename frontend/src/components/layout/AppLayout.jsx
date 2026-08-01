@@ -4,6 +4,8 @@ import { Toaster } from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import BottomNav from "../mobile/BottomNav";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 const pageVariants = {
   initial: { opacity: 0, y: 12 },
@@ -19,11 +21,18 @@ const pageVariants = {
   },
 };
 
+// Listing detail pages (e.g. /listings/64f0…) render their own sticky
+// "Reserve" bar on mobile — showing the global BottomNav there as well
+// would stack two fixed bottom bars. /listings/new (the create wizard) is
+// excluded from this pattern since it has no trailing id segment.
+const HIDE_BOTTOM_NAV_PATTERN = /^\/listings\/(?!new)[^/]+\/?$/;
+
 export default function AppLayout() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
   const [availableCountries, setAvailableCountries] = useState([]);
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   const setSearchRef = useRef(setSearchQuery);
   const setCountryRef = useRef(setSelectedCountry);
@@ -34,6 +43,7 @@ export default function AppLayout() {
   const handleCountryFilter = useCallback((c) => setCountryRef.current(c), []);
 
   const isListingsPage = location.pathname === "/listings";
+  const showBottomNav = isMobile && !HIDE_BOTTOM_NAV_PATTERN.test(location.pathname);
 
   return (
     <div
@@ -56,7 +66,9 @@ export default function AppLayout() {
           width: "100%",
           maxWidth: 1280,
           marginInline: "auto",
-          padding: "0 24px 80px",
+          padding: showBottomNav
+            ? "0 16px calc(env(safe-area-inset-bottom, 0px) + 92px)"
+            : "0 24px 80px",
         }}
       >
         <AnimatePresence mode="wait" initial={false}>
@@ -78,7 +90,8 @@ export default function AppLayout() {
         </AnimatePresence>
       </main>
 
-      <Footer />
+      {!showBottomNav && <Footer />}
+      {showBottomNav && <BottomNav />}
 
       {/* Premium toast config */}
       <Toaster
