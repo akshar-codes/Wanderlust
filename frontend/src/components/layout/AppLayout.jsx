@@ -1,4 +1,3 @@
-import { useState, useCallback, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -27,23 +26,21 @@ const pageVariants = {
 // excluded from this pattern since it has no trailing id segment.
 const HIDE_BOTTOM_NAV_PATTERN = /^\/listings\/(?!new)[^/]+\/?$/;
 
+/**
+ * Determines how the Navbar's desktop search pill should behave for a
+ * given route.
+ */
+function getNavSearchMode(pathname) {
+  return pathname === "/" ? "collapsed" : "hidden";
+}
+
 export default function AppLayout() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [availableCountries, setAvailableCountries] = useState([]);
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  const setSearchRef = useRef(setSearchQuery);
-  const setCountryRef = useRef(setSelectedCountry);
-  setSearchRef.current = setSearchQuery;
-  setCountryRef.current = setSelectedCountry;
-
-  const handleSearch = useCallback((q) => setSearchRef.current(q), []);
-  const handleCountryFilter = useCallback((c) => setCountryRef.current(c), []);
-
-  const isListingsPage = location.pathname === "/listings";
-  const showBottomNav = isMobile && !HIDE_BOTTOM_NAV_PATTERN.test(location.pathname);
+  const searchMode = getNavSearchMode(location.pathname);
+  const showBottomNav =
+    isMobile && !HIDE_BOTTOM_NAV_PATTERN.test(location.pathname);
 
   return (
     <div
@@ -54,11 +51,7 @@ export default function AppLayout() {
         background: "#faf8f6",
       }}
     >
-      <Navbar
-        onSearch={isListingsPage ? handleSearch : undefined}
-        onCountryFilter={isListingsPage ? handleCountryFilter : undefined}
-        countries={isListingsPage ? availableCountries : []}
-      />
+      <Navbar searchMode={searchMode} />
 
       <main
         style={{
@@ -79,13 +72,7 @@ export default function AppLayout() {
             animate="animate"
             exit="exit"
           >
-            <Outlet
-              context={{
-                searchQuery: isListingsPage ? searchQuery : "",
-                selectedCountry: isListingsPage ? selectedCountry : "",
-                setAvailableCountries,
-              }}
-            />
+            <Outlet />
           </motion.div>
         </AnimatePresence>
       </main>

@@ -113,6 +113,46 @@ function formatDate(d) {
   });
 }
 
+// ─── Gallery grid placement ───────────────────────────────────────────────────
+// The hero+secondary gallery grid previously relied on CSS Grid
+// auto-placement with a fixed `gridTemplateColumns: "1fr 1fr"` /
+// `gridTemplateRows` pair that only ever provided 2 explicit cells for
+// secondary images (col2/row1, col2/row2), while up to 4 secondary images
+// (`images.slice(1, 5)`) could be rendered into it. Once a listing had 4+
+// images, the extra tiles overflowed into browser-generated implicit rows,
+// which — combined with the container's fixed `height` + `overflow:
+// hidden` — produced a clipped sliver of image content above the visible
+// 2-column grid. A parallel mismatch existed for exactly 2 images: rows
+// were declared as a single `"1fr"` row while the hero's `gridRow: "1/3"`
+// still demanded two.
+//
+// The fix: always declare exactly the number of columns/rows needed for
+// the actual secondary-image count (1-4, since `images.slice(1, 5)` caps
+// at 4), and place every image with an explicit `gridColumn`/`gridRow`
+// instead of relying on auto-placement. This guarantees the cell count in
+// the explicit grid always matches the number of items placed into it, so
+// no implicit rows are ever generated.
+function getSecondaryGalleryCellStyle(index, secondaryCount) {
+  if (secondaryCount <= 1) {
+    // Single secondary image: full-height column beside the hero.
+    return { gridColumn: "2", gridRow: "1 / 3" };
+  }
+  if (secondaryCount === 2) {
+    // Classic 3-photo layout: hero + 2 stacked secondary tiles.
+    return { gridColumn: "2", gridRow: index === 0 ? "1" : "2" };
+  }
+  if (secondaryCount === 3) {
+    if (index === 0) return { gridColumn: "2", gridRow: "1" };
+    if (index === 1) return { gridColumn: "3", gridRow: "1" };
+    return { gridColumn: "2 / 4", gridRow: "2" };
+  }
+  // secondaryCount === 4: a full 2x2 grid beside the hero.
+  return {
+    gridColumn: index % 2 === 0 ? "2" : "3",
+    gridRow: index < 2 ? "1" : "2",
+  };
+}
+
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
 function Lightbox({ images, startIndex, onClose }) {
   const [index, setIndex] = useState(startIndex);
@@ -941,6 +981,14 @@ export default function ListingShowPage() {
       ? [{ url: listing.image.url, filename: listing.image.filename }]
       : [];
 
+  // Number of secondary (non-hero) tiles the multi-image grid below will
+  // actually render — capped at 4 since `images.slice(1, 5)` never returns
+  // more than 4 items. Drives both the grid's explicit column template and
+  // each tile's explicit gridColumn/gridRow placement (see
+  // getSecondaryGalleryCellStyle above) so the number of declared cells
+  // always matches the number of tiles placed into them.
+  const secondaryImageCount = Math.min(Math.max(images.length - 1, 0), 4);
+
   const reviews = listing.reviews ?? [];
   const amenities = listing.amenities ?? [];
   const similarListings = (allListingsData?.listings ?? [])
@@ -1232,8 +1280,9 @@ export default function ListingShowPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gridTemplateRows: images.length >= 3 ? "1fr 1fr" : "1fr",
+                gridTemplateColumns:
+                  secondaryImageCount <= 2 ? "1fr 1fr" : "2fr 1fr 1fr",
+                gridTemplateRows: "1fr 1fr",
                 gap: 8,
                 height: 480,
                 borderRadius: 20,
@@ -1243,6 +1292,7 @@ export default function ListingShowPage() {
               {/* Hero image */}
               <div
                 style={{
+                  gridColumn: "1",
                   gridRow: "1 / 3",
                   position: "relative",
                   cursor: "zoom-in",
@@ -1266,57 +1316,66 @@ export default function ListingShowPage() {
                   }}
                 />
               </div>
-              {/* Secondary images */}
-              {images.slice(1, 5).map((img, i) => (
-                <div
-                  key={i}
-                  style={{
-                    position: "relative",
-                    cursor: "zoom-in",
-                    overflow: "hidden",
-                  }}
-                  onClick={() => {
-                    setLightboxIndex(i + 1);
-                    setLightboxOpen(true);
-                  }}
-                >
-                  <motion.img
-                    whileHover={{ scale: 1.04 }}
-                    transition={{ duration: 0.4 }}
-                    src={img.url}
-                    alt={`Photo ${i + 2}`}
+              {/* Secondary images — each explicitly placed via
+                  getSecondaryGalleryCellStyle so the grid never contains
+                  more (or fewer) declared cells than rendered tiles. */}
+              {images.slice(1, 5).map((img, i) => {
+                const cellStyle = getSecondaryGalleryCellStyle(
+                  i,
+                  secondaryImageCount,
+                );
+                return (
+                  <div
+                    key={i}
                     style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
+                      ...cellStyle,
+                      position: "relative",
+                      cursor: "zoom-in",
+                      overflow: "hidden",
                     }}
-                  />
-                  {/* Last tile overlay when more images */}
-                  {i === 3 && images.length > 5 && (
-                    <div
+                    onClick={() => {
+                      setLightboxIndex(i + 1);
+                      setLightboxOpen(true);
+                    }}
+                  >
+                    <motion.img
+                      whileHover={{ scale: 1.04 }}
+                      transition={{ duration: 0.4 }}
+                      src={img.url}
+                      alt={`Photo ${i + 2}`}
                       style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "rgba(14,9,5,0.55)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
                       }}
-                    >
-                      <span
+                    />
+                    {/* Last tile overlay when more images */}
+                    {i === secondaryImageCount - 1 && images.length > 5 && (
+                      <div
                         style={{
-                          color: "#fff",
-                          fontWeight: 700,
-                          fontSize: "1.125rem",
+                          position: "absolute",
+                          inset: 0,
+                          background: "rgba(14,9,5,0.55)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
-                        +{images.length - 5} more
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ))}
+                        <span
+                          style={{
+                            color: "#fff",
+                            fontWeight: 700,
+                            fontSize: "1.125rem",
+                          }}
+                        >
+                          +{images.length - 5} more
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 

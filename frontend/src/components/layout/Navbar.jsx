@@ -43,26 +43,22 @@ const drawerItemVariants = {
 };
 
 /* ── Nav Search Pill ─────────────────────────────────────────── */
-function NavSearch({ onSearch, countries = [], onCountryFilter }) {
+// Self-contained: owns its own query state and, on submit, navigates
+// straight to /listings?q=... — the same destination HomePage's
+// <HeroSearch> already resolves to. Previously this forwarded onSearch /
+// onCountryFilter callbacks up to AppLayout's local state, which
+// ListingsPage never read, and a country <select> with no backend support
+// (search.service.js has no `country` query param). Both were dead UI and
+// have been removed rather than repaired.
+function NavSearch({ onSubmitSearch }) {
   const [query, setQuery] = useState("");
-  const [country, setCountry] = useState("");
   const [focused, setFocused] = useState(false);
 
-  const handleQuery = useCallback(
-    (e) => {
-      setQuery(e.target.value);
-      onSearch?.(e.target.value);
-    },
-    [onSearch],
-  );
+  const handleQuery = useCallback((e) => setQuery(e.target.value), []);
 
-  const handleCountry = useCallback(
-    (e) => {
-      setCountry(e.target.value);
-      onCountryFilter?.(e.target.value);
-    },
-    [onCountryFilter],
-  );
+  const submit = useCallback(() => {
+    onSubmitSearch?.(query);
+  }, [query, onSubmitSearch]);
 
   return (
     <motion.div
@@ -96,6 +92,12 @@ function NavSearch({ onSearch, countries = [], onCountryFilter }) {
         onChange={handleQuery}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            submit();
+          }
+        }}
         placeholder="Search destinations…"
         style={{
           flex: 1,
@@ -107,43 +109,12 @@ function NavSearch({ onSearch, countries = [], onCountryFilter }) {
           fontFamily: "inherit",
         }}
       />
-      {countries.length > 0 && (
-        <>
-          <div
-            style={{
-              width: 1,
-              height: 20,
-              background: "#e5e0d8",
-              flexShrink: 0,
-            }}
-          />
-          <select
-            value={country}
-            onChange={handleCountry}
-            style={{
-              border: "none",
-              outline: "none",
-              background: "transparent",
-              fontSize: "0.8125rem",
-              color: "#8a8179",
-              fontFamily: "inherit",
-              cursor: "pointer",
-              maxWidth: 120,
-            }}
-          >
-            <option value="">All countries</option>
-            {countries.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </>
-      )}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         type="button"
+        onClick={submit}
+        aria-label="Search"
         style={{
           width: 34,
           height: 34,
@@ -693,6 +664,13 @@ function MobileDrawer({
         { icon: <HelpCircle size={18} />, label: "Help centre", to: "#" },
       ];
 
+  const submitSearch = () => {
+    if (!query.trim()) return;
+    onSearch?.(query);
+    setQuery("");
+    onClose();
+  };
+
   return (
     <Drawer
       anchor="right"
@@ -770,9 +748,12 @@ function MobileDrawer({
             <Search size={15} color="#8a8179" />
             <input
               value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                onSearch?.(e.target.value);
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  submitSearch();
+                }
               }}
               placeholder="Search destinations…"
               style={{
@@ -948,18 +929,53 @@ function MobileDrawer({
 }
 
 /* ── Main Navbar ─────────────────────────────────────────────── */
-export default function Navbar({ onSearch, onCountryFilter, countries = [] }) {
+// `searchMode` ("hidden" | "collapsed" | "visible") is computed once per
+// route by AppLayout's getNavSearchMode() and drives whether the desktop
+// search pill renders at all:
+//   - "hidden"    → never rendered (default for every route except Home)
+//   - "collapsed" → rendered only after scrolling past the hero (Home)
+//   - "visible"   → always rendered (reserved for future use)
+export default function Navbar({ searchMode = "hidden" }) {
   const { isAuthenticated, user } = useAuthStore();
   const { mutate: logout, isPending } = useLogout();
   const [scrolled, setScrolled] = useState(false);
+  const [heroScrolled, setHeroScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    // Hero reveal threshold scales with viewport height (HomePage's hero
+    // is ~92vh) rather than reusing the 8px "add a shadow" threshold,
+    // which is far too small to mean "the hero has scrolled away."
+    const heroThreshold = () => Math.max(360, window.innerHeight * 0.6);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+      setHeroScrolled(window.scrollY > heroThreshold());
+    };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Reset the hero-scroll gate whenever the route changes so navigating
+  // away from and back to Home doesn't leave a stale "revealed" pill.
+  useEffect(() => {
+    setHeroScrolled(window.scrollY > Math.max(360, window.innerHeight * 0.6));
+  }, [location.pathname]);
+
+  const goToSearch = useCallback(
+    (query) => {
+      const params = new URLSearchParams();
+      if (query?.trim()) params.set("q", query.trim());
+      const qs = params.toString();
+      navigate(`/listings${qs ? `?${qs}` : ""}`);
+    },
+    [navigate],
+  );
+
+  const showNavSearch =
+    searchMode === "visible" || (searchMode === "collapsed" && heroScrolled);
 
   return (
     <>
@@ -1026,21 +1042,31 @@ export default function Navbar({ onSearch, onCountryFilter, countries = [] }) {
             </Link>
           </motion.div>
 
-          {/* Desktop Search */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "center",
-              maxWidth: 520,
-            }}
-          >
-            <NavSearch
-              onSearch={onSearch}
-              countries={countries}
-              onCountryFilter={onCountryFilter}
-            />
-          </div>
+          {/* Desktop Search — only mounted when showNavSearch is true, so
+              it never competes with a route's own search UI (HeroSearch on
+              Home, SearchBar+CategoryFilters on /listings) and never
+              appears on non-search routes like auth pages or listing
+              detail. */}
+          <AnimatePresence>
+            {showNavSearch && (
+              <motion.div
+                key="nav-search-wrapper"
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                  maxWidth: 520,
+                  minWidth: 0,
+                }}
+              >
+                <NavSearch onSubmitSearch={goToSearch} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Desktop Right Actions */}
           <div
@@ -1117,7 +1143,7 @@ export default function Navbar({ onSearch, onCountryFilter, countries = [] }) {
         isAuthenticated={isAuthenticated}
         user={user}
         onLogout={logout}
-        onSearch={onSearch}
+        onSearch={goToSearch}
       />
 
       <style>{`
