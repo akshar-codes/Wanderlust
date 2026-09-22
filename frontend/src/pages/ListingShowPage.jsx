@@ -44,6 +44,7 @@ import {
   Facebook,
   Loader2,
 } from "lucide-react";
+import WishlistHeartButton from "../components/wishlist/WishlistHeartButton";
 import { useListing } from "../hooks/useListings";
 import { useListings } from "../hooks/useListings";
 import { useAuthStore } from "../store/auth.store";
@@ -915,7 +916,6 @@ export default function ListingShowPage() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
 
   const bookingRef = useRef(null);
@@ -1174,51 +1174,11 @@ export default function ListingShowPage() {
                   <Share2 size={15} /> Share
                 </motion.button>
               </Tooltip>
-              <Tooltip
-                title={wishlisted ? "Saved" : "Save to wishlist"}
-                placement="top"
-              >
-                <motion.button
-                  whileHover={{ scale: 1.06 }}
-                  whileTap={{ scale: 0.94 }}
-                  onClick={() => {
-                    setWishlisted((w) => !w);
-                    toast(
-                      wishlisted
-                        ? "Removed from wishlist"
-                        : "Saved to wishlist",
-                      { icon: wishlisted ? "💔" : "❤️" },
-                    );
-                  }}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    padding: "8px 16px",
-                    border: `1.5px solid ${wishlisted ? "rgba(255,90,95,0.4)" : neutral[300]}`,
-                    borderRadius: 999,
-                    background: wishlisted ? "rgba(255,90,95,0.06)" : neutral[0],
-                    cursor: "pointer",
-                    fontSize: "0.8125rem",
-                    fontWeight: 600,
-                    color: wishlisted ? brand[500] : neutral[700],
-                    fontFamily: "inherit",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  <motion.div
-                    animate={{ scale: wishlisted ? [1, 1.4, 1] : 1 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Heart
-                      size={15}
-                      fill={wishlisted ? brand[500] : "none"}
-                      stroke={wishlisted ? brand[500] : "currentColor"}
-                    />
-                  </motion.div>
-                  {wishlisted ? "Saved" : "Save"}
-                </motion.button>
-              </Tooltip>
+                <WishlistHeartButton 
+                  listingId={listing._id} 
+                  variant="pill"
+                  iconSize={15}
+                />
             </div>
           </div>
         </div>

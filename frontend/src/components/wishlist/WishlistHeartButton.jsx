@@ -10,13 +10,14 @@ export default function WishlistHeartButton({
   listingId,
   size = 34,
   iconSize = 15,
+  variant = "circle", // "circle" or "pill"
   style,
 }) {
   const { isAuthenticated } = useAuthStore();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
-  const { data: status } = useWishlistStatus(listingId, {
+  const { data: status, isLoading } = useWishlistStatus(listingId, {
     enabled: isAuthenticated,
   });
   const isSaved = Boolean(status?.wishlisted);
@@ -31,35 +32,54 @@ export default function WishlistHeartButton({
     setAnchorEl(e.currentTarget);
   };
 
+  const isPill = variant === "pill";
+
   return (
     <>
       <motion.button
-        whileHover={{ scale: 1.12 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.94 }}
         onClick={handleClick}
         aria-label={isSaved ? "Manage wishlist" : "Save to wishlist"}
         style={{
-          width: size,
-          height: size,
-          borderRadius: "50%",
-          background: "rgba(255,255,255,0.92)",
-          backdropFilter: "blur(8px)",
-          border: "none",
+          width: isPill ? "auto" : size,
+          height: isPill ? "auto" : size,
+          padding: isPill ? "8px 16px" : 0,
+          borderRadius: isPill ? 999 : "50%",
+          background: isPill 
+            ? (isSaved ? "rgba(255,90,95,0.06)" : "var(--color-surface)")
+            : "var(--color-surface)",
+          opacity: isLoading ? 0.6 : 1,
+          border: isPill 
+            ? `1.5px solid ${isSaved ? "rgba(255,90,95,0.4)" : "var(--color-border)"}`
+            : "1px solid var(--color-border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          gap: isPill ? 6 : 0,
           cursor: "pointer",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.14)",
+          boxShadow: isPill ? "none" : "0 2px 8px rgba(0,0,0,0.14)",
           flexShrink: 0,
+          transition: "all 0.2s",
+          color: isSaved ? "var(--color-primary-500)" : "var(--color-text)",
+          fontSize: "0.8125rem",
+          fontWeight: 600,
+          fontFamily: "inherit",
           ...style,
         }}
       >
-        <Heart
-          size={iconSize}
-          fill={isSaved ? "#ff5a5f" : "none"}
-          stroke={isSaved ? "#ff5a5f" : "#3d3630"}
-          strokeWidth={2}
-        />
+        <motion.div
+          animate={{ scale: isSaved ? [1, 1.4, 1] : 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Heart
+            size={iconSize}
+            fill={isSaved ? "var(--color-primary-500)" : "none"}
+            stroke={isSaved ? "var(--color-primary-500)" : "currentColor"}
+            strokeWidth={2}
+          />
+        </motion.div>
+        {isPill && (isSaved ? "Saved" : "Save")}
       </motion.button>
 
       <CollectionPickerMenu

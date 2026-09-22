@@ -44,13 +44,44 @@ export function useToggleWishlist() {
   return useMutation({
     mutationFn: ({ listingId, collectionId }) =>
       wishlistService.toggle(listingId, collectionId),
+    onMutate: async ({ listingId }) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await qc.cancelQueries({ queryKey: [WISHLIST_STATUS_KEY, listingId] });
+
+      // Snapshot the previous value
+      const previousStatus = qc.getQueryData([WISHLIST_STATUS_KEY, listingId]);
+
+      // Optimistically update to the new value
+      qc.setQueryData([WISHLIST_STATUS_KEY, listingId], (old) => {
+        // If we don't have old data, guess based on action
+        if (!old) return { wishlisted: true, collectionIds: [] };
+        return {
+          ...old,
+          wishlisted: !old.wishlisted,
+        };
+      });
+
+      return { previousStatus, listingId };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousStatus) {
+        qc.setQueryData(
+          [WISHLIST_STATUS_KEY, context.listingId],
+          context.previousStatus
+        );
+      }
+      toast.error(err.message || "Failed to update wishlist");
+    },
     onSuccess: (data, { listingId }) => {
-      invalidateWishlistCaches(qc, listingId);
       toast.success(
         data.wishlisted ? "Saved to wishlist" : "Removed from wishlist",
       );
     },
-    onError: (err) => toast.error(err.message || "Failed to update wishlist"),
+    onSettled: (data, error, variables) => {
+      // Always refetch after error or success to sync with server
+      invalidateWishlistCaches(qc, variables.listingId);
+    },
   });
 }
 
