@@ -245,3 +245,22 @@ export const spacing = {
   9: "48px",
   10: "64px",
 };
+
+export const CSS_VARS = {
+  brand500: "var(--color-primary-500)",
+  brand600: "var(--color-primary-600)",
+  neutral0: "var(--color-neutral-0)",
+  neutral25: "var(--color-neutral-25)",
+  neutral50: "var(--color-neutral-50)",
+  neutral100: "var(--color-neutral-100)",
+  neutral200: "var(--color-neutral-200)",
+  neutral300: "var(--color-neutral-300)",
+  neutral400: "var(--color-neutral-400)",
+  neutral500: "var(--color-neutral-500)",
+  neutral600: "var(--color-neutral-600)",
+  neutral700: "var(--color-neutral-700)",
+  neutral800: "var(--color-neutral-800)",
+  successBase: "var(--color-success)",
+  warningBase: "var(--color-warning)",
+  errorBase: "var(--color-error)",
+};
