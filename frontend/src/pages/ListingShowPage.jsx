@@ -56,6 +56,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { reviewSchema } from "../schemas";
 import toast from "react-hot-toast";
+import { cloudinaryUrl } from "../utils/cloudinaryUrl";
 
 // ─── Amenity icon map ─────────────────────────────────────────────────────────
 const AMENITY_ICONS = {
@@ -342,7 +343,7 @@ function Lightbox({ images, startIndex, onClose }) {
               }}
             >
               <img
-                src={img.url}
+                src={cloudinaryUrl(img.url, { width: 120 })}
                 alt=""
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
@@ -461,7 +462,7 @@ function ShareSheet({ open, onClose, listing }) {
               }}
             >
               <img
-                src={listing?.image?.url}
+                src={cloudinaryUrl(listing?.image?.url, { width: 120 })}
                 alt=""
                 style={{
                   width: 60,
@@ -1215,7 +1216,7 @@ export default function ListingShowPage() {
               }}
             >
               <img
-                src={images[0].url}
+                src={cloudinaryUrl(images[0].url, { width: 1200 })}
                 alt={listing.title}
                 style={{
                   width: "100%",
@@ -1255,7 +1256,7 @@ export default function ListingShowPage() {
                 <motion.img
                   whileHover={{ scale: 1.03 }}
                   transition={{ duration: 0.4 }}
-                  src={images[0].url}
+                  src={cloudinaryUrl(images[0].url, { width: 1200 })}
                   alt={listing.title}
                   style={{
                     width: "100%",
@@ -1290,7 +1291,7 @@ export default function ListingShowPage() {
                     <motion.img
                       whileHover={{ scale: 1.04 }}
                       transition={{ duration: 0.4 }}
-                      src={img.url}
+                      src={cloudinaryUrl(img.url, { width: 800 })}
                       alt={`Photo ${i + 2}`}
                       style={{
                         width: "100%",

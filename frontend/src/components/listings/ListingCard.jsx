@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, MapPin, TrendingUp } from "lucide-react";
 import WishlistHeartButton from "../wishlist/WishlistHeartButton";
+import { cloudinaryUrl } from "../../utils/cloudinaryUrl";
 
 const CATEGORY_ICONS = {
   trending: "🔥",
@@ -29,7 +30,8 @@ export default function ListingCard({ listing, variant = "default", showTax = fa
   const rating = averageRating ?? (4.2 + (seed % 8) * 0.1).toFixed(1);
   const reviews = reviewCount ?? 12 + (seed % 88);
 
-  const displayImage = images?.[0]?.url ?? image?.url;
+  const rawImage = images?.[0]?.url ?? image?.url;
+  const displayImage = cloudinaryUrl(rawImage, { width: 640 });
   const isFeatured = variant === "featured" || featured;
 
   const Wrapper = noLink ? "div" : Link;

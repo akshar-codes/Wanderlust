@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { Heart, Lock, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { neutral, brand, radii, shadows } from "../../theme/tokens";
+import { cloudinaryUrl } from "../../utils/cloudinaryUrl";
 
 export default function CollectionCard({ collection, onClick }) {
   const { name, itemCount, coverImage, visibility, isDefault } = collection;
@@ -25,7 +26,7 @@ export default function CollectionCard({ collection, onClick }) {
         {coverImage ? (
           <Box
             component="img"
-            src={coverImage}
+            src={cloudinaryUrl(coverImage, { width: 640 })}
             alt={name}
             sx={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
