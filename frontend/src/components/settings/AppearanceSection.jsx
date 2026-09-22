@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Stack } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { Sun, Moon, Monitor, Globe2 } from "lucide-react";
 
 import { Card } from "../ui/Card";
@@ -161,15 +162,20 @@ export default function AppearanceSection() {
               gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
             }}
           >
-            <Select
-              label="Language"
-              options={LANGUAGE_OPTIONS}
-              value={language}
-              onChange={(e) => {
-                setLanguage(e.target.value);
-                setDirty(true);
-              }}
-            />
+            <Tooltip title="Multi-language support coming soon">
+              <span>
+                <Select
+                  label="Language"
+                  options={LANGUAGE_OPTIONS}
+                  value={language}
+                  onChange={(e) => {
+                    setLanguage(e.target.value);
+                    setDirty(true);
+                  }}
+                  disabled
+                />
+              </span>
+            </Tooltip>
             <Select
               label="Currency"
               options={CURRENCY_OPTIONS}
