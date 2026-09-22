@@ -48,7 +48,7 @@ export default function AppLayout() {
         display: "flex",
         flexDirection: "column",
         minHeight: "100svh",
-        background: "#faf8f6",
+        background: "var(--color-bg)",
       }}
     >
       <Navbar searchMode={searchMode} />

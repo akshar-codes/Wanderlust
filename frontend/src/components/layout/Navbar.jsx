@@ -21,9 +21,11 @@ import { Badge, Avatar, Tooltip, Drawer, Divider } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../../store/auth.store";
 import { useLogout } from "../../hooks/useAuth";
+import { useColorModeContext } from "../../hooks/useColorMode";
+import { Moon, Sun } from "lucide-react";
 
 /* ── Framer variants ─────────────────────────────────────────── */
-const BRAND_GRADIENT = BRAND_GRADIENT;
+const BRAND_GRADIENT = `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`;
 
 const menuVariants = {
   hidden: { opacity: 0, y: -8, scale: 0.96 },
@@ -75,8 +77,8 @@ function NavSearch({ onSubmitSearch }) {
       style={{
         display: "flex",
         alignItems: "center",
-        background: "rgba(255,255,255,0.92)",
-        border: "1.5px solid rgba(230,224,218,0.9)",
+        background: "var(--color-surface)",
+        border: "1.5px solid var(--color-border)",
         borderRadius: 999,
         padding: "0 6px 0 18px",
         height: 46,
@@ -85,7 +87,7 @@ function NavSearch({ onSubmitSearch }) {
         gap: 8,
         backdropFilter: "blur(12px)",
         transition: "border-color 0.2s",
-        borderColor: focused ? "rgba(255,90,95,0.4)" : "rgba(230,224,218,0.9)",
+        borderColor: focused ? "rgba(255,90,95,0.4)" : "var(--color-border)",
       }}
     >
       <Search size={15} style={{ color: "#b0a89e", flexShrink: 0 }} />
@@ -383,16 +385,23 @@ function UserMenu({ user, onLogout, isPending }) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const { mode, toggle } = useColorModeContext();
+
   const items = [
     {
       icon: <User size={15} />,
       label: "Profile",
       to: `/users/${user?.username}`,
     },
-    { icon: <Heart size={15} />, label: "Wishlist", to: "#" },
-    { icon: <Sparkles size={15} />, label: "My listings", to: "#" },
+    { icon: <Heart size={15} />, label: "Wishlist", to: "/wishlist" },
+    { icon: <Sparkles size={15} />, label: "My listings", to: "/dashboard" },
     null,
     { icon: <Settings size={15} />, label: "Settings", to: "/settings" },
+    {
+      icon: mode === "dark" ? <Sun size={15} /> : <Moon size={15} />,
+      label: mode === "dark" ? "Light Mode" : "Dark Mode",
+      onClick: toggle,
+    },
     { icon: <HelpCircle size={15} />, label: "Help", to: "#" },
     { icon: <Globe size={15} />, label: "Language · EN", to: "#" },
     null,

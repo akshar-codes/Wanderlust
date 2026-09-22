@@ -65,14 +65,14 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
     >
       <Box sx={{ p: 2 }}>
         <Typography
-          sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800], mb: 1.5 }}
+          sx={{ fontWeight: 700, fontSize: "0.9375rem", color: "text.primary", mb: 1.5 }}
         >
           Save to wishlist
         </Typography>
 
         {collectionsLoading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
-            <CircularProgress size={20} sx={{ color: brand[500] }} />
+            <CircularProgress size={20} sx={{ color: "primary.main" }} />
           </Box>
         ) : (
           <Box
@@ -95,14 +95,14 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
                   px: 0.5,
                   borderRadius: radii.md,
                   cursor: toggling ? "not-allowed" : "pointer",
-                  "&:hover": { bgcolor: neutral[50] },
+                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
                 <Checkbox
                   checked={savedIds.has(c._id)}
                   disabled={toggling}
                   size="small"
-                  sx={{ color: neutral[300], "&.Mui-checked": { color: brand[500] } }}
+                  sx={{ color: "action.active", "&.Mui-checked": { color: "primary.main" } }}
                 />
                 {c.coverImage ? (
                   <Box
@@ -123,14 +123,14 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
                       width: 32,
                       height: 32,
                       borderRadius: radii.sm,
-                      bgcolor: neutral[100],
+                      bgcolor: "action.hover",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
                     }}
                   >
-                    <Heart size={14} color={neutral[400]} />
+                    <Heart size={14} color="var(--color-text-muted)" />
                   </Box>
                 )}
                 <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -138,7 +138,7 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
                     sx={{
                       fontSize: "0.8125rem",
                       fontWeight: 600,
-                      color: neutral[800],
+                      color: "text.primary",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -155,7 +155,7 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
           </Box>
         )}
 
-        <Box sx={{ height: 1, bgcolor: neutral[100], my: 1.5 }} />
+        <Box sx={{ height: 1, bgcolor: "divider", my: 1.5 }} />
 
         {creatingNew ? (
           <Box sx={{ display: "flex", gap: 1 }}>
@@ -178,7 +178,7 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
                 px: 1.5,
                 border: "none",
                 borderRadius: radii.md,
-                bgcolor: brand[500],
+                bgcolor: "primary.main",
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: "0.8125rem",
@@ -201,10 +201,10 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
               px: 0.5,
               borderRadius: radii.md,
               cursor: "pointer",
-              color: brand[600],
+              color: "primary.main",
               fontWeight: 700,
               fontSize: "0.8125rem",
-              "&:hover": { bgcolor: neutral[50] },
+              "&:hover": { bgcolor: "action.hover" },
             }}
           >
             <Box
@@ -212,13 +212,13 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
                 width: 32,
                 height: 32,
                 borderRadius: radii.sm,
-                border: `1.5px dashed ${neutral[300]}`,
+                border: `1.5px dashed var(--color-border)`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Plus size={14} color={neutral[500]} />
+              <Plus size={14} color="var(--color-text-muted)" />
             </Box>
             Create new wishlist
           </Box>

@@ -39,22 +39,13 @@ const CURRENCY_OPTIONS = [
   { value: "SGD", label: "SGD — Singapore Dollar (S$)" },
 ];
 
-function applyLocalTheme(mode) {
-  const root = document.documentElement;
-  const resolved =
-    mode === "system"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light"
-      : mode;
-  root.classList.toggle("dark", resolved === "dark");
-  localStorage.setItem("wl-theme", mode);
-}
+import { useColorModeContext } from "../../hooks/useColorMode";
 
 export default function AppearanceSection() {
   const user = useCurrentUser();
   const username = user?.username;
   const { mutate: updateSettings, isPending: saving } = useUpdateSettings();
+  const { setMode } = useColorModeContext();
 
   const [theme, setTheme] = useState("system");
   const [language, setLanguage] = useState("en");
@@ -71,7 +62,6 @@ export default function AppearanceSection() {
   }, [user?.settings]);
 
   const handleSave = () => {
-    applyLocalTheme(theme);
     updateSettings(
       { username, settings: { theme, language, currency } },
       { onSuccess: () => setDirty(false) },
@@ -86,7 +76,7 @@ export default function AppearanceSection() {
             sx={{
               fontWeight: 700,
               fontSize: "1.0625rem",
-              color: neutral[800],
+              color: "var(--color-text)",
               mb: 2,
             }}
           >
@@ -106,6 +96,7 @@ export default function AppearanceSection() {
                   key={value}
                   onClick={() => {
                     setTheme(value);
+                    setMode(value);
                     setDirty(true);
                   }}
                   sx={{
