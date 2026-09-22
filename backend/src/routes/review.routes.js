@@ -2,7 +2,7 @@ import express from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import * as reviewCtrl from "../controllers/review.controller.js";
 import validate from "../middlewares/validate.js";
-import upload from "../middlewares/upload.js";
+import { listingImageUpload, validateFileType } from "../middlewares/upload.js";
 import { reviewBodySchema } from "../validators/index.js";
 import * as reviewRepo from "../repositories/review.repository.js";
 import {
@@ -65,7 +65,8 @@ router.post(
 router.post(
   "/:reviewId/photos",
   requireAuth(),
-  upload.array("photos", 5),
+  listingImageUpload.array("photos", 5),
+  validateFileType,
   asyncHandler(reviewCtrl.addPhotos),
 );
 

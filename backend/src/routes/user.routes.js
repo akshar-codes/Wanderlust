@@ -2,7 +2,7 @@ import express from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import * as userCtrl from "../controllers/user.controller.js";
 import validate from "../middlewares/validate.js";
-import upload from "../middlewares/upload.js";
+import { avatarUpload, validateFileType } from "../middlewares/upload.js";
 import {
   updateProfileBodySchema,
   updateSettingsBodySchema,
@@ -40,7 +40,8 @@ router.put(
   "/:username/avatar",
   requireAuth(),
   requireSelfOrAdmin(),
-  upload.single("avatar"),
+  avatarUpload.single("avatar"),
+  validateFileType,
   asyncHandler(userCtrl.updateAvatar),
 );
 

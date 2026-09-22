@@ -1,7 +1,7 @@
 import express from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import * as listingCtrl from "../controllers/listing.controller.js";
-import upload from "../middlewares/upload.js";
+import { listingImageUpload, validateFileType } from "../middlewares/upload.js";
 import validate from "../middlewares/validate.js";
 import { requireVerifiedEmail } from "../middlewares/requireVerifiedEmail.js";
 import {
@@ -31,7 +31,8 @@ router
     requireVerifiedEmail(),
     requirePermission("listing", "create"),
     createLimiter,
-    upload.single("listing[image]"),
+    listingImageUpload.single("listing[image]"),
+    validateFileType,
     validate(listingBodySchema),
     asyncHandler(listingCtrl.create),
   );
@@ -50,7 +51,8 @@ router
     requireAuth(),
     requirePermission("listing", "update"),
     requireOwnerOrAdmin(fetchListing, "owner", "Listing"),
-    upload.single("listing[image]"),
+    listingImageUpload.single("listing[image]"),
+    validateFileType,
     validate(listingBodySchema),
     asyncHandler(listingCtrl.update),
   )
@@ -58,7 +60,8 @@ router
     requireAuth(),
     requirePermission("listing", "update"),
     requireOwnerOrAdmin(fetchListing, "owner", "Listing"),
-    upload.single("listing[image]"),
+    listingImageUpload.single("listing[image]"),
+    validateFileType,
     validate(listingPatchSchema),
     asyncHandler(listingCtrl.partialUpdate),
   )
@@ -103,7 +106,8 @@ router.post(
   requireAuth(),
   requirePermission("listing", "manageImages"),
   requireOwnerOrAdmin(fetchListing, "owner", "Listing"),
-  upload.array("images", 10),
+  listingImageUpload.array("images", 10),
+  validateFileType,
   asyncHandler(listingCtrl.addImages),
 );
 

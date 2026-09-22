@@ -21,11 +21,11 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "wanderlust_DEV",
-    allowedFormats: ["png", "jpg", "jpeg"],
-
-    timeout: 20000,
+    folder: "wanderlust_dev",
+    allowedFormats: ["png", "jpg", "jpeg", "webp"],
+    transformation: [{ quality: "auto", fetch_format: "auto" }],
   },
+  timeout: 20000,
 });
 
 export { cloudinary, storage };
