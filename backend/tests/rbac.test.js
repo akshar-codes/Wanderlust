@@ -1,15 +1,13 @@
-"use strict";
-
-const assert = require("assert");
-const {
+import assert from "assert";
+import {
   ROLES,
   ROLE_HIERARCHY,
   can,
   hasMinimumRole,
   getAllowedActions,
-} = require("../src/middlewares/permissions");
+} from "../src/middlewares/permissions.js";
 
-const {
+import {
   requireAuth,
   requireRole,
   requireMinRole,
@@ -18,7 +16,7 @@ const {
   requireOwnerOrAdmin,
   requireActiveAccount,
   requireAuthAndPermission,
-} = require("../src/middlewares/rbac");
+} from "../src/middlewares/rbac.js";
 
 // ── Test helpers ──────────────────────────────────────────────────────────────
 

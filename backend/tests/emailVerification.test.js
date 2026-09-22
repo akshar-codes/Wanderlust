@@ -1,11 +1,20 @@
 #!/usr/bin/env node
 "use strict";
 
-const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import crypto from "crypto";
 
-const mongoose = require("mongoose");
-const crypto = require("crypto");
+import * as emailVerificationService from "../src/services/emailVerification.service.js";
+import EmailVerificationToken from "../src/models/emailVerificationToken.js";
+import User from "../src/models/user.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 // ── Minimal assert helpers ────────────────────────────────────────────────────
 
@@ -36,7 +45,7 @@ async function assertRejects(fn, label) {
 // ── Setup helpers ─────────────────────────────────────────────────────────────
 
 async function createTestUser(overrides = {}) {
-  const User = require("../src/models/user");
+
   const username = `testuser_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
   const email = `${username}@test.wanderlust.com`;
   const user = new User({
@@ -51,8 +60,7 @@ async function createTestUser(overrides = {}) {
 }
 
 async function teardown(userId) {
-  const User = require("../src/models/user");
-  const EmailVerificationToken = require("../src/models/emailVerificationToken");
+
   await User.findByIdAndDelete(userId);
   await EmailVerificationToken.deleteMany({ userId });
 }
@@ -66,9 +74,7 @@ async function runTests() {
   await mongoose.connect(MONGO_URL);
   console.log("✅  Connected to MongoDB\n");
 
-  const emailVerificationService = require("../src/services/emailVerification.service");
-  const EmailVerificationToken = require("../src/models/emailVerificationToken");
-  const User = require("../src/models/user");
+
 
   // ── Test 1: sendVerificationEmail issues token ────────────────────────────
   console.log(
