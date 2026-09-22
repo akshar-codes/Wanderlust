@@ -18,11 +18,19 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
+export const ALLOWED_FORMATS = ["png", "jpg", "jpeg", "webp"];
+export const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/jpg",
+  "image/webp",
+];
+
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "wanderlust_dev",
-    allowedFormats: ["png", "jpg", "jpeg", "webp"],
+    allowedFormats: ALLOWED_FORMATS,
     transformation: [{ quality: "auto", fetch_format: "auto" }],
   },
   timeout: 20000,
