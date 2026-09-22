@@ -40,9 +40,29 @@ const authFailureLogger = (req, res, next) => {
       userId: user._id,
     });
 
-    req.logIn(user, (loginErr) => {
-      if (loginErr) return next(loginErr);
-      next();
+    if (user.settings?.twoFactorEnabled) {
+      return req.session.regenerate((err) => {
+        if (err) return next(err);
+
+        req.session.pendingTwoFactor = { userId: user._id };
+        req.session.save((saveErr) => {
+          if (saveErr) return next(saveErr);
+          return res.json({
+            success: true,
+            data: { requiresTwoFactor: true },
+            message: "Two-factor authentication required",
+          });
+        });
+      });
+    }
+
+    req.session.regenerate((err) => {
+      if (err) return next(err);
+
+      req.logIn(user, (loginErr) => {
+        if (loginErr) return next(loginErr);
+        next();
+      });
     });
   })(req, res, next);
 };

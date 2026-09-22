@@ -59,10 +59,18 @@ function oauthCallbackHandler(provider) {
           return res.redirect(getFrontendRedirectUrl(req, reason));
         }
 
-        req.logIn(user, async (loginErr) => {
-          if (loginErr) return next(loginErr);
-          userRepo.touchLastLogin(user._id).catch(() => {});
-          return res.redirect(getFrontendRedirectUrl(req));
+        const oldSessionData = { ...req.session };
+
+        req.session.regenerate((regenErr) => {
+          if (regenErr) return next(regenErr);
+
+          Object.assign(req.session, oldSessionData);
+
+          req.logIn(user, async (loginErr) => {
+            if (loginErr) return next(loginErr);
+            userRepo.touchLastLogin(user._id).catch(() => {});
+            return res.redirect(getFrontendRedirectUrl(req));
+          });
         });
       },
     )(req, res, next);
