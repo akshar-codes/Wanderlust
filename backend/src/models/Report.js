@@ -98,7 +98,6 @@ const reportSchema = new Schema(
 
 // ── Indexes ────────────────────────────────────────────────────────────────────
 reportSchema.index({ status: 1, createdAt: -1 });
-reportSchema.index({ targetType: 1, targetId: 1 });
 // Prevents the same user from spamming duplicate reports against one target.
 reportSchema.index(
   { targetType: 1, targetId: 1, reportedBy: 1 },

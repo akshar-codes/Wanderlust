@@ -187,8 +187,6 @@ const listingSchema = new Schema(
     },
     slug: {
       type: String,
-      unique: true,
-      sparse: true,
       lowercase: true,
       trim: true,
     },
@@ -361,9 +359,10 @@ const listingSchema = new Schema(
 
 // ── Indexes ────────────────────────────────────────────────────────────────────
 listingSchema.index({ slug: 1 }, { unique: true, sparse: true });
-listingSchema.index({ status: 1, draft: 1 });
-listingSchema.index({ category: 1 });
-listingSchema.index({ featured: 1 });
+listingSchema.index({ status: 1, draft: 1, category: 1 });
+listingSchema.index({ featured: 1, status: 1, draft: 1 });
+listingSchema.index({ owner: 1, status: 1, draft: 1, createdAt: -1 });
+listingSchema.index({ "pricing.nightlyPrice": 1 });
 listingSchema.index({ owner: 1 });
 listingSchema.index({ averageRating: -1 });
 listingSchema.index({ createdAt: -1 });

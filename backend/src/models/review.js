@@ -69,7 +69,7 @@ const reviewSchema = new Schema(
     helpfulVoters: [{ type: Schema.Types.ObjectId, ref: "User" }],
 
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    listing: { type: Schema.Types.ObjectId, ref: "Listing", index: true },
+    listing: { type: Schema.Types.ObjectId, ref: "Listing" },
 
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: null },
@@ -84,6 +84,7 @@ const reviewSchema = new Schema(
 // ── Indexes ────────────────────────────────────────────────────────────────────
 reviewSchema.index({ listing: 1, createdAt: -1 });
 reviewSchema.index({ listing: 1, rating: -1 });
+reviewSchema.index({ listing: 1, rating: 1, createdAt: -1 });
 reviewSchema.index({ author: 1, createdAt: -1 });
 reviewSchema.index({ helpfulVotes: -1 });
 
