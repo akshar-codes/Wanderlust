@@ -118,10 +118,6 @@ export const updateNotificationPreferences = async (req, res, next) => {
 // ── PATCH /api/users/:username/role (admin only) ──────────────────────────────
 
 export const changeRole = async (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return next(AppError.forbidden("Only admins can change user roles"));
-  }
-
   const target = await userRepo.findByUsername(req.params.username);
   if (!target) return next(AppError.notFound("User not found"));
 
