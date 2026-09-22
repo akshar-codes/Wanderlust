@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/auth.store";
 import { useToggleWishlist } from "../../hooks/useWishlist";
 import { brand, neutral, radii, shadows } from "../../theme/tokens";
+import ListingCard from "../listings/ListingCard";
 
 const SWIPE_THRESHOLD = 120;
 const VISIBLE_STACK = 3;
@@ -50,23 +51,12 @@ function StackCard({ listing, index, isTop, onSwiped }) {
           borderRadius: radii["2xl"],
           overflow: "hidden",
           boxShadow: shadows.xl,
-          background: neutral[100],
+          background: "var(--color-surface)",
           cursor: isTop ? "grab" : "default",
+          padding: 8, // Give some breathing room for the card
         }}
       >
-        <img
-          src={listing.image?.url}
-          alt={listing.title}
-          draggable={false}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", pointerEvents: "none" }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(to top, rgba(20,13,8,0.75) 0%, rgba(20,13,8,0.05) 45%, transparent 65%)",
-          }}
-        />
+        <ListingCard listing={listing} index={0} noLink />
 
         {isTop && (
           <>
@@ -84,6 +74,7 @@ function StackCard({ listing, index, isTop, onSwiped }) {
                 fontSize: "1.4rem",
                 transform: "rotate(-14deg)",
                 textTransform: "uppercase",
+                pointerEvents: "none",
               }}
             >
               Save
@@ -102,53 +93,13 @@ function StackCard({ listing, index, isTop, onSwiped }) {
                 fontSize: "1.4rem",
                 transform: "rotate(14deg)",
                 textTransform: "uppercase",
+                pointerEvents: "none",
               }}
             >
               Pass
             </motion.div>
           </>
         )}
-
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "20px 20px 24px", color: "#fff" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 6 }}>
-            <MapPin size={12} color="rgba(255,255,255,0.8)" />
-            <span
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: 700,
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.85)",
-              }}
-            >
-              {listing.location}, {listing.country}
-            </span>
-          </div>
-          <h3
-            style={{
-              fontSize: "1.25rem",
-              fontWeight: 700,
-              lineHeight: 1.25,
-              margin: "0 0 8px",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {listing.title}
-          </h3>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontWeight: 700, fontSize: "1rem" }}>
-              ₹{Number(listing.price).toLocaleString("en-IN")}
-              <span style={{ fontWeight: 400, fontSize: "0.8125rem", opacity: 0.85 }}> / night</span>
-            </span>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <Star size={13} fill="#f59e0b" stroke="none" />
-              <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>{Number(rating).toFixed(1)}</span>
-            </div>
-          </div>
-        </div>
       </div>
     </motion.div>
   );

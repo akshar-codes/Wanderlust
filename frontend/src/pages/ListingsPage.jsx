@@ -41,6 +41,8 @@ import { useSearch, usePriceHistogram } from "../hooks/useSearch";
 import SearchBar from "../components/search/SearchBar";
 import PriceRangeSlider from "../components/search/PriceRangeSlider";
 import MapBoundsFilter from "../components/search/MapBoundsFilter";
+import ListingCard from "../components/listings/ListingCard";
+import CategoryFilters from "../components/listings/CategoryFilters";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -574,248 +576,6 @@ function FDivider() {
         margin: "0 0 24px",
       }}
     />
-  );
-}
-
-// ─── Listing card (grid) ──────────────────────────────────────────────────────
-function ListingCardGrid({ listing, index }) {
-  const [wishlist, setWishlist] = useState(false);
-  const {
-    _id,
-    title,
-    location,
-    country,
-    price,
-    image,
-    category,
-    averageRating,
-    reviewCount,
-  } = listing;
-  const seed = _id ? parseInt(_id.slice(-4), 16) : index;
-  const rating = averageRating ?? (4.2 + (seed % 8) * 0.1).toFixed(1);
-  const reviews = reviewCount ?? 12 + (seed % 88);
-  const isFeatured = listing.featured;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        delay: index * 0.04,
-        duration: 0.35,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-    >
-      <Link
-        to={`/listings/${_id}`}
-        style={{ textDecoration: "none", color: "inherit", display: "block" }}
-      >
-        <motion.article
-          whileHover="hover"
-          initial="rest"
-          animate="rest"
-          style={{ display: "flex", flexDirection: "column", gap: 10 }}
-        >
-          <div
-            style={{
-              position: "relative",
-              borderRadius: 18,
-              overflow: "hidden",
-              aspectRatio: "4/3",
-              background: neutral[100],
-            }}
-          >
-            <motion.img
-              variants={{ rest: { scale: 1 }, hover: { scale: 1.06 } }}
-              transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-              src={image?.url}
-              alt={title}
-              loading="lazy"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                display: "block",
-              }}
-            />
-            <motion.div
-              variants={{ rest: { opacity: 0 }, hover: { opacity: 1 } }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                background:
-                  "linear-gradient(to top, rgba(20,13,8,0.4) 0%, transparent 55%)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: 10,
-                left: 10,
-                display: "flex",
-                gap: 5,
-              }}
-            >
-              {isFeatured ? (
-                <div
-                  style={{
-                    background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
-                    borderRadius: 999,
-                    padding: "3px 10px",
-                    fontSize: "0.65rem",
-                    fontWeight: 700,
-                    color: neutral[0],
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 3,
-                  }}
-                >
-                  <TrendingUp size={9} /> Featured
-                </div>
-              ) : (
-                <div
-                  style={{
-                    background: "rgba(255,255,255,0.92)",
-                    backdropFilter: "blur(8px)",
-                    borderRadius: 999,
-                    padding: "3px 10px",
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    color: neutral[700],
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 3,
-                  }}
-                >
-                  <span>{CATEGORY_ICONS[category] ?? "🏠"}</span>
-                  <span style={{ textTransform: "capitalize" }}>
-                    {category || "Stay"}
-                  </span>
-                </div>
-              )}
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.12 }}
-              whileTap={{ scale: 0.88 }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setWishlist((w) => !w);
-              }}
-              aria-label={
-                wishlist ? "Remove from wishlist" : "Save to wishlist"
-              }
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.9)",
-                backdropFilter: "blur(6px)",
-                border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.14)",
-              }}
-            >
-              <motion.div
-                animate={{ scale: wishlist ? [1, 1.4, 1] : 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Heart
-                  size={14}
-                  fill={wishlist ? brand[500] : "none"}
-                  stroke={wishlist ? brand[500] : neutral[700]}
-                  strokeWidth={2}
-                />
-              </motion.div>
-            </motion.button>
-          </div>
-          <div style={{ padding: "0 2px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 3,
-                marginBottom: 3,
-              }}
-            >
-              <MapPin size={10} color={neutral[400]} />
-              <span
-                style={{
-                  fontSize: "0.7rem",
-                  fontWeight: 600,
-                  color: neutral[400],
-                  letterSpacing: "0.05em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {location}, {country}
-              </span>
-            </div>
-            <h3
-              style={{
-                fontSize: "0.9375rem",
-                fontWeight: 700,
-                color: neutral[800],
-                lineHeight: 1.35,
-                margin: "0 0 6px",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-              }}
-            >
-              {title}
-            </h3>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <div>
-                <span
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "0.9375rem",
-                    color: neutral[800],
-                  }}
-                >
-                  ₹{price?.toLocaleString("en-IN")}
-                </span>
-                <span style={{ color: neutral[500], fontSize: "0.8125rem" }}>
-                  {" "}
-                  / night
-                </span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                <Star size={12} fill={semantic.warning.base} stroke="none" />
-                <span
-                  style={{
-                    fontSize: "0.8125rem",
-                    fontWeight: 700,
-                    color: neutral[700],
-                  }}
-                >
-                  {Number(rating).toFixed(1)}
-                </span>
-                <span style={{ fontSize: "0.72rem", color: neutral[400] }}>
-                  ({reviews})
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.article>
-      </Link>
-    </motion.div>
   );
 }
 
@@ -1437,10 +1197,11 @@ export default function ListingsPage() {
                 }}
               >
                 {listings.map((listing, i) => (
-                  <ListingCardGrid
+                  <ListingCard
                     key={listing._id}
                     listing={listing}
                     index={i}
+                    showTax={showTaxes}
                   />
                 ))}
               </div>
