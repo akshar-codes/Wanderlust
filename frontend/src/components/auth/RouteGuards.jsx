@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
+import { neutral } from "../../theme/tokens";
 import { useAuthStore } from "../../store/auth.store";
 import Spinner from "../common/Spinner";
 
@@ -11,13 +12,13 @@ function SplashLoader() {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100svh",
-        background: "#faf8f6",
+        background: neutral[50],
         gap: 16,
         flexDirection: "column",
       }}
     >
       <Spinner size={36} />
-      <p style={{ fontSize: "0.875rem", color: "#8a8179", fontWeight: 500 }}>
+      <p style={{ fontSize: "0.875rem", color: neutral[500], fontWeight: 500 }}>
         Loading Wanderlust…
       </p>
     </div>

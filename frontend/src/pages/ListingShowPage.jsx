@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { brand, neutral, semantic, shadows } from "../theme/tokens";
+import { CATEGORY_ICONS } from "../constants/categories";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,
@@ -84,19 +86,6 @@ const AMENITY_ICONS = {
   lake_access: { icon: <Waves size={18} />, label: "Lake access" },
 };
 
-const CATEGORY_ICONS = {
-  trending: "🔥",
-  rooms: "🛏",
-  iconic: "🏙",
-  mountains: "⛰",
-  castles: "🏰",
-  pools: "🏊",
-  camping: "⛺",
-  farms: "🐄",
-  arctic: "❄️",
-  domes: "🛖",
-  boats: "⛵",
-};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function idEquals(a, b) {
@@ -213,7 +202,7 @@ function Lightbox({ images, startIndex, onClose }) {
           zIndex: 1,
         }}
       >
-        <X size={20} color="#fff" />
+        <X size={20} color={neutral[0]} />
       </motion.button>
 
       {/* Counter */}
@@ -285,7 +274,7 @@ function Lightbox({ images, startIndex, onClose }) {
               cursor: "pointer",
             }}
           >
-            <ChevronLeft size={22} color="#fff" />
+            <ChevronLeft size={22} color={neutral[0]} />
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.08 }}
@@ -310,7 +299,7 @@ function Lightbox({ images, startIndex, onClose }) {
               cursor: "pointer",
             }}
           >
-            <ChevronRight size={22} color="#fff" />
+            <ChevronRight size={22} color={neutral[0]} />
           </motion.button>
         </>
       )}
@@ -417,7 +406,7 @@ function ShareSheet({ open, onClose, listing }) {
             style={{
               width: "100%",
               maxWidth: 480,
-              background: "#fff",
+              background: neutral[0],
               borderRadius: "24px 24px 0 0",
               padding: "28px 28px 36px",
             }}
@@ -434,7 +423,7 @@ function ShareSheet({ open, onClose, listing }) {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.3rem",
-                  color: "#261f1a",
+                  color: neutral[800],
                   margin: 0,
                 }}
               >
@@ -443,7 +432,7 @@ function ShareSheet({ open, onClose, listing }) {
               <button
                 onClick={onClose}
                 style={{
-                  background: "#f4f1ee",
+                  background: neutral[100],
                   border: "none",
                   width: 32,
                   height: 32,
@@ -454,7 +443,7 @@ function ShareSheet({ open, onClose, listing }) {
                   cursor: "pointer",
                 }}
               >
-                <X size={15} color="#5c544c" />
+                <X size={15} color={neutral[600]} />
               </button>
             </div>
 
@@ -464,7 +453,7 @@ function ShareSheet({ open, onClose, listing }) {
                 display: "flex",
                 gap: 12,
                 padding: "12px",
-                background: "#faf8f6",
+                background: neutral[50],
                 borderRadius: 12,
                 marginBottom: 20,
                 border: "1px solid #ebe7e3",
@@ -486,7 +475,7 @@ function ShareSheet({ open, onClose, listing }) {
                   style={{
                     fontSize: "0.875rem",
                     fontWeight: 700,
-                    color: "#261f1a",
+                    color: neutral[800],
                     margin: 0,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -498,7 +487,7 @@ function ShareSheet({ open, onClose, listing }) {
                 <p
                   style={{
                     fontSize: "0.75rem",
-                    color: "#8a8179",
+                    color: neutral[500],
                     margin: "3px 0 0",
                   }}
                 >
@@ -525,7 +514,7 @@ function ShareSheet({ open, onClose, listing }) {
                     borderRadius: 10,
                     textDecoration: "none",
                     background: s.bg,
-                    color: "#fff",
+                    color: neutral[0],
                     fontSize: "0.8125rem",
                     fontWeight: 600,
                   }}
@@ -540,12 +529,12 @@ function ShareSheet({ open, onClose, listing }) {
               <div
                 style={{
                   flex: 1,
-                  background: "#f4f1ee",
+                  background: neutral[100],
                   border: "1.5px solid #ebe7e3",
                   borderRadius: 10,
                   padding: "10px 14px",
                   fontSize: "0.8125rem",
-                  color: "#8a8179",
+                  color: neutral[500],
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -562,9 +551,9 @@ function ShareSheet({ open, onClose, listing }) {
                   gap: 6,
                   padding: "10px 16px",
                   borderRadius: 10,
-                  background: copied ? "#10b981" : "#261f1a",
+                  background: copied ? semantic.success.base : neutral[800],
                   border: "none",
-                  color: "#fff",
+                  color: neutral[0],
                   fontSize: "0.8125rem",
                   fontWeight: 700,
                   cursor: "pointer",
@@ -604,8 +593,8 @@ function StarPicker({ value, onChange }) {
             width={26}
             height={26}
             viewBox="0 0 24 24"
-            fill={star <= value ? "#f59e0b" : "none"}
-            stroke={star <= value ? "#f59e0b" : "#9ca3af"}
+            fill={star <= value ? semantic.warning.base : "none"}
+            stroke={star <= value ? semantic.warning.base : "#9ca3af"}
             strokeWidth="1.5"
           >
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -656,7 +645,7 @@ function ReviewForm({ listingId }) {
             display: "block",
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: "#261f1a",
+            color: neutral[800],
             marginBottom: 8,
           }}
         >
@@ -673,7 +662,7 @@ function ReviewForm({ listingId }) {
           <p
             style={{
               fontSize: "0.8125rem",
-              color: "#ef4444",
+              color: semantic.error.base,
               margin: "6px 0 0",
             }}
           >
@@ -688,7 +677,7 @@ function ReviewForm({ listingId }) {
             display: "block",
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: "#261f1a",
+            color: neutral[800],
             marginBottom: 8,
           }}
         >
@@ -702,12 +691,12 @@ function ReviewForm({ listingId }) {
             width: "100%",
             padding: "12px 14px",
             boxSizing: "border-box",
-            border: `1.5px solid ${errors.comment ? "#ef4444" : "#d6d0ca"}`,
+            border: `1.5px solid ${errors.comment ? semantic.error.base : neutral[300]}`,
             borderRadius: 12,
             fontSize: "0.9375rem",
             fontFamily: "inherit",
-            color: "#261f1a",
-            background: "#fff",
+            color: neutral[800],
+            background: neutral[0],
             outline: "none",
             resize: "vertical",
             transition: "border-color 0.15s",
@@ -718,7 +707,7 @@ function ReviewForm({ listingId }) {
           <p
             style={{
               fontSize: "0.8125rem",
-              color: "#ef4444",
+              color: semantic.error.base,
               margin: "4px 0 0",
             }}
           >
@@ -736,10 +725,10 @@ function ReviewForm({ listingId }) {
           alignItems: "center",
           gap: 8,
           padding: "12px 24px",
-          background: "linear-gradient(135deg, #ff5a5f, #e84040)",
+          background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
           border: "none",
           borderRadius: 999,
-          color: "#fff",
+          color: neutral[0],
           fontSize: "0.9rem",
           fontWeight: 700,
           cursor: isPending ? "not-allowed" : "pointer",
@@ -770,7 +759,7 @@ function ReviewCard({ review, listingId }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       style={{
-        background: "#fff",
+        background: neutral[0],
         border: "1px solid #ebe7e3",
         borderRadius: 16,
         padding: "20px 22px",
@@ -796,7 +785,7 @@ function ReviewCard({ review, listingId }) {
               justifyContent: "center",
               fontWeight: 700,
               fontSize: "0.9375rem",
-              color: "#cc2828",
+              color: brand[700],
               flexShrink: 0,
             }}
           >
@@ -807,7 +796,7 @@ function ReviewCard({ review, listingId }) {
               style={{
                 fontWeight: 700,
                 fontSize: "0.875rem",
-                color: "#261f1a",
+                color: neutral[800],
                 margin: 0,
               }}
             >
@@ -820,8 +809,8 @@ function ReviewCard({ review, listingId }) {
                   width={13}
                   height={13}
                   viewBox="0 0 24 24"
-                  fill={s <= review.rating ? "#f59e0b" : "none"}
-                  stroke={s <= review.rating ? "#f59e0b" : "#d1d5db"}
+                  fill={s <= review.rating ? semantic.warning.base : "none"}
+                  stroke={s <= review.rating ? semantic.warning.base : "#d1d5db"}
                   strokeWidth="1.5"
                 >
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -832,7 +821,7 @@ function ReviewCard({ review, listingId }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {review.createdAt && (
-            <time style={{ fontSize: "0.75rem", color: "#b8b0a8" }}>
+            <time style={{ fontSize: "0.75rem", color: neutral[400] }}>
               {formatDate(review.createdAt)}
             </time>
           )}
@@ -848,7 +837,7 @@ function ReviewCard({ review, listingId }) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: "#b8b0a8",
+                color: neutral[400],
                 padding: 4,
                 borderRadius: 6,
                 display: "flex",
@@ -865,7 +854,7 @@ function ReviewCard({ review, listingId }) {
         style={{
           fontSize: "0.9375rem",
           lineHeight: 1.65,
-          color: "#3d3630",
+          color: neutral[700],
           margin: 0,
         }}
       >
@@ -950,7 +939,7 @@ export default function ListingShowPage() {
         <h2
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
-            color: "#261f1a",
+            color: neutral[800],
           }}
         >
           Listing not found
@@ -959,10 +948,10 @@ export default function ListingShowPage() {
           onClick={() => navigate("/listings")}
           style={{
             padding: "10px 24px",
-            background: "#ff5a5f",
+            background: brand[500],
             border: "none",
             borderRadius: 999,
-            color: "#fff",
+            color: neutral[0],
             fontWeight: 700,
             cursor: "pointer",
             fontFamily: "inherit",
@@ -1042,7 +1031,7 @@ export default function ListingShowPage() {
               cursor: "pointer",
               fontSize: "0.875rem",
               fontWeight: 600,
-              color: "#5c544c",
+              color: neutral[600],
               fontFamily: "inherit",
               padding: 0,
             }}
@@ -1074,7 +1063,7 @@ export default function ListingShowPage() {
                 <span
                   style={{
                     background: "rgba(255,90,95,0.1)",
-                    color: "#e84040",
+                    color: brand[600],
                     borderRadius: 999,
                     padding: "3px 10px",
                     fontSize: "0.72rem",
@@ -1088,8 +1077,8 @@ export default function ListingShowPage() {
                 {listing.featured && (
                   <span
                     style={{
-                      background: "linear-gradient(135deg, #ff5a5f, #e84040)",
-                      color: "#fff",
+                      background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
+                      color: neutral[0],
                       borderRadius: 999,
                       padding: "3px 10px",
                       fontSize: "0.72rem",
@@ -1110,7 +1099,7 @@ export default function ListingShowPage() {
                   fontWeight: 400,
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
-                  color: "#261f1a",
+                  color: neutral[800],
                   margin: 0,
                   maxWidth: 700,
                 }}
@@ -1130,27 +1119,27 @@ export default function ListingShowPage() {
                   <div
                     style={{ display: "flex", alignItems: "center", gap: 4 }}
                   >
-                    <Star size={14} fill="#f59e0b" stroke="none" />
+                    <Star size={14} fill={semantic.warning.base} stroke="none" />
                     <span
                       style={{
                         fontSize: "0.875rem",
                         fontWeight: 700,
-                        color: "#261f1a",
+                        color: neutral[800],
                       }}
                     >
                       {Number(avgRating).toFixed(1)}
                     </span>
-                    <span style={{ fontSize: "0.875rem", color: "#8a8179" }}>
+                    <span style={{ fontSize: "0.875rem", color: neutral[500] }}>
                       · {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
                     </span>
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <MapPin size={13} color="#b8b0a8" />
+                  <MapPin size={13} color={neutral[400]} />
                   <span
                     style={{
                       fontSize: "0.875rem",
-                      color: "#5c544c",
+                      color: neutral[600],
                       fontWeight: 500,
                     }}
                   >
@@ -1174,11 +1163,11 @@ export default function ListingShowPage() {
                     padding: "8px 16px",
                     border: "1.5px solid #d6d0ca",
                     borderRadius: 999,
-                    background: "#fff",
+                    background: neutral[0],
                     cursor: "pointer",
                     fontSize: "0.8125rem",
                     fontWeight: 600,
-                    color: "#3d3630",
+                    color: neutral[700],
                     fontFamily: "inherit",
                   }}
                 >
@@ -1206,13 +1195,13 @@ export default function ListingShowPage() {
                     alignItems: "center",
                     gap: 6,
                     padding: "8px 16px",
-                    border: `1.5px solid ${wishlisted ? "rgba(255,90,95,0.4)" : "#d6d0ca"}`,
+                    border: `1.5px solid ${wishlisted ? "rgba(255,90,95,0.4)" : neutral[300]}`,
                     borderRadius: 999,
-                    background: wishlisted ? "rgba(255,90,95,0.06)" : "#fff",
+                    background: wishlisted ? "rgba(255,90,95,0.06)" : neutral[0],
                     cursor: "pointer",
                     fontSize: "0.8125rem",
                     fontWeight: 600,
-                    color: wishlisted ? "#ff5a5f" : "#3d3630",
+                    color: wishlisted ? brand[500] : neutral[700],
                     fontFamily: "inherit",
                     transition: "all 0.2s",
                   }}
@@ -1223,8 +1212,8 @@ export default function ListingShowPage() {
                   >
                     <Heart
                       size={15}
-                      fill={wishlisted ? "#ff5a5f" : "none"}
-                      stroke={wishlisted ? "#ff5a5f" : "currentColor"}
+                      fill={wishlisted ? brand[500] : "none"}
+                      stroke={wishlisted ? brand[500] : "currentColor"}
                     />
                   </motion.div>
                   {wishlisted ? "Saved" : "Save"}
@@ -1246,7 +1235,7 @@ export default function ListingShowPage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#b8b0a8",
+                color: neutral[400],
                 fontSize: "3rem",
               }}
             >
@@ -1364,7 +1353,7 @@ export default function ListingShowPage() {
                       >
                         <span
                           style={{
-                            color: "#fff",
+                            color: neutral[0],
                             fontWeight: 700,
                             fontSize: "1.125rem",
                           }}
@@ -1402,7 +1391,7 @@ export default function ListingShowPage() {
                 borderRadius: 999,
                 fontSize: "0.8125rem",
                 fontWeight: 700,
-                color: "#261f1a",
+                color: neutral[800],
                 cursor: "pointer",
                 fontFamily: "inherit",
                 boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
@@ -1467,15 +1456,15 @@ export default function ListingShowPage() {
                       alignItems: "center",
                       gap: 7,
                       padding: "8px 14px",
-                      background: "#faf8f6",
+                      background: neutral[50],
                       border: "1px solid #ebe7e3",
                       borderRadius: 10,
                       fontSize: "0.875rem",
                       fontWeight: 600,
-                      color: "#3d3630",
+                      color: neutral[700],
                     }}
                   >
-                    <span style={{ color: "#ff5a5f" }}>{icon}</span>
+                    <span style={{ color: brand[500] }}>{icon}</span>
                     {label}
                   </div>
                 ))}
@@ -1505,7 +1494,7 @@ export default function ListingShowPage() {
                       sx={{
                         width: 52,
                         height: 52,
-                        background: "linear-gradient(135deg, #FF5A5F, #e84040)",
+                        background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
                         fontWeight: 700,
                         fontSize: "1.125rem",
                       }}
@@ -1521,14 +1510,14 @@ export default function ListingShowPage() {
                           width: 18,
                           height: 18,
                           borderRadius: "50%",
-                          background: "#10b981",
+                          background: semantic.success.base,
                           border: "2px solid #fff",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={10} color="#fff" strokeWidth={3} />
+                        <Check size={10} color={neutral[0]} strokeWidth={3} />
                       </div>
                     )}
                   </div>
@@ -1540,7 +1529,7 @@ export default function ListingShowPage() {
                         fontWeight: 700,
                         textTransform: "uppercase",
                         letterSpacing: "0.08em",
-                        color: "#b8b0a8",
+                        color: neutral[400],
                       }}
                     >
                       Hosted by
@@ -1550,7 +1539,7 @@ export default function ListingShowPage() {
                         margin: "2px 0 0",
                         fontWeight: 700,
                         fontSize: "1rem",
-                        color: "#261f1a",
+                        color: neutral[800],
                       }}
                     >
                       {listing.owner.firstName
@@ -1562,7 +1551,7 @@ export default function ListingShowPage() {
                         style={{
                           margin: "4px 0 0",
                           fontSize: "0.8125rem",
-                          color: "#8a8179",
+                          color: neutral[500],
                           lineHeight: 1.5,
                           maxWidth: 400,
                         }}
@@ -1599,11 +1588,11 @@ export default function ListingShowPage() {
                           alignItems: "center",
                           gap: 5,
                           fontSize: "0.75rem",
-                          color: "#5c544c",
+                          color: neutral[600],
                           fontWeight: 500,
                         }}
                       >
-                        <span style={{ color: "#10b981" }}>{icon}</span> {text}
+                        <span style={{ color: semantic.success.base }}>{icon}</span> {text}
                       </div>
                     ))}
                 </div>
@@ -1616,7 +1605,7 @@ export default function ListingShowPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.5rem",
-                  color: "#261f1a",
+                  color: neutral[800],
                   marginBottom: 14,
                 }}
               >
@@ -1626,7 +1615,7 @@ export default function ListingShowPage() {
                 style={{
                   fontSize: "1rem",
                   lineHeight: 1.75,
-                  color: "#5c544c",
+                  color: neutral[600],
                   margin: 0,
                 }}
               >
@@ -1641,7 +1630,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: "#261f1a",
+                    color: neutral[800],
                     marginBottom: 20,
                   }}
                 >
@@ -1674,12 +1663,12 @@ export default function ListingShowPage() {
                             border: "1px solid #ebe7e3",
                             borderRadius: 12,
                             fontSize: "0.875rem",
-                            color: "#3d3630",
+                            color: neutral[700],
                             fontWeight: 500,
-                            background: "#faf8f6",
+                            background: neutral[50],
                           }}
                         >
-                          <span style={{ color: "#8a8179", flexShrink: 0 }}>
+                          <span style={{ color: neutral[500], flexShrink: 0 }}>
                             {meta?.icon ?? <Check size={18} />}
                           </span>
                           {label}
@@ -1697,10 +1686,10 @@ export default function ListingShowPage() {
                       padding: "10px 20px",
                       border: "1.5px solid #d6d0ca",
                       borderRadius: 999,
-                      background: "#fff",
+                      background: neutral[0],
                       fontSize: "0.875rem",
                       fontWeight: 600,
-                      color: "#3d3630",
+                      color: neutral[700],
                       cursor: "pointer",
                       fontFamily: "inherit",
                     }}
@@ -1720,7 +1709,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: "#261f1a",
+                    color: neutral[800],
                     marginBottom: 16,
                   }}
                 >
@@ -1772,7 +1761,7 @@ export default function ListingShowPage() {
                         key={label}
                         style={{
                           padding: "12px 14px",
-                          background: "#faf8f6",
+                          background: neutral[50],
                           border: "1px solid #ebe7e3",
                           borderRadius: 12,
                         }}
@@ -1784,7 +1773,7 @@ export default function ListingShowPage() {
                             fontWeight: 700,
                             textTransform: "uppercase",
                             letterSpacing: "0.07em",
-                            color: "#b8b0a8",
+                            color: neutral[400],
                           }}
                         >
                           {label}
@@ -1794,7 +1783,7 @@ export default function ListingShowPage() {
                             margin: "4px 0 0",
                             fontSize: "0.875rem",
                             fontWeight: 600,
-                            color: "#3d3630",
+                            color: neutral[700],
                           }}
                         >
                           {value}
@@ -1817,7 +1806,7 @@ export default function ListingShowPage() {
                         key={i}
                         style={{
                           fontSize: "0.875rem",
-                          color: "#5c544c",
+                          color: neutral[600],
                           lineHeight: 1.6,
                         }}
                       >
@@ -1843,7 +1832,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: "#261f1a",
+                    color: neutral[800],
                     margin: 0,
                   }}
                 >
@@ -1853,17 +1842,17 @@ export default function ListingShowPage() {
                   <div
                     style={{ display: "flex", alignItems: "center", gap: 5 }}
                   >
-                    <Star size={16} fill="#f59e0b" stroke="none" />
+                    <Star size={16} fill={semantic.warning.base} stroke="none" />
                     <span
                       style={{
                         fontWeight: 700,
                         fontSize: "1rem",
-                        color: "#261f1a",
+                        color: neutral[800],
                       }}
                     >
                       {Number(avgRating).toFixed(1)}
                     </span>
-                    <span style={{ color: "#8a8179", fontSize: "0.875rem" }}>
+                    <span style={{ color: neutral[500], fontSize: "0.875rem" }}>
                       · {reviewCount} reviews
                     </span>
                   </div>
@@ -1879,7 +1868,7 @@ export default function ListingShowPage() {
                     gap: "8px 24px",
                     marginBottom: 28,
                     padding: "20px",
-                    background: "#faf8f6",
+                    background: neutral[50],
                     border: "1px solid #ebe7e3",
                     borderRadius: 16,
                   }}
@@ -1892,7 +1881,7 @@ export default function ListingShowPage() {
                       <span
                         style={{
                           fontSize: "0.8125rem",
-                          color: "#5c544c",
+                          color: neutral[600],
                           minWidth: 14,
                           textAlign: "right",
                         }}
@@ -1901,7 +1890,7 @@ export default function ListingShowPage() {
                       </span>
                       <Star
                         size={12}
-                        fill="#f59e0b"
+                        fill={semantic.warning.base}
                         stroke="none"
                         style={{ flexShrink: 0 }}
                       />
@@ -1929,7 +1918,7 @@ export default function ListingShowPage() {
                           }}
                           style={{
                             height: "100%",
-                            background: "#261f1a",
+                            background: neutral[800],
                             borderRadius: 2,
                           }}
                         />
@@ -1937,7 +1926,7 @@ export default function ListingShowPage() {
                       <span
                         style={{
                           fontSize: "0.75rem",
-                          color: "#b8b0a8",
+                          color: neutral[400],
                           minWidth: 20,
                         }}
                       >
@@ -1972,7 +1961,7 @@ export default function ListingShowPage() {
                   style={{
                     textAlign: "center",
                     padding: "40px 24px",
-                    background: "#faf8f6",
+                    background: neutral[50],
                     border: "1px dashed #d6d0ca",
                     borderRadius: 16,
                     marginBottom: 28,
@@ -1982,7 +1971,7 @@ export default function ListingShowPage() {
                   <p
                     style={{
                       fontWeight: 700,
-                      color: "#261f1a",
+                      color: neutral[800],
                       margin: "0 0 4px",
                     }}
                   >
@@ -1991,7 +1980,7 @@ export default function ListingShowPage() {
                   <p
                     style={{
                       fontSize: "0.875rem",
-                      color: "#8a8179",
+                      color: neutral[500],
                       margin: 0,
                     }}
                   >
@@ -2004,7 +1993,7 @@ export default function ListingShowPage() {
               {user && (
                 <div
                   style={{
-                    background: "#fff",
+                    background: neutral[0],
                     border: "1.5px solid #ebe7e3",
                     borderRadius: 18,
                     padding: "24px",
@@ -2014,7 +2003,7 @@ export default function ListingShowPage() {
                     style={{
                       fontFamily: "'DM Serif Display', Georgia, serif",
                       fontSize: "1.2rem",
-                      color: "#261f1a",
+                      color: neutral[800],
                       margin: "0 0 20px",
                     }}
                   >
@@ -2031,7 +2020,7 @@ export default function ListingShowPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.5rem",
-                  color: "#261f1a",
+                  color: neutral[800],
                   marginBottom: 8,
                 }}
               >
@@ -2040,14 +2029,14 @@ export default function ListingShowPage() {
               <p
                 style={{
                   fontSize: "0.9375rem",
-                  color: "#5c544c",
+                  color: neutral[600],
                   marginBottom: 16,
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
                 }}
               >
-                <MapPin size={15} color="#ff5a5f" />
+                <MapPin size={15} color={brand[500]} />
                 {listing.location}, {listing.country}
               </p>
               <div
@@ -2071,7 +2060,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: "#261f1a",
+                    color: neutral[800],
                     marginBottom: 20,
                   }}
                 >
@@ -2109,7 +2098,7 @@ export default function ListingShowPage() {
                               borderRadius: 16,
                               overflow: "hidden",
                               aspectRatio: "4/3",
-                              background: "#f4f1ee",
+                              background: neutral[100],
                               marginBottom: 10,
                             }}
                           >
@@ -2137,7 +2126,7 @@ export default function ListingShowPage() {
                             style={{
                               fontSize: "0.9rem",
                               fontWeight: 700,
-                              color: "#261f1a",
+                              color: neutral[800],
                               margin: "0 0 4px",
                               lineHeight: 1.3,
                               overflow: "hidden",
@@ -2151,7 +2140,7 @@ export default function ListingShowPage() {
                           <p
                             style={{
                               fontSize: "0.75rem",
-                              color: "#8a8179",
+                              color: neutral[500],
                               margin: "0 0 4px",
                             }}
                           >
@@ -2168,14 +2157,14 @@ export default function ListingShowPage() {
                               style={{
                                 fontWeight: 700,
                                 fontSize: "0.9rem",
-                                color: "#261f1a",
+                                color: neutral[800],
                               }}
                             >
                               ₹{Number(similar.price).toLocaleString("en-IN")}
                               <span
                                 style={{
                                   fontWeight: 400,
-                                  color: "#8a8179",
+                                  color: neutral[500],
                                   fontSize: "0.8rem",
                                 }}
                               >
@@ -2189,12 +2178,12 @@ export default function ListingShowPage() {
                                 gap: 3,
                               }}
                             >
-                              <Star size={11} fill="#f59e0b" stroke="none" />
+                              <Star size={11} fill={semantic.warning.base} stroke="none" />
                               <span
                                 style={{
                                   fontSize: "0.8rem",
                                   fontWeight: 600,
-                                  color: "#3d3630",
+                                  color: neutral[700],
                                 }}
                               >
                                 {Number(rating).toFixed(1)}
@@ -2218,7 +2207,7 @@ export default function ListingShowPage() {
                       borderRadius: 999,
                       fontSize: "0.875rem",
                       fontWeight: 600,
-                      color: "#3d3630",
+                      color: neutral[700],
                       textDecoration: "none",
                       transition: "all 0.15s",
                     }}
@@ -2239,7 +2228,7 @@ export default function ListingShowPage() {
                 style={{
                   textAlign: "center",
                   fontSize: "0.8125rem",
-                  color: "#b8b0a8",
+                  color: neutral[400],
                   marginTop: 12,
                   display: "flex",
                   alignItems: "center",

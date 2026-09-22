@@ -34,6 +34,8 @@ import {
   Filter,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { brand, neutral, semantic } from "../theme/tokens";
+import { CATEGORIES } from "../constants/categories";
 
 import { useSearch, usePriceHistogram } from "../hooks/useSearch";
 import SearchBar from "../components/search/SearchBar";
@@ -41,20 +43,6 @@ import PriceRangeSlider from "../components/search/PriceRangeSlider";
 import MapBoundsFilter from "../components/search/MapBoundsFilter";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const CATEGORIES = [
-  { key: null, icon: "⊞", label: "All" },
-  { key: "trending", icon: "🔥", label: "Trending" },
-  { key: "rooms", icon: "🛏", label: "Rooms" },
-  { key: "iconic", icon: "🏙", label: "Iconic" },
-  { key: "mountains", icon: "⛰", label: "Mountains" },
-  { key: "castles", icon: "🏰", label: "Castles" },
-  { key: "pools", icon: "🏊", label: "Pools" },
-  { key: "camping", icon: "⛺", label: "Camping" },
-  { key: "farms", icon: "🐄", label: "Farms" },
-  { key: "arctic", icon: "❄️", label: "Arctic" },
-  { key: "domes", icon: "🛖", label: "Domes" },
-  { key: "boats", icon: "⛵", label: "Boats" },
-];
 
 const AMENITIES_OPTIONS = [
   { key: "wifi", label: "Wifi", icon: <Wifi size={15} /> },
@@ -114,7 +102,7 @@ function CategoryBar({ active, onChange }) {
           width: 32,
           height: 32,
           borderRadius: "50%",
-          background: "#fff",
+          background: neutral[0],
           border: "1.5px solid #ebe7e3",
           display: "flex",
           alignItems: "center",
@@ -124,7 +112,7 @@ function CategoryBar({ active, onChange }) {
           boxShadow: "0 1px 6px rgba(0,0,0,0.08)",
         }}
       >
-        <ChevronLeft size={15} color="#5c544c" />
+        <ChevronLeft size={15} color={neutral[600]} />
       </motion.button>
       <div
         ref={scrollRef}
@@ -154,7 +142,7 @@ function CategoryBar({ active, onChange }) {
                 padding: "8px 14px",
                 borderRadius: 12,
                 flexShrink: 0,
-                border: `1.5px solid ${isActive ? "#261f1a" : "transparent"}`,
+                border: `1.5px solid ${isActive ? neutral[800] : "transparent"}`,
                 background: isActive ? "rgba(38,31,26,0.06)" : "transparent",
                 cursor: "pointer",
                 fontFamily: "inherit",
@@ -167,7 +155,7 @@ function CategoryBar({ active, onChange }) {
                 style={{
                   fontSize: "0.6875rem",
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? "#261f1a" : "#8a8179",
+                  color: isActive ? neutral[800] : neutral[500],
                   whiteSpace: "nowrap",
                   letterSpacing: "0.02em",
                 }}
@@ -184,7 +172,7 @@ function CategoryBar({ active, onChange }) {
                     transform: "translateX(-50%)",
                     width: 24,
                     height: 2.5,
-                    background: "#261f1a",
+                    background: neutral[800],
                     borderRadius: 999,
                   }}
                   transition={{ type: "spring", stiffness: 380, damping: 35 }}
@@ -202,7 +190,7 @@ function CategoryBar({ active, onChange }) {
           width: 32,
           height: 32,
           borderRadius: "50%",
-          background: "#fff",
+          background: neutral[0],
           border: "1.5px solid #ebe7e3",
           display: "flex",
           alignItems: "center",
@@ -211,7 +199,7 @@ function CategoryBar({ active, onChange }) {
           flexShrink: 0,
         }}
       >
-        <ChevronRight size={15} color="#5c544c" />
+        <ChevronRight size={15} color={neutral[600]} />
       </motion.button>
     </div>
   );
@@ -266,7 +254,7 @@ function FilterDrawer({
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
                 fontSize: "1.4rem",
-                color: "#261f1a",
+                color: neutral[800],
                 margin: 0,
               }}
             >
@@ -276,7 +264,7 @@ function FilterDrawer({
               <p
                 style={{
                   fontSize: "0.75rem",
-                  color: "#ff5a5f",
+                  color: brand[500],
                   margin: "2px 0 0",
                   fontWeight: 600,
                 }}
@@ -296,7 +284,7 @@ function FilterDrawer({
                   borderRadius: 999,
                   background: "transparent",
                   fontSize: "0.8rem",
-                  color: "#5c544c",
+                  color: neutral[600],
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}
@@ -311,7 +299,7 @@ function FilterDrawer({
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                background: "#f4f1ee",
+                background: neutral[100],
                 border: "none",
                 display: "flex",
                 alignItems: "center",
@@ -319,7 +307,7 @@ function FilterDrawer({
                 cursor: "pointer",
               }}
             >
-              <X size={17} color="#5c544c" />
+              <X size={17} color={neutral[600]} />
             </motion.button>
           </div>
         </div>
@@ -357,10 +345,10 @@ function FilterDrawer({
                     gap: 4,
                     padding: "8px 14px",
                     borderRadius: 10,
-                    border: `1.5px solid ${local.rating === r ? "#ff5a5f" : "#ebe7e3"}`,
+                    border: `1.5px solid ${local.rating === r ? brand[500] : neutral[200]}`,
                     background:
-                      local.rating === r ? "rgba(255,90,95,0.06)" : "#fff",
-                    color: local.rating === r ? "#ff5a5f" : "#5c544c",
+                      local.rating === r ? "rgba(255,90,95,0.06)" : neutral[0],
+                    color: local.rating === r ? brand[500] : neutral[600],
                     cursor: "pointer",
                     fontFamily: "inherit",
                     fontWeight: local.rating === r ? 700 : 500,
@@ -372,7 +360,7 @@ function FilterDrawer({
                     "Any"
                   ) : (
                     <>
-                      <Star size={12} fill="#f59e0b" stroke="none" /> {r}+
+                      <Star size={12} fill={semantic.warning.base} stroke="none" /> {r}+
                     </>
                   )}
                 </motion.button>
@@ -394,7 +382,7 @@ function FilterDrawer({
                   height: 36,
                   borderRadius: "50%",
                   border: "1.5px solid #ebe7e3",
-                  background: "#fff",
+                  background: neutral[0],
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -402,14 +390,14 @@ function FilterDrawer({
                   opacity: local.guests <= 1 ? 0.4 : 1,
                 }}
               >
-                <ChevronDown size={16} color="#5c544c" />
+                <ChevronDown size={16} color={neutral[600]} />
               </motion.button>
               <div style={{ textAlign: "center", minWidth: 64 }}>
                 <div
                   style={{
                     fontSize: "1.5rem",
                     fontWeight: 700,
-                    color: "#261f1a",
+                    color: neutral[800],
                     lineHeight: 1,
                   }}
                 >
@@ -418,7 +406,7 @@ function FilterDrawer({
                 <div
                   style={{
                     fontSize: "0.72rem",
-                    color: "#8a8179",
+                    color: neutral[500],
                     marginTop: 2,
                     fontWeight: 500,
                   }}
@@ -434,14 +422,14 @@ function FilterDrawer({
                   height: 36,
                   borderRadius: "50%",
                   border: "1.5px solid #ebe7e3",
-                  background: "#fff",
+                  background: neutral[0],
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
                 }}
               >
-                <ChevronUp size={16} color="#5c544c" />
+                <ChevronUp size={16} color={neutral[600]} />
               </motion.button>
             </div>
           </FSection>
@@ -475,9 +463,9 @@ function FilterDrawer({
                       gap: 8,
                       padding: "10px 12px",
                       borderRadius: 10,
-                      border: `1.5px solid ${isSelected ? "#ff5a5f" : "#ebe7e3"}`,
-                      background: isSelected ? "rgba(255,90,95,0.06)" : "#fff",
-                      color: isSelected ? "#ff5a5f" : "#5c544c",
+                      border: `1.5px solid ${isSelected ? brand[500] : neutral[200]}`,
+                      background: isSelected ? "rgba(255,90,95,0.06)" : neutral[0],
+                      color: isSelected ? brand[500] : neutral[600],
                       cursor: "pointer",
                       fontFamily: "inherit",
                       fontWeight: isSelected ? 600 : 400,
@@ -485,7 +473,7 @@ function FilterDrawer({
                       transition: "all 0.15s",
                     }}
                   >
-                    <span style={{ color: isSelected ? "#ff5a5f" : "#8a8179" }}>
+                    <span style={{ color: isSelected ? brand[500] : neutral[500] }}>
                       {icon}
                     </span>
                     {label}
@@ -513,8 +501,8 @@ function FilterDrawer({
               padding: "13px",
               border: "1.5px solid #ebe7e3",
               borderRadius: 12,
-              background: "#fff",
-              color: "#5c544c",
+              background: neutral[0],
+              color: neutral[600],
               fontSize: "0.9rem",
               fontWeight: 600,
               cursor: "pointer",
@@ -532,10 +520,10 @@ function FilterDrawer({
             style={{
               flex: 2,
               padding: "13px",
-              background: "linear-gradient(135deg, #ff5a5f, #e84040)",
+              background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
               border: "none",
               borderRadius: 12,
-              color: "#fff",
+              color: neutral[0],
               fontSize: "0.9rem",
               fontWeight: 700,
               cursor: "pointer",
@@ -559,7 +547,7 @@ function FSection({ title, subtitle, children }) {
           style={{
             fontSize: "1rem",
             fontWeight: 700,
-            color: "#261f1a",
+            color: neutral[800],
             margin: 0,
           }}
         >
@@ -567,7 +555,7 @@ function FSection({ title, subtitle, children }) {
         </h3>
         {subtitle && (
           <p
-            style={{ fontSize: "0.8rem", color: "#8a8179", margin: "3px 0 0" }}
+            style={{ fontSize: "0.8rem", color: neutral[500], margin: "3px 0 0" }}
           >
             {subtitle}
           </p>
@@ -634,7 +622,7 @@ function ListingCardGrid({ listing, index }) {
               borderRadius: 18,
               overflow: "hidden",
               aspectRatio: "4/3",
-              background: "#f4f1ee",
+              background: neutral[100],
             }}
           >
             <motion.img
@@ -671,12 +659,12 @@ function ListingCardGrid({ listing, index }) {
               {isFeatured ? (
                 <div
                   style={{
-                    background: "linear-gradient(135deg, #ff5a5f, #e84040)",
+                    background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
                     borderRadius: 999,
                     padding: "3px 10px",
                     fontSize: "0.65rem",
                     fontWeight: 700,
-                    color: "#fff",
+                    color: neutral[0],
                     letterSpacing: "0.05em",
                     textTransform: "uppercase",
                     display: "flex",
@@ -695,7 +683,7 @@ function ListingCardGrid({ listing, index }) {
                     padding: "3px 10px",
                     fontSize: "0.7rem",
                     fontWeight: 700,
-                    color: "#3d3630",
+                    color: neutral[700],
                     display: "flex",
                     alignItems: "center",
                     gap: 3,
@@ -742,8 +730,8 @@ function ListingCardGrid({ listing, index }) {
               >
                 <Heart
                   size={14}
-                  fill={wishlist ? "#ff5a5f" : "none"}
-                  stroke={wishlist ? "#ff5a5f" : "#3d3630"}
+                  fill={wishlist ? brand[500] : "none"}
+                  stroke={wishlist ? brand[500] : neutral[700]}
                   strokeWidth={2}
                 />
               </motion.div>
@@ -758,12 +746,12 @@ function ListingCardGrid({ listing, index }) {
                 marginBottom: 3,
               }}
             >
-              <MapPin size={10} color="#b8b0a8" />
+              <MapPin size={10} color={neutral[400]} />
               <span
                 style={{
                   fontSize: "0.7rem",
                   fontWeight: 600,
-                  color: "#b8b0a8",
+                  color: neutral[400],
                   letterSpacing: "0.05em",
                   textTransform: "uppercase",
                 }}
@@ -775,7 +763,7 @@ function ListingCardGrid({ listing, index }) {
               style={{
                 fontSize: "0.9375rem",
                 fontWeight: 700,
-                color: "#261f1a",
+                color: neutral[800],
                 lineHeight: 1.35,
                 margin: "0 0 6px",
                 display: "-webkit-box",
@@ -798,28 +786,28 @@ function ListingCardGrid({ listing, index }) {
                   style={{
                     fontWeight: 700,
                     fontSize: "0.9375rem",
-                    color: "#261f1a",
+                    color: neutral[800],
                   }}
                 >
                   ₹{price?.toLocaleString("en-IN")}
                 </span>
-                <span style={{ color: "#8a8179", fontSize: "0.8125rem" }}>
+                <span style={{ color: neutral[500], fontSize: "0.8125rem" }}>
                   {" "}
                   / night
                 </span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                <Star size={12} fill="#f59e0b" stroke="none" />
+                <Star size={12} fill={semantic.warning.base} stroke="none" />
                 <span
                   style={{
                     fontSize: "0.8125rem",
                     fontWeight: 700,
-                    color: "#3d3630",
+                    color: neutral[700],
                   }}
                 >
                   {Number(rating).toFixed(1)}
                 </span>
-                <span style={{ fontSize: "0.72rem", color: "#b8b0a8" }}>
+                <span style={{ fontSize: "0.72rem", color: neutral[400] }}>
                   ({reviews})
                 </span>
               </div>
@@ -853,7 +841,7 @@ function EmptyResults({ hasFilters, onReset }) {
           width: 80,
           height: 80,
           borderRadius: 24,
-          background: "linear-gradient(135deg, #fff1ef, #ffe1dc)",
+          background: `linear-gradient(135deg, ${brand[50]}, ${brand[100]})`,
           border: "1.5px solid #ffc1b8",
           display: "flex",
           alignItems: "center",
@@ -868,7 +856,7 @@ function EmptyResults({ hasFilters, onReset }) {
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "1.6rem",
-            color: "#261f1a",
+            color: neutral[800],
             margin: "0 0 8px",
           }}
         >
@@ -877,7 +865,7 @@ function EmptyResults({ hasFilters, onReset }) {
         <p
           style={{
             fontSize: "0.9375rem",
-            color: "#8a8179",
+            color: neutral[500],
             maxWidth: 360,
             margin: "0 auto",
             lineHeight: 1.6,
@@ -895,10 +883,10 @@ function EmptyResults({ hasFilters, onReset }) {
           onClick={onReset}
           style={{
             padding: "12px 28px",
-            background: "linear-gradient(135deg, #ff5a5f, #e84040)",
+            background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
             border: "none",
             borderRadius: 999,
-            color: "#fff",
+            color: neutral[0],
             fontSize: "0.9rem",
             fontWeight: 700,
             cursor: "pointer",
@@ -1029,7 +1017,7 @@ function ActiveChips({ filters, onRemove }) {
             borderRadius: 999,
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: "#261f1a",
+            color: neutral[800],
             cursor: "pointer",
             fontFamily: "inherit",
           }}
@@ -1137,12 +1125,12 @@ export default function ListingsPage() {
             alignItems: "center",
             gap: 7,
             padding: "9px 16px",
-            border: `1.5px solid ${activeFilterCount > 0 ? "#ff5a5f" : "#d6d0ca"}`,
+            border: `1.5px solid ${activeFilterCount > 0 ? brand[500] : neutral[300]}`,
             borderRadius: 10,
-            background: activeFilterCount > 0 ? "rgba(255,90,95,0.05)" : "#fff",
+            background: activeFilterCount > 0 ? "rgba(255,90,95,0.05)" : neutral[0],
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: activeFilterCount > 0 ? "#ff5a5f" : "#3d3630",
+            color: activeFilterCount > 0 ? brand[500] : neutral[700],
             cursor: "pointer",
             fontFamily: "inherit",
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
@@ -1154,8 +1142,8 @@ export default function ListingsPage() {
           {activeFilterCount > 0 && (
             <span
               style={{
-                background: "#ff5a5f",
-                color: "#fff",
+                background: brand[500],
+                color: neutral[0],
                 borderRadius: 999,
                 width: 18,
                 height: 18,
@@ -1184,10 +1172,10 @@ export default function ListingsPage() {
               padding: "9px 16px",
               border: "1.5px solid #d6d0ca",
               borderRadius: 10,
-              background: "#fff",
+              background: neutral[0],
               fontSize: "0.875rem",
               fontWeight: 600,
-              color: "#3d3630",
+              color: neutral[700],
               cursor: "pointer",
               fontFamily: "inherit",
               boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
@@ -1199,7 +1187,7 @@ export default function ListingsPage() {
               animate={{ rotate: sortOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ChevronDown size={13} color="#8a8179" />
+              <ChevronDown size={13} color={neutral[500]} />
             </motion.div>
           </motion.button>
           <AnimatePresence>
@@ -1227,7 +1215,7 @@ export default function ListingsPage() {
                 {SORT_OPTIONS.map((opt) => (
                   <motion.button
                     key={opt.value}
-                    whileHover={{ background: "#f4f1ee" }}
+                    whileHover={{ background: neutral[100] }}
                     onClick={() => {
                       setFilter("sort", opt.value);
                       setSortOpen(false);
@@ -1243,7 +1231,7 @@ export default function ListingsPage() {
                         filters.sort === opt.value
                           ? "rgba(255,90,95,0.06)"
                           : "transparent",
-                      color: filters.sort === opt.value ? "#ff5a5f" : "#3d3630",
+                      color: filters.sort === opt.value ? brand[500] : neutral[700],
                       fontSize: "0.875rem",
                       fontWeight: filters.sort === opt.value ? 700 : 500,
                       cursor: "pointer",
@@ -1271,7 +1259,7 @@ export default function ListingsPage() {
             border: "1.5px solid #d6d0ca",
             borderRadius: 10,
             overflow: "hidden",
-            background: "#fff",
+            background: neutral[0],
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
@@ -1286,10 +1274,10 @@ export default function ListingsPage() {
                 onClick={() => setViewMode(mode)}
                 style={{
                   padding: "8px 14px",
-                  background: viewMode === mode ? "#261f1a" : "transparent",
+                  background: viewMode === mode ? neutral[800] : "transparent",
                   border: "none",
                   cursor: "pointer",
-                  color: viewMode === mode ? "#fff" : "#8a8179",
+                  color: viewMode === mode ? neutral[0] : neutral[500],
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -1307,7 +1295,7 @@ export default function ListingsPage() {
           style={{
             marginLeft: "auto",
             fontSize: "0.8125rem",
-            color: isFetching ? "#ff5a5f" : "#8a8179",
+            color: isFetching ? brand[500] : neutral[500],
             fontWeight: 500,
             display: "flex",
             alignItems: "center",
@@ -1364,7 +1352,7 @@ export default function ListingsPage() {
             style={{
               margin: "32px auto",
               maxWidth: 520,
-              background: "#fef2f2",
+              background: semantic.error.light,
               border: "1.5px solid #fca5a5",
               borderRadius: 16,
               padding: "24px",
@@ -1385,7 +1373,7 @@ export default function ListingsPage() {
             <p
               style={{
                 fontSize: "0.875rem",
-                color: "#b91c1c",
+                color: semantic.error.text,
                 margin: "0 0 16px",
               }}
             >
@@ -1396,10 +1384,10 @@ export default function ListingsPage() {
               onClick={refetch}
               style={{
                 padding: "9px 20px",
-                background: "#ef4444",
+                background: semantic.error.base,
                 border: "none",
                 borderRadius: 999,
-                color: "#fff",
+                color: neutral[0],
                 fontWeight: 600,
                 fontSize: "0.875rem",
                 cursor: "pointer",
@@ -1501,14 +1489,14 @@ export default function ListingsPage() {
                       borderRadius: "10px",
                     },
                     "& .MuiPaginationItem-root.Mui-selected": {
-                      background: "linear-gradient(135deg, #ff5a5f, #e84040)",
-                      color: "#fff",
+                      background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
+                      color: neutral[0],
                       border: "none",
                     },
                   }}
                 />
                 <p
-                  style={{ fontSize: "0.8125rem", color: "#b8b0a8", margin: 0 }}
+                  style={{ fontSize: "0.8125rem", color: neutral[400], margin: 0 }}
                 >
                   Page {filters.page} of {pagination.totalPages} ·{" "}
                   {pagination.total?.toLocaleString()} total

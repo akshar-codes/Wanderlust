@@ -2,14 +2,16 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useListings } from "../hooks/useListings";
+import { brand, teal, neutral, semantic, fonts } from "../theme/tokens";
+import { CATEGORIES } from "../constants/categories";
 
 // ─── Inline styles injected once ─────────────────────────────────────────────
 const GLOBAL_CSS = `
 
   .hp-root {
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-    color: #1a1410;
-    background: #fdfcfb;
+    color: var(--color-neutral-800);
+    background: var(--color-neutral-25);
     overflow-x: hidden;
   }
 
@@ -42,7 +44,7 @@ const GLOBAL_CSS = `
 
   /* ── Skeleton ── */
   .hp-skeleton {
-    background: linear-gradient(90deg, #f0ece4 25%, #e6e1d9 50%, #f0ece4 75%);
+    background: linear-gradient(90deg, var(--color-neutral-100) 25%, var(--color-neutral-200) 50%, var(--color-neutral-100) 75%);
     background-size: 800px 100%;
     animation: hp-shimmer 1.5s ease-in-out infinite;
     border-radius: 12px;
@@ -70,42 +72,7 @@ const GLOBAL_CSS = `
 `;
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const C = {
-  coral: "#FF5A5F",
-  coralDark: "#E04E53",
-  coralLight: "#FFF0F0",
-  coralGlow: "rgba(255,90,95,0.22)",
-  teal: "#0D9488",
-  navy: "#1a1410",
-  navyLight: "#2d2520",
-  warmWhite: "#FDFCFB",
-  sand: "#F7F4EF",
-  sandDark: "#EDE9E2",
-  slate: "#6B7280",
-  slateLight: "#9CA3AF",
-  gold: "#F59E0B",
-  border: "#E8E3DC",
-  green: "#10B981",
-};
-
-const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
-const FONT_BODY = "'Plus Jakarta Sans', system-ui, sans-serif";
-
 // ─── Static data ──────────────────────────────────────────────────────────────
-const CATEGORIES = [
-  { key: null, icon: "✦", label: "All" },
-  { key: "trending", icon: "🔥", label: "Trending" },
-  { key: "rooms", icon: "🛏", label: "Rooms" },
-  { key: "iconic", icon: "🏙", label: "Iconic" },
-  { key: "mountains", icon: "⛰", label: "Mountains" },
-  { key: "castles", icon: "🏰", label: "Castles" },
-  { key: "pools", icon: "🏊", label: "Pools" },
-  { key: "camping", icon: "⛺", label: "Camping" },
-  { key: "farms", icon: "🐄", label: "Farms" },
-  { key: "arctic", icon: "❄️", label: "Arctic" },
-  { key: "domes", icon: "🛖", label: "Domes" },
-  { key: "boats", icon: "⛵", label: "Boats" },
-];
 
 const DESTINATIONS = [
   {
@@ -273,12 +240,12 @@ function SectionTitle({ eyebrow, title, subtitle, center = false }) {
       {eyebrow && (
         <p
           style={{
-            fontFamily: FONT_BODY,
+            fontFamily: fonts.body,
             fontSize: "0.72rem",
             fontWeight: 700,
             letterSpacing: "0.18em",
             textTransform: "uppercase",
-            color: C.coral,
+            color: brand[500],
             marginBottom: 10,
           }}
         >
@@ -287,11 +254,11 @@ function SectionTitle({ eyebrow, title, subtitle, center = false }) {
       )}
       <h2
         style={{
-          fontFamily: FONT_DISPLAY,
+          fontFamily: fonts.display,
           fontSize: "clamp(1.9rem, 3.2vw, 2.8rem)",
           fontWeight: 400,
           lineHeight: 1.12,
-          color: C.navy,
+          color: neutral[800],
           letterSpacing: "-0.01em",
           marginBottom: subtitle ? 12 : 0,
         }}
@@ -301,9 +268,9 @@ function SectionTitle({ eyebrow, title, subtitle, center = false }) {
       {subtitle && (
         <p
           style={{
-            fontFamily: FONT_BODY,
+            fontFamily: fonts.body,
             fontSize: "1rem",
-            color: C.slate,
+            color: neutral[500],
             lineHeight: 1.65,
             maxWidth: center ? 520 : "none",
             marginInline: center ? "auto" : undefined,
@@ -325,7 +292,7 @@ function Stars({ rating, size = 13 }) {
         <svg key={i} width={size} height={size} viewBox="0 0 24 24">
           <path
             d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-            fill={i <= Math.round(rating) ? C.gold : "#E5E7EB"}
+            fill={i <= Math.round(rating) ? semantic.warning.base : neutral[200]}
             stroke="none"
           />
         </svg>
@@ -395,7 +362,7 @@ function ListingCard({ listing, index }) {
             borderRadius: 18,
             overflow: "hidden",
             aspectRatio: "4/3",
-            background: "#f0ece4",
+            background: "var(--color-neutral-100)",
           }}
         >
           <motion.img
@@ -439,7 +406,7 @@ function ListingCard({ listing, index }) {
               gap: 5,
               fontSize: "0.72rem",
               fontWeight: 700,
-              color: C.navy,
+              color: neutral[800],
               letterSpacing: "0.03em",
             }}
           >
@@ -481,8 +448,8 @@ function ListingCard({ listing, index }) {
             <svg width={15} height={15} viewBox="0 0 24 24">
               <path
                 d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                fill={saved ? C.coral : "none"}
-                stroke={saved ? C.coral : C.navy}
+                fill={saved ? brand[500] : "none"}
+                stroke={saved ? brand[500] : neutral[800]}
                 strokeWidth={2}
                 strokeLinecap="round"
               />
@@ -505,7 +472,7 @@ function ListingCard({ listing, index }) {
               height={11}
               viewBox="0 0 24 24"
               fill="none"
-              stroke={C.slateLight}
+              stroke={neutral[400]}
               strokeWidth={2.5}
             >
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -515,7 +482,7 @@ function ListingCard({ listing, index }) {
               style={{
                 fontSize: "0.7rem",
                 fontWeight: 600,
-                color: C.slateLight,
+                color: neutral[400],
                 textTransform: "uppercase",
                 letterSpacing: "0.07em",
               }}
@@ -525,10 +492,10 @@ function ListingCard({ listing, index }) {
           </div>
           <h3
             style={{
-              fontFamily: FONT_DISPLAY,
+              fontFamily: fonts.display,
               fontSize: "1.05rem",
               fontWeight: 400,
-              color: C.navy,
+              color: neutral[800],
               lineHeight: 1.3,
               marginBottom: 8,
               display: "-webkit-box",
@@ -551,12 +518,12 @@ function ListingCard({ listing, index }) {
                 style={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: C.navy,
+                  color: neutral[800],
                 }}
               >
                 ₹{price?.toLocaleString("en-IN")}
               </span>
-              <span style={{ color: C.slate, fontSize: "0.8rem" }}>
+              <span style={{ color: neutral[500], fontSize: "0.8rem" }}>
                 {" "}
                 / night
               </span>
@@ -564,11 +531,11 @@ function ListingCard({ listing, index }) {
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <Stars rating={parseFloat(rating)} />
               <span
-                style={{ fontSize: "0.8rem", fontWeight: 600, color: C.navy }}
+                style={{ fontSize: "0.8rem", fontWeight: 600, color: neutral[800] }}
               >
                 {rating}
               </span>
-              <span style={{ fontSize: "0.72rem", color: C.slateLight }}>
+              <span style={{ fontSize: "0.72rem", color: neutral[400] }}>
                 ({reviews})
               </span>
             </div>
@@ -588,8 +555,8 @@ function ExperienceCard({ exp, index }) {
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       style={{
-        background: "#fff",
-        border: `1px solid ${C.border}`,
+        background: neutral[0],
+        border: `1px solid ${neutral[200]}`,
         borderRadius: 20,
         overflow: "hidden",
         cursor: "pointer",
@@ -628,7 +595,7 @@ function ExperienceCard({ exp, index }) {
             padding: "4px 12px",
             fontSize: "0.72rem",
             fontWeight: 600,
-            color: "#fff",
+            color: neutral[0],
             letterSpacing: "0.04em",
           }}
         >
@@ -648,10 +615,10 @@ function ExperienceCard({ exp, index }) {
         >
           <h3
             style={{
-              fontFamily: FONT_DISPLAY,
+              fontFamily: fonts.display,
               fontSize: "1.15rem",
               fontWeight: 400,
-              color: C.navy,
+              color: neutral[800],
               lineHeight: 1.25,
               flex: 1,
             }}
@@ -662,7 +629,7 @@ function ExperienceCard({ exp, index }) {
         <p
           style={{
             fontSize: "0.8rem",
-            color: C.slate,
+            color: neutral[500],
             marginBottom: 12,
             display: "flex",
             alignItems: "center",
@@ -674,7 +641,7 @@ function ExperienceCard({ exp, index }) {
             height={11}
             viewBox="0 0 24 24"
             fill="none"
-            stroke={C.slateLight}
+            stroke={neutral[400]}
             strokeWidth={2.5}
           >
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -688,16 +655,16 @@ function ExperienceCard({ exp, index }) {
             alignItems: "center",
             justifyContent: "space-between",
             paddingTop: 12,
-            borderTop: `1px solid ${C.border}`,
+            borderTop: `1px solid ${neutral[200]}`,
           }}
         >
           <div>
             <span
-              style={{ fontWeight: 700, fontSize: "0.95rem", color: C.navy }}
+              style={{ fontWeight: 700, fontSize: "0.95rem", color: neutral[800] }}
             >
               ₹{exp.price.toLocaleString("en-IN")}
             </span>
-            <span style={{ color: C.slate, fontSize: "0.78rem" }}>
+            <span style={{ color: neutral[500], fontSize: "0.78rem" }}>
               {" "}
               / person
             </span>
@@ -705,11 +672,11 @@ function ExperienceCard({ exp, index }) {
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <Stars rating={exp.rating} />
             <span
-              style={{ fontSize: "0.8rem", fontWeight: 700, color: C.navy }}
+              style={{ fontSize: "0.8rem", fontWeight: 700, color: neutral[800] }}
             >
               {exp.rating}
             </span>
-            <span style={{ fontSize: "0.72rem", color: C.slateLight }}>
+            <span style={{ fontSize: "0.72rem", color: neutral[400] }}>
               ({exp.reviews})
             </span>
           </div>
@@ -780,7 +747,7 @@ function DestinationCard({ dest, index, isLarge }) {
             padding: "4px 13px",
             fontSize: "0.7rem",
             fontWeight: 700,
-            color: "#fff",
+            color: neutral[0],
             letterSpacing: "0.06em",
             textTransform: "uppercase",
           }}
@@ -800,10 +767,10 @@ function DestinationCard({ dest, index, isLarge }) {
         >
           <h3
             style={{
-              fontFamily: FONT_DISPLAY,
+              fontFamily: fonts.display,
               fontSize: isLarge ? "2rem" : "1.4rem",
               fontWeight: 400,
-              color: "#fff",
+              color: neutral[0],
               lineHeight: 1.1,
               marginBottom: 5,
             }}
@@ -837,7 +804,7 @@ function DestinationCard({ dest, index, isLarge }) {
                 height={13}
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#fff"
+                stroke={neutral[0]}
                 strokeWidth={2.5}
                 strokeLinecap="round"
               >
@@ -858,8 +825,8 @@ function TestimonialCard({ t, index }) {
       variants={fadeUp}
       custom={index * 0.5}
       style={{
-        background: "#fff",
-        border: `1px solid ${C.border}`,
+        background: neutral[0],
+        border: `1px solid ${neutral[200]}`,
         borderRadius: 22,
         padding: "28px 28px 26px",
         display: "flex",
@@ -876,7 +843,7 @@ function TestimonialCard({ t, index }) {
           position: "absolute",
           top: 20,
           right: 24,
-          fontFamily: FONT_DISPLAY,
+          fontFamily: fonts.display,
           fontSize: "5rem",
           lineHeight: 1,
           color: "rgba(255,90,95,0.08)",
@@ -893,11 +860,11 @@ function TestimonialCard({ t, index }) {
       {/* Text */}
       <p
         style={{
-          fontFamily: FONT_DISPLAY,
+          fontFamily: fonts.display,
           fontSize: "1.05rem",
           fontWeight: 300,
           lineHeight: 1.7,
-          color: C.navy,
+          color: neutral[800],
           fontStyle: "italic",
           flex: 1,
         }}
@@ -912,11 +879,11 @@ function TestimonialCard({ t, index }) {
           alignItems: "center",
           gap: 6,
           padding: "5px 12px",
-          background: C.coralLight,
+          background: brand[50],
           borderRadius: 999,
           fontSize: "0.72rem",
           fontWeight: 700,
-          color: C.coralDark,
+          color: brand[600],
           letterSpacing: "0.03em",
           alignSelf: "flex-start",
         }}
@@ -941,7 +908,7 @@ function TestimonialCard({ t, index }) {
           alignItems: "center",
           gap: 12,
           paddingTop: 12,
-          borderTop: `1px solid ${C.border}`,
+          borderTop: `1px solid ${neutral[200]}`,
         }}
       >
         <div
@@ -953,9 +920,9 @@ function TestimonialCard({ t, index }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: FONT_DISPLAY,
+            fontFamily: fonts.display,
             fontSize: "1.1rem",
-            color: "#fff",
+            color: neutral[0],
             flexShrink: 0,
           }}
         >
@@ -966,13 +933,13 @@ function TestimonialCard({ t, index }) {
             style={{
               fontWeight: 700,
               fontSize: "0.875rem",
-              color: C.navy,
+              color: neutral[800],
               marginBottom: 1,
             }}
           >
             {t.name}
           </p>
-          <p style={{ fontSize: "0.75rem", color: C.slate }}>
+          <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
             {t.location} · {t.date}
           </p>
         </div>
@@ -1006,9 +973,9 @@ function HeroSearch({ listings }) {
   const fieldStyle = (key) => ({
     flex: 1,
     padding: "16px 22px",
-    borderRight: key !== "guests" ? `1px solid ${C.border}` : "none",
+    borderRight: key !== "guests" ? `1px solid ${neutral[200]}` : "none",
     cursor: "text",
-    background: focused === key ? "#fff" : "transparent",
+    background: focused === key ? neutral[0] : "transparent",
     transition: "background 0.2s",
   });
 
@@ -1017,9 +984,9 @@ function HeroSearch({ listings }) {
       <form onSubmit={handleSearch}>
         <div
           style={{
-            background: "#fff",
+            background: neutral[0],
             borderRadius: 24,
-            border: `1.5px solid ${C.border}`,
+            border: `1.5px solid ${neutral[200]}`,
             boxShadow:
               "0 20px 60px rgba(26,20,16,0.14), 0 4px 16px rgba(26,20,16,0.08)",
             overflow: "hidden",
@@ -1034,7 +1001,7 @@ function HeroSearch({ listings }) {
                 fontSize: "0.65rem",
                 fontWeight: 800,
                 letterSpacing: "0.12em",
-                color: C.navy,
+                color: neutral[800],
                 textTransform: "uppercase",
                 marginBottom: 4,
               }}
@@ -1052,9 +1019,9 @@ function HeroSearch({ listings }) {
                 border: "none",
                 outline: "none",
                 background: "transparent",
-                fontFamily: FONT_BODY,
+                fontFamily: fonts.body,
                 fontSize: "0.9rem",
-                color: C.navy,
+                color: neutral[800],
                 width: "100%",
                 padding: 0,
               }}
@@ -1068,7 +1035,7 @@ function HeroSearch({ listings }) {
                 fontSize: "0.65rem",
                 fontWeight: 800,
                 letterSpacing: "0.12em",
-                color: C.navy,
+                color: neutral[800],
                 textTransform: "uppercase",
                 marginBottom: 4,
               }}
@@ -1086,9 +1053,9 @@ function HeroSearch({ listings }) {
                 border: "none",
                 outline: "none",
                 background: "transparent",
-                fontFamily: FONT_BODY,
+                fontFamily: fonts.body,
                 fontSize: "0.9rem",
-                color: C.navy,
+                color: neutral[800],
                 width: "100%",
                 padding: 0,
               }}
@@ -1105,7 +1072,7 @@ function HeroSearch({ listings }) {
                 fontSize: "0.65rem",
                 fontWeight: 800,
                 letterSpacing: "0.12em",
-                color: C.navy,
+                color: neutral[800],
                 textTransform: "uppercase",
                 marginBottom: 4,
               }}
@@ -1121,9 +1088,9 @@ function HeroSearch({ listings }) {
                 border: "none",
                 outline: "none",
                 background: "transparent",
-                fontFamily: FONT_BODY,
+                fontFamily: fonts.body,
                 fontSize: "0.9rem",
-                color: C.navy,
+                color: neutral[800],
                 width: "100%",
                 cursor: "pointer",
                 padding: 0,
@@ -1152,7 +1119,7 @@ function HeroSearch({ listings }) {
               whileTap={{ scale: 0.96 }}
               type="submit"
               style={{
-                background: `linear-gradient(135deg, ${C.coral} 0%, ${C.coralDark} 100%)`,
+                background: `linear-gradient(135deg, ${brand[500]} 0%, ${brand[600]} 100%)`,
                 border: "none",
                 borderRadius: 16,
                 width: 52,
@@ -1171,7 +1138,7 @@ function HeroSearch({ listings }) {
                 height={20}
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#fff"
+                stroke={neutral[0]}
                 strokeWidth={2.5}
                 strokeLinecap="round"
               >
@@ -1215,11 +1182,11 @@ function HeroSearch({ listings }) {
                       ? "rgba(255,255,255,0.25)"
                       : "rgba(255,255,255,0.1)",
                   backdropFilter: "blur(10px)",
-                  color: "#fff",
+                  color: neutral[0],
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   cursor: "pointer",
-                  fontFamily: FONT_BODY,
+                  fontFamily: fonts.body,
                   transition: "all 0.15s",
                 }}
               >
@@ -1278,7 +1245,7 @@ function HeroSection({ listings }) {
             left: 0,
             right: 0,
             height: 200,
-            background: "linear-gradient(to top, #fdfcfb 0%, transparent 100%)",
+            background: "linear-gradient(to top, var(--color-neutral-25) 0%, transparent 100%)",
           }}
         />
       </div>
@@ -1322,7 +1289,7 @@ function HeroSection({ listings }) {
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                background: C.coral,
+                background: brand[500],
                 animation: "hp-pulse-dot 2s ease infinite",
               }}
             />
@@ -1346,10 +1313,10 @@ function HeroSection({ listings }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            fontFamily: FONT_DISPLAY,
+            fontFamily: fonts.display,
             fontSize: "clamp(3rem, 7vw, 6rem)",
             fontWeight: 300,
-            color: "#fff",
+            color: neutral[0],
             lineHeight: 1.06,
             letterSpacing: "-0.015em",
             marginBottom: 20,
@@ -1357,7 +1324,7 @@ function HeroSection({ listings }) {
           }}
         >
           Where will your{" "}
-          <em style={{ fontStyle: "italic", color: C.coral }}>next story</em>{" "}
+          <em style={{ fontStyle: "italic", color: brand[500] }}>next story</em>{" "}
           begin?
         </motion.h1>
 
@@ -1367,7 +1334,7 @@ function HeroSection({ listings }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
           style={{
-            fontFamily: FONT_BODY,
+            fontFamily: fonts.body,
             fontSize: "1.05rem",
             color: "rgba(255,255,255,0.75)",
             fontWeight: 300,
@@ -1412,9 +1379,9 @@ function HeroSection({ listings }) {
             <div key={l} style={{ textAlign: "center" }}>
               <p
                 style={{
-                  fontFamily: FONT_DISPLAY,
+                  fontFamily: fonts.display,
                   fontSize: "1.8rem",
-                  color: "#fff",
+                  color: neutral[0],
                   lineHeight: 1,
                   marginBottom: 4,
                   fontWeight: 400,
@@ -1454,25 +1421,25 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
     <Reveal>
       <section
         style={{
-          background: C.sand,
+          background: neutral[50],
           padding: "52px 0 44px",
-          borderTop: `1px solid ${C.border}`,
-          borderBottom: `1px solid ${C.border}`,
+          borderTop: `1px solid ${neutral[200]}`,
+          borderBottom: `1px solid ${neutral[200]}`,
         }}
       >
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {/* Left scroll */}
             <motion.button
-              whileHover={{ scale: 1.08, background: "#fff" }}
+              whileHover={{ scale: 1.08, background: neutral[0] }}
               whileTap={{ scale: 0.93 }}
               onClick={() => scroll(-1)}
               style={{
                 width: 38,
                 height: 38,
                 borderRadius: "50%",
-                background: "#fff",
-                border: `1.5px solid ${C.border}`,
+                background: neutral[0],
+                border: `1.5px solid ${neutral[200]}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1487,7 +1454,7 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                 height={14}
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={C.slate}
+                stroke={neutral[500]}
                 strokeWidth={2.5}
                 strokeLinecap="round"
               >
@@ -1525,12 +1492,12 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                       gap: 7,
                       padding: "14px 20px",
                       borderRadius: 18,
-                      border: `1.5px solid ${active ? C.navy : "transparent"}`,
-                      background: active ? "rgba(26,20,16,0.07)" : "#fff",
+                      border: `1.5px solid ${active ? neutral[800] : "transparent"}`,
+                      background: active ? "rgba(26,20,16,0.07)" : neutral[0],
                       cursor: "pointer",
                       whiteSpace: "nowrap",
                       flexShrink: 0,
-                      fontFamily: FONT_BODY,
+                      fontFamily: fonts.body,
                       boxShadow: active
                         ? "none"
                         : "0 1px 4px rgba(26,20,16,0.06)",
@@ -1546,7 +1513,7 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                       style={{
                         fontSize: "0.68rem",
                         fontWeight: active ? 700 : 600,
-                        color: active ? C.navy : C.slate,
+                        color: active ? neutral[800] : neutral[500],
                         letterSpacing: "0.04em",
                       }}
                     >
@@ -1562,7 +1529,7 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                           transform: "translateX(-50%)",
                           width: 24,
                           height: 2.5,
-                          background: C.navy,
+                          background: neutral[800],
                           borderRadius: 999,
                         }}
                         transition={{
@@ -1579,15 +1546,15 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
 
             {/* Right scroll */}
             <motion.button
-              whileHover={{ scale: 1.08, background: "#fff" }}
+              whileHover={{ scale: 1.08, background: neutral[0] }}
               whileTap={{ scale: 0.93 }}
               onClick={() => scroll(1)}
               style={{
                 width: 38,
                 height: 38,
                 borderRadius: "50%",
-                background: "#fff",
-                border: `1.5px solid ${C.border}`,
+                background: neutral[0],
+                border: `1.5px solid ${neutral[200]}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1602,7 +1569,7 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                 height={14}
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={C.slate}
+                stroke={neutral[500]}
                 strokeWidth={2.5}
                 strokeLinecap="round"
               >
@@ -1649,7 +1616,7 @@ function FeaturedListingsSection({ activeCategory }) {
               activeCategory ? (
                 <>
                   The finest{" "}
-                  <em style={{ fontStyle: "italic", color: C.coral }}>
+                  <em style={{ fontStyle: "italic", color: brand[500] }}>
                     {catLabel}
                   </em>{" "}
                   stays
@@ -1657,7 +1624,7 @@ function FeaturedListingsSection({ activeCategory }) {
               ) : (
                 <>
                   Stays worth{" "}
-                  <em style={{ fontStyle: "italic", color: C.coral }}>
+                  <em style={{ fontStyle: "italic", color: brand[500] }}>
                     remembering
                   </em>
                 </>
@@ -1672,9 +1639,9 @@ function FeaturedListingsSection({ activeCategory }) {
               gap: 6,
               fontSize: "0.875rem",
               fontWeight: 700,
-              color: C.navy,
+              color: neutral[800],
               textDecoration: "none",
-              borderBottom: `1.5px solid ${C.navy}`,
+              borderBottom: `1.5px solid ${neutral[800]}`,
               paddingBottom: 2,
               whiteSpace: "nowrap",
               flexShrink: 0,
@@ -1718,15 +1685,15 @@ function FeaturedListingsSection({ activeCategory }) {
               key="empty"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              style={{ textAlign: "center", padding: "60px 0", color: C.slate }}
+              style={{ textAlign: "center", padding: "60px 0", color: neutral[500] }}
             >
               <div style={{ fontSize: "3rem", marginBottom: 16 }}>🔍</div>
               <p
                 style={{
-                  fontFamily: FONT_DISPLAY,
+                  fontFamily: fonts.display,
                   fontSize: "1.4rem",
                   marginBottom: 16,
-                  color: C.navy,
+                  color: neutral[800],
                 }}
               >
                 No listings found
@@ -1735,14 +1702,14 @@ function FeaturedListingsSection({ activeCategory }) {
                 onClick={() => {}}
                 style={{
                   padding: "10px 24px",
-                  border: `1.5px solid ${C.coral}`,
+                  border: `1.5px solid ${brand[500]}`,
                   borderRadius: 999,
                   background: "transparent",
-                  color: C.coral,
+                  color: brand[500],
                   fontWeight: 600,
                   fontSize: "0.875rem",
                   cursor: "pointer",
-                  fontFamily: FONT_BODY,
+                  fontFamily: fonts.body,
                 }}
               >
                 Clear filters
@@ -1776,7 +1743,7 @@ function Ticker() {
   return (
     <div
       style={{
-        background: C.navy,
+        background: neutral[800],
         overflow: "hidden",
         padding: "14px 0",
         borderTop: `1px solid rgba(255,255,255,0.05)`,
@@ -1811,7 +1778,7 @@ function Ticker() {
                 width: 4,
                 height: 4,
                 borderRadius: "50%",
-                background: C.coral,
+                background: brand[500],
                 display: "inline-block",
               }}
             />
@@ -1844,7 +1811,7 @@ function TrendingDestinationsSection() {
             title={
               <>
                 Trending{" "}
-                <em style={{ fontStyle: "italic", color: C.coral }}>
+                <em style={{ fontStyle: "italic", color: brand[500] }}>
                   destinations
                 </em>
               </>
@@ -1859,9 +1826,9 @@ function TrendingDestinationsSection() {
               gap: 6,
               fontSize: "0.875rem",
               fontWeight: 700,
-              color: C.navy,
+              color: neutral[800],
               textDecoration: "none",
-              borderBottom: `1.5px solid ${C.navy}`,
+              borderBottom: `1.5px solid ${neutral[800]}`,
               paddingBottom: 2,
               whiteSpace: "nowrap",
               flexShrink: 0,
@@ -1915,9 +1882,9 @@ function ExperiencesSection() {
     <Reveal>
       <section
         style={{
-          background: C.sand,
+          background: neutral[50],
           padding: "72px 0",
-          borderTop: `1px solid ${C.border}`,
+          borderTop: `1px solid ${neutral[200]}`,
         }}
       >
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
@@ -1936,7 +1903,7 @@ function ExperiencesSection() {
               title={
                 <>
                   More than a place to{" "}
-                  <em style={{ fontStyle: "italic", color: C.coral }}>sleep</em>
+                  <em style={{ fontStyle: "italic", color: brand[500] }}>sleep</em>
                 </>
               }
               subtitle="Local experiences that turn a trip into a memory."
@@ -1949,9 +1916,9 @@ function ExperiencesSection() {
                 gap: 6,
                 fontSize: "0.875rem",
                 fontWeight: 700,
-                color: C.navy,
+                color: neutral[800],
                 textDecoration: "none",
-                borderBottom: `1.5px solid ${C.navy}`,
+                borderBottom: `1.5px solid ${neutral[800]}`,
                 paddingBottom: 2,
                 whiteSpace: "nowrap",
                 flexShrink: 0,
@@ -2008,7 +1975,7 @@ function HostCTASection() {
             minHeight: 420,
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            background: C.navy,
+            background: neutral[800],
           }}
         >
           {/* Left: Content */}
@@ -2030,7 +1997,7 @@ function HostCTASection() {
                   fontWeight: 800,
                   letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: C.coral,
+                  color: brand[500],
                   marginBottom: 14,
                 }}
               >
@@ -2038,22 +2005,22 @@ function HostCTASection() {
               </p>
               <h2
                 style={{
-                  fontFamily: FONT_DISPLAY,
+                  fontFamily: fonts.display,
                   fontSize: "clamp(2rem, 3.5vw, 3rem)",
                   fontWeight: 300,
-                  color: "#fff",
+                  color: neutral[0],
                   lineHeight: 1.12,
                   marginBottom: 16,
                 }}
               >
                 Your home could be{" "}
-                <em style={{ fontStyle: "italic", color: C.coral }}>
+                <em style={{ fontStyle: "italic", color: brand[500] }}>
                   someone's dream
                 </em>
               </h2>
               <p
                 style={{
-                  fontFamily: FONT_BODY,
+                  fontFamily: fonts.body,
                   fontSize: "1rem",
                   color: "rgba(255,255,255,0.6)",
                   lineHeight: 1.65,
@@ -2104,14 +2071,14 @@ function HostCTASection() {
                     alignItems: "center",
                     gap: 8,
                     padding: "14px 28px",
-                    background: C.coral,
+                    background: brand[500],
                     borderRadius: 999,
-                    color: "#fff",
+                    color: neutral[0],
                     fontWeight: 700,
                     fontSize: "0.9375rem",
                     textDecoration: "none",
                     boxShadow: "0 8px 28px rgba(255,90,95,0.35)",
-                    fontFamily: FONT_BODY,
+                    fontFamily: fonts.body,
                   }}
                 >
                   Start hosting
@@ -2145,7 +2112,7 @@ function HostCTASection() {
                     fontWeight: 600,
                     fontSize: "0.9375rem",
                     cursor: "pointer",
-                    fontFamily: FONT_BODY,
+                    fontFamily: fonts.body,
                     transition: "border-color 0.15s",
                   }}
                 >
@@ -2210,7 +2177,7 @@ function HostCTASection() {
                 style={{
                   fontSize: "0.7rem",
                   fontWeight: 700,
-                  color: C.slate,
+                  color: neutral[500],
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   marginBottom: 6,
@@ -2220,9 +2187,9 @@ function HostCTASection() {
               </p>
               <p
                 style={{
-                  fontFamily: FONT_DISPLAY,
+                  fontFamily: fonts.display,
                   fontSize: "2rem",
-                  color: C.navy,
+                  color: neutral[800],
                   fontWeight: 400,
                   lineHeight: 1,
                   marginBottom: 4,
@@ -2230,7 +2197,7 @@ function HostCTASection() {
               >
                 ₹45,000
               </p>
-              <p style={{ fontSize: "0.75rem", color: C.slate }}>
+              <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
                 per month for 3-bed homes
               </p>
               <div
@@ -2246,13 +2213,13 @@ function HostCTASection() {
                     width: 6,
                     height: 6,
                     borderRadius: "50%",
-                    background: C.green,
+                    background: semantic.success.base,
                   }}
                 />
                 <span
                   style={{
                     fontSize: "0.72rem",
-                    color: C.green,
+                    color: semantic.success.base,
                     fontWeight: 700,
                   }}
                 >
@@ -2273,10 +2240,10 @@ function TestimonialsSection() {
     <Reveal>
       <section
         style={{
-          background: C.sand,
+          background: neutral[50],
           padding: "72px 0",
-          borderTop: `1px solid ${C.border}`,
-          borderBottom: `1px solid ${C.border}`,
+          borderTop: `1px solid ${neutral[200]}`,
+          borderBottom: `1px solid ${neutral[200]}`,
         }}
       >
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
@@ -2286,7 +2253,7 @@ function TestimonialsSection() {
               title={
                 <>
                   Stories from{" "}
-                  <em style={{ fontStyle: "italic", color: C.coral }}>
+                  <em style={{ fontStyle: "italic", color: brand[500] }}>
                     real guests
                   </em>
                 </>
@@ -2321,7 +2288,7 @@ function TestimonialsSection() {
               gap: 32,
               marginTop: 48,
               paddingTop: 40,
-              borderTop: `1px solid ${C.border}`,
+              borderTop: `1px solid ${neutral[200]}`,
               flexWrap: "wrap",
             }}
           >
@@ -2339,7 +2306,7 @@ function TestimonialsSection() {
                   style={{
                     fontSize: "0.85rem",
                     fontWeight: 600,
-                    color: C.navy,
+                    color: neutral[800],
                   }}
                 >
                   {label}
@@ -2359,7 +2326,7 @@ function MiniFooterCTA() {
     <Reveal>
       <section
         style={{
-          background: C.navy,
+          background: neutral[800],
           padding: "64px 32px",
           textAlign: "center",
         }}
@@ -2367,22 +2334,22 @@ function MiniFooterCTA() {
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <p
             style={{
-              fontFamily: FONT_DISPLAY,
+              fontFamily: fonts.display,
               fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
               fontWeight: 300,
-              color: "#fff",
+              color: neutral[0],
               lineHeight: 1.2,
               marginBottom: 18,
             }}
           >
             Ready to find your{" "}
-            <em style={{ fontStyle: "italic", color: C.coral }}>
+            <em style={{ fontStyle: "italic", color: brand[500] }}>
               perfect stay?
             </em>
           </p>
           <p
             style={{
-              fontFamily: FONT_BODY,
+              fontFamily: fonts.body,
               fontSize: "0.95rem",
               color: "rgba(255,255,255,0.55)",
               fontWeight: 300,
@@ -2412,14 +2379,14 @@ function MiniFooterCTA() {
                   alignItems: "center",
                   gap: 8,
                   padding: "15px 32px",
-                  background: C.coral,
+                  background: brand[500],
                   borderRadius: 999,
-                  color: "#fff",
+                  color: neutral[0],
                   fontWeight: 700,
                   fontSize: "0.9375rem",
                   textDecoration: "none",
                   boxShadow: "0 8px 28px rgba(255,90,95,0.4)",
-                  fontFamily: FONT_BODY,
+                  fontFamily: fonts.body,
                 }}
               >
                 Explore stays
@@ -2440,7 +2407,7 @@ function MiniFooterCTA() {
                   fontWeight: 600,
                   fontSize: "0.9375rem",
                   textDecoration: "none",
-                  fontFamily: FONT_BODY,
+                  fontFamily: fonts.body,
                 }}
               >
                 Become a host
@@ -2465,7 +2432,7 @@ const RESPONSIVE_CSS = `
     .hp-host-grid > *:last-child { display: none; }
     .hp-dest-grid { grid-template-columns: 1fr !important; grid-template-rows: auto !important; }
     .hp-search-bar { flex-direction: column !important; border-radius: 20px !important; }
-    .hp-search-field { border-right: none !important; border-bottom: 1px solid #E8E3DC; }
+    .hp-search-field { border-right: none !important; border-bottom: 1px solid var(--color-neutral-200); }
     .hp-search-field:last-of-type { border-bottom: none; }
   }
 `;

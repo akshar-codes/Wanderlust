@@ -3,20 +3,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const CATEGORIES = [
-  { key: null, icon: "⊞", label: "All" },
-  { key: "trending", icon: "🔥", label: "Trending" },
-  { key: "rooms", icon: "🛏", label: "Rooms" },
-  { key: "iconic", icon: "🏙", label: "Iconic City" },
-  { key: "mountains", icon: "⛰", label: "Mountains" },
-  { key: "castles", icon: "🏰", label: "Castles" },
-  { key: "pools", icon: "🏊", label: "Pools" },
-  { key: "camping", icon: "⛺", label: "Camping" },
-  { key: "farms", icon: "🐄", label: "Farms" },
-  { key: "arctic", icon: "❄️", label: "Arctic" },
-  { key: "domes", icon: "🛖", label: "Domes" },
-  { key: "boats", icon: "⛵", label: "Boats" },
-];
 
 export default function CategoryFilters({ showTax, onTaxToggle }) {
   const [params] = useSearchParams();
@@ -49,7 +35,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           width: 36,
           height: 36,
           borderRadius: "50%",
-          background: "#fff",
+          background: neutral[0],
           border: "1.5px solid #ebe7e3",
           display: "flex",
           alignItems: "center",
@@ -59,7 +45,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           boxShadow: "0 2px 8px rgba(61,43,26,0.08)",
         }}
       >
-        <ChevronLeft size={16} color="#5c544c" />
+        <ChevronLeft size={16} color={neutral[600]} />
       </motion.button>
 
       {/* Scrollable category list */}
@@ -97,7 +83,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
                     gap: 6,
                     padding: "10px 14px",
                     borderRadius: 14,
-                    border: `1.5px solid ${isActive ? "#261f1a" : "transparent"}`,
+                    border: `1.5px solid ${isActive ? neutral[800] : "transparent"}`,
                     background: isActive
                       ? "rgba(38,31,26,0.05)"
                       : "transparent",
@@ -115,7 +101,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
                     style={{
                       fontSize: "0.6875rem",
                       fontWeight: isActive ? 700 : 500,
-                      color: isActive ? "#261f1a" : "#8a8179",
+                      color: isActive ? neutral[800] : neutral[500],
                       letterSpacing: "0.02em",
                       whiteSpace: "nowrap",
                     }}
@@ -132,7 +118,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
                         transform: "translateX(-50%)",
                         width: 28,
                         height: 2.5,
-                        background: "#261f1a",
+                        background: neutral[800],
                         borderRadius: 999,
                       }}
                       transition={{
@@ -158,7 +144,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           width: 36,
           height: 36,
           borderRadius: "50%",
-          background: "#fff",
+          background: neutral[0],
           border: "1.5px solid #ebe7e3",
           display: "flex",
           alignItems: "center",
@@ -168,7 +154,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           boxShadow: "0 2px 8px rgba(61,43,26,0.08)",
         }}
       >
-        <ChevronRight size={16} color="#5c544c" />
+        <ChevronRight size={16} color={neutral[600]} />
       </motion.button>
 
       {/* Tax toggle */}
@@ -180,8 +166,8 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           gap: 8,
           flexShrink: 0,
           padding: "8px 14px",
-          background: showTax ? "rgba(255,90,95,0.08)" : "#fff",
-          border: `1.5px solid ${showTax ? "rgba(255,90,95,0.3)" : "#ebe7e3"}`,
+          background: showTax ? "rgba(255,90,95,0.08)" : neutral[0],
+          border: `1.5px solid ${showTax ? "rgba(255,90,95,0.3)" : neutral[200]}`,
           borderRadius: 12,
           cursor: "pointer",
           transition: "all 0.2s",
@@ -192,7 +178,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           checked={showTax}
           onChange={(e) => onTaxToggle(e.target.checked)}
           style={{
-            accentColor: "#ff5a5f",
+            accentColor: brand[500],
             width: 14,
             height: 14,
             cursor: "pointer",
@@ -202,7 +188,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           style={{
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: showTax ? "#ff5a5f" : "#5c544c",
+            color: showTax ? brand[500] : neutral[600],
             whiteSpace: "nowrap",
           }}
         >

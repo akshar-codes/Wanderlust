@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { brand, neutral, semantic, shadows } from "../../theme/tokens";
 import {
   Search,
   Compass,
@@ -22,6 +23,8 @@ import { useAuthStore } from "../../store/auth.store";
 import { useLogout } from "../../hooks/useAuth";
 
 /* ── Framer variants ─────────────────────────────────────────── */
+const BRAND_GRADIENT = BRAND_GRADIENT;
+
 const menuVariants = {
   hidden: { opacity: 0, y: -8, scale: 0.96 },
   visible: {
@@ -65,7 +68,7 @@ function NavSearch({ onSubmitSearch }) {
       className="nav-search-pill"
       animate={{
         boxShadow: focused
-          ? "0 0 0 2px rgba(255,90,95,0.35), 0 4px 24px rgba(0,0,0,0.10)"
+          ? shadows.focus
           : "0 2px 12px rgba(0,0,0,0.08)",
       }}
       transition={{ duration: 0.2 }}
@@ -105,7 +108,7 @@ function NavSearch({ onSubmitSearch }) {
           outline: "none",
           background: "transparent",
           fontSize: "0.875rem",
-          color: "#3d3630",
+          color: neutral[700],
           fontFamily: "inherit",
         }}
       />
@@ -119,7 +122,7 @@ function NavSearch({ onSubmitSearch }) {
           width: 34,
           height: 34,
           borderRadius: 999,
-          background: "linear-gradient(135deg, #FF5A5F 0%, #e84040 100%)",
+          background: BRAND_GRADIENT,
           border: "none",
           display: "flex",
           alignItems: "center",
@@ -129,7 +132,7 @@ function NavSearch({ onSubmitSearch }) {
           boxShadow: "0 2px 8px rgba(255,90,95,0.3)",
         }}
       >
-        <Search size={14} color="#fff" />
+        <Search size={14} color={neutral[0]} />
       </motion.button>
     </motion.div>
   );
@@ -195,7 +198,7 @@ function NotificationMenu() {
             position: "relative",
           }}
         >
-          <Bell size={17} color={open ? "#ff5a5f" : "#5c544c"} />
+          <Bell size={17} color={open ? brand[500] : neutral[600]} />
           {unreadCount > 0 && (
             <span
               style={{
@@ -205,8 +208,8 @@ function NotificationMenu() {
                 width: 16,
                 height: 16,
                 borderRadius: 999,
-                background: "#ff5a5f",
-                color: "#fff",
+                background: brand[500],
+                color: neutral[0],
                 fontSize: 9,
                 fontWeight: 700,
                 display: "flex",
@@ -260,7 +263,7 @@ function NotificationMenu() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.1rem",
-                    color: "#261f1a",
+                    color: neutral[800],
                   }}
                 >
                   Notifications
@@ -268,7 +271,7 @@ function NotificationMenu() {
                 <button
                   style={{
                     fontSize: "0.75rem",
-                    color: "#ff5a5f",
+                    color: brand[500],
                     fontWeight: 600,
                     background: "none",
                     border: "none",
@@ -298,21 +301,21 @@ function NotificationMenu() {
                     width: 36,
                     height: 36,
                     borderRadius: 10,
-                    background: n.unread ? "rgba(255,90,95,0.12)" : "#f4f1ee",
+                    background: n.unread ? "rgba(255,90,95,0.12)" : neutral[100],
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
                   }}
                 >
-                  <Bell size={15} color={n.unread ? "#ff5a5f" : "#8a8179"} />
+                  <Bell size={15} color={n.unread ? brand[500] : neutral[500]} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p
                     style={{
                       fontSize: "0.8125rem",
                       fontWeight: 600,
-                      color: "#261f1a",
+                      color: neutral[800],
                       marginBottom: 2,
                     }}
                   >
@@ -321,14 +324,14 @@ function NotificationMenu() {
                   <p
                     style={{
                       fontSize: "0.75rem",
-                      color: "#8a8179",
+                      color: neutral[500],
                       marginBottom: 4,
                       lineHeight: 1.4,
                     }}
                   >
                     {n.body}
                   </p>
-                  <p style={{ fontSize: "0.7rem", color: "#b8b0a8" }}>
+                  <p style={{ fontSize: "0.7rem", color: neutral[400] }}>
                     {n.time}
                   </p>
                 </div>
@@ -338,7 +341,7 @@ function NotificationMenu() {
                       width: 7,
                       height: 7,
                       borderRadius: 999,
-                      background: "#ff5a5f",
+                      background: brand[500],
                       flexShrink: 0,
                       marginTop: 5,
                     }}
@@ -351,7 +354,7 @@ function NotificationMenu() {
                 to="#"
                 style={{
                   fontSize: "0.8125rem",
-                  color: "#ff5a5f",
+                  color: brand[500],
                   fontWeight: 600,
                   textDecoration: "none",
                 }}
@@ -425,14 +428,14 @@ function UserMenu({ user, onLogout, isPending }) {
             height: 30,
             fontSize: "0.8rem",
             fontWeight: 700,
-            background: "linear-gradient(135deg, #FF5A5F, #e84040)",
-            color: "#fff",
+            background: BRAND_GRADIENT,
+            color: neutral[0],
           }}
         >
           {initial}
         </Avatar>
         <span
-          style={{ fontSize: "0.8125rem", fontWeight: 600, color: "#3d3630" }}
+          style={{ fontSize: "0.8125rem", fontWeight: 600, color: neutral[700] }}
         >
           {user?.username ?? "Account"}
         </span>
@@ -440,7 +443,7 @@ function UserMenu({ user, onLogout, isPending }) {
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown size={13} color="#8a8179" />
+          <ChevronDown size={13} color={neutral[500]} />
         </motion.div>
       </motion.button>
 
@@ -471,7 +474,7 @@ function UserMenu({ user, onLogout, isPending }) {
               <p
                 style={{
                   fontSize: "0.75rem",
-                  color: "#b8b0a8",
+                  color: neutral[400],
                   fontWeight: 600,
                   letterSpacing: "0.05em",
                   textTransform: "uppercase",
@@ -483,13 +486,13 @@ function UserMenu({ user, onLogout, isPending }) {
                 style={{
                   fontSize: "0.875rem",
                   fontWeight: 700,
-                  color: "#261f1a",
+                  color: neutral[800],
                   marginTop: 2,
                 }}
               >
                 {user?.username}
               </p>
-              <p style={{ fontSize: "0.75rem", color: "#8a8179" }}>
+              <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
                 {user?.email}
               </p>
             </div>
@@ -538,12 +541,12 @@ function UserMenu({ user, onLogout, isPending }) {
                         width: "100%",
                         fontSize: "0.875rem",
                         fontWeight: 500,
-                        color: item.danger ? "#e84040" : "#3d3630",
+                        color: item.danger ? brand[600] : neutral[700],
                         fontFamily: "inherit",
                       }}
                     >
                       <span
-                        style={{ color: item.danger ? "#e84040" : "#8a8179" }}
+                        style={{ color: item.danger ? brand[600] : neutral[500] }}
                       >
                         {item.icon}
                       </span>
@@ -560,11 +563,11 @@ function UserMenu({ user, onLogout, isPending }) {
                         padding: "9px 14px",
                         fontSize: "0.875rem",
                         fontWeight: 500,
-                        color: "#3d3630",
+                        color: neutral[700],
                         textDecoration: "none",
                       }}
                     >
-                      <span style={{ color: "#8a8179" }}>{item.icon}</span>
+                      <span style={{ color: neutral[500] }}>{item.icon}</span>
                       {item.label}
                     </Link>
                   )}
@@ -593,7 +596,7 @@ function GuestButtons() {
             borderRadius: 999,
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: "#3d3630",
+            color: neutral[700],
             textDecoration: "none",
             backdropFilter: "blur(8px)",
             background: "rgba(255,255,255,0.7)",
@@ -609,12 +612,12 @@ function GuestButtons() {
             display: "inline-flex",
             alignItems: "center",
             padding: "8px 16px",
-            background: "linear-gradient(135deg, #FF5A5F 0%, #e84040 100%)",
+            background: BRAND_GRADIENT,
             border: "none",
             borderRadius: 999,
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: "#fff",
+            color: neutral[0],
             textDecoration: "none",
             boxShadow: "0 2px 12px rgba(255,90,95,0.3)",
           }}
@@ -697,12 +700,12 @@ function MobileDrawer({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Compass size={22} color="#ff5a5f" />
+            <Compass size={22} color={brand[500]} />
             <span
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
                 fontSize: "1.15rem",
-                color: "#261f1a",
+                color: neutral[800],
               }}
             >
               Wanderlust
@@ -716,7 +719,7 @@ function MobileDrawer({
               width: 36,
               height: 36,
               borderRadius: 999,
-              background: "#f4f1ee",
+              background: neutral[100],
               border: "none",
               display: "flex",
               alignItems: "center",
@@ -724,7 +727,7 @@ function MobileDrawer({
               cursor: "pointer",
             }}
           >
-            <X size={18} color="#5c544c" />
+            <X size={18} color={neutral[600]} />
           </motion.button>
         </div>
 
@@ -740,12 +743,12 @@ function MobileDrawer({
               display: "flex",
               alignItems: "center",
               gap: 10,
-              background: "#f4f1ee",
+              background: neutral[100],
               borderRadius: 12,
               padding: "10px 14px",
             }}
           >
-            <Search size={15} color="#8a8179" />
+            <Search size={15} color={neutral[500]} />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -763,7 +766,7 @@ function MobileDrawer({
                 flex: 1,
                 fontSize: "0.875rem",
                 fontFamily: "inherit",
-                color: "#3d3630",
+                color: neutral[700],
               }}
             />
           </div>
@@ -784,7 +787,7 @@ function MobileDrawer({
               sx={{
                 width: 44,
                 height: 44,
-                background: "linear-gradient(135deg, #FF5A5F, #e84040)",
+                background: BRAND_GRADIENT,
                 fontWeight: 700,
                 fontSize: "1rem",
               }}
@@ -796,12 +799,12 @@ function MobileDrawer({
                 style={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: "#261f1a",
+                  color: neutral[800],
                 }}
               >
                 {user.username}
               </p>
-              <p style={{ fontSize: "0.75rem", color: "#8a8179" }}>
+              <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
                 {user.email}
               </p>
             </div>
@@ -828,19 +831,19 @@ function MobileDrawer({
                   padding: "12px 14px",
                   borderRadius: 12,
                   textDecoration: "none",
-                  color: "#3d3630",
+                  color: neutral[700],
                   fontWeight: 500,
                   fontSize: "0.9375rem",
                   marginBottom: 2,
                 }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "#f4f1ee")
+                  (e.currentTarget.style.background = neutral[100])
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.background = "transparent")
                 }
               >
-                <span style={{ color: "#8a8179" }}>{item.icon}</span>
+                <span style={{ color: neutral[500] }}>{item.icon}</span>
                 {item.label}
               </Link>
             </motion.div>
@@ -872,7 +875,7 @@ function MobileDrawer({
                 background: "#fee2e2",
                 border: "1.5px solid #fca5a5",
                 borderRadius: 12,
-                color: "#b91c1c",
+                color: semantic.error.text,
                 fontWeight: 600,
                 fontSize: "0.875rem",
                 cursor: "pointer",
@@ -895,7 +898,7 @@ function MobileDrawer({
                   borderRadius: 12,
                   fontWeight: 600,
                   fontSize: "0.875rem",
-                  color: "#3d3630",
+                  color: neutral[700],
                   textDecoration: "none",
                 }}
               >
@@ -909,11 +912,11 @@ function MobileDrawer({
                   alignItems: "center",
                   justifyContent: "center",
                   padding: "12px",
-                  background: "linear-gradient(135deg, #FF5A5F, #e84040)",
+                  background: BRAND_GRADIENT,
                   borderRadius: 12,
                   fontWeight: 600,
                   fontSize: "0.875rem",
-                  color: "#fff",
+                  color: neutral[0],
                   textDecoration: "none",
                   boxShadow: "0 4px 16px rgba(255,90,95,0.3)",
                 }}
@@ -1027,13 +1030,13 @@ export default function Navbar({ searchMode = "hidden" }) {
                 whileHover={{ rotate: [0, -10, 10, 0] }}
                 transition={{ duration: 0.5 }}
               >
-                <Compass size={26} color="#ff5a5f" />
+                <Compass size={26} color={brand[500]} />
               </motion.div>
               <span
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.35rem",
-                  color: "#261f1a",
+                  color: neutral[800],
                   letterSpacing: "-0.01em",
                 }}
               >
@@ -1092,7 +1095,7 @@ export default function Navbar({ searchMode = "hidden" }) {
                   borderRadius: 999,
                   fontSize: "0.8125rem",
                   fontWeight: 600,
-                  color: "#3d3630",
+                  color: neutral[700],
                   textDecoration: "none",
                   backdropFilter: "blur(8px)",
                   whiteSpace: "nowrap",
@@ -1132,7 +1135,7 @@ export default function Navbar({ searchMode = "hidden" }) {
               backdropFilter: "blur(8px)",
             }}
           >
-            <Menu size={19} color="#3d3630" />
+            <Menu size={19} color={neutral[700]} />
           </motion.button>
         </div>
       </motion.nav>

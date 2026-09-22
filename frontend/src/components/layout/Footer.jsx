@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { brand, neutral, semantic } from "../../theme/tokens";
 import { motion } from "framer-motion";
 import {
   Compass,
@@ -119,7 +120,7 @@ export default function Footer() {
   return (
     <footer
       style={{
-        background: "#faf8f6",
+        background: neutral[50],
         borderTop: "1px solid #ebe7e3",
         marginTop: "auto",
       }}
@@ -127,7 +128,7 @@ export default function Footer() {
       {/* Top band — newsletter */}
       <div
         style={{
-          background: "linear-gradient(135deg, #261f1a 0%, #3d3630 100%)",
+          background: `linear-gradient(135deg, ${neutral[800]}, ${neutral[700]})`,
           padding: "48px 24px",
         }}
       >
@@ -149,7 +150,7 @@ export default function Footer() {
                 fontWeight: 700,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
-                color: "#ff8a8e",
+                color: brand[200],
                 marginBottom: 10,
               }}
             >
@@ -159,7 +160,7 @@ export default function Footer() {
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
                 fontSize: "clamp(1.5rem, 3vw, 2rem)",
-                color: "#fff",
+                color: neutral[0],
                 marginBottom: 10,
                 lineHeight: 1.2,
               }}
@@ -200,7 +201,7 @@ export default function Footer() {
                   background: "rgba(16,185,129,0.15)",
                   border: "1.5px solid rgba(16,185,129,0.3)",
                   borderRadius: 14,
-                  color: "#6ee7b7",
+                  color: semantic.success.muted,
                   fontWeight: 600,
                   fontSize: "0.9rem",
                   width: "100%",
@@ -224,14 +225,14 @@ export default function Footer() {
                     border: "1.5px solid rgba(255,255,255,0.15)",
                     borderRight: "none",
                     borderRadius: "12px 0 0 12px",
-                    color: "#fff",
+                    color: neutral[0],
                     fontSize: "0.875rem",
                     outline: "none",
                     fontFamily: "inherit",
                   }}
                 />
                 <motion.button
-                  whileHover={{ background: "#e84040" }}
+                  whileHover={{ background: brand[600] }}
                   whileTap={{ scale: 0.97 }}
                   type="submit"
                   style={{
@@ -239,10 +240,10 @@ export default function Footer() {
                     alignItems: "center",
                     gap: 8,
                     padding: "13px 20px",
-                    background: "#ff5a5f",
+                    background: brand[500],
                     border: "1.5px solid #ff5a5f",
                     borderRadius: "0 12px 12px 0",
-                    color: "#fff",
+                    color: neutral[0],
                     fontWeight: 600,
                     fontSize: "0.875rem",
                     cursor: "pointer",
@@ -281,12 +282,12 @@ export default function Footer() {
                 marginBottom: 16,
               }}
             >
-              <Compass size={24} color="#ff5a5f" />
+              <Compass size={24} color={brand[500]} />
               <span
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.2rem",
-                  color: "#261f1a",
+                  color: neutral[800],
                 }}
               >
                 Wanderlust
@@ -295,7 +296,7 @@ export default function Footer() {
             <p
               style={{
                 fontSize: "0.8125rem",
-                color: "#8a8179",
+                color: neutral[500],
                 lineHeight: 1.7,
                 marginBottom: 20,
               }}
@@ -310,11 +311,11 @@ export default function Footer() {
                   key={b.label}
                   style={{ display: "flex", alignItems: "center", gap: 7 }}
                 >
-                  <span style={{ color: "#ff5a5f" }}>{b.icon}</span>
+                  <span style={{ color: brand[500] }}>{b.icon}</span>
                   <span
                     style={{
                       fontSize: "0.75rem",
-                      color: "#5c544c",
+                      color: neutral[600],
                       fontWeight: 500,
                     }}
                   >
@@ -339,23 +340,23 @@ export default function Footer() {
                     width: 34,
                     height: 34,
                     borderRadius: 10,
-                    background: "#f4f1ee",
+                    background: neutral[100],
                     border: "1px solid #ebe7e3",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#5c544c",
+                    color: neutral[600],
                     textDecoration: "none",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#ff5a5f";
-                    e.currentTarget.style.color = "#fff";
-                    e.currentTarget.style.borderColor = "#ff5a5f";
+                    e.currentTarget.style.background = brand[500];
+                    e.currentTarget.style.color = neutral[0];
+                    e.currentTarget.style.borderColor = brand[500];
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#f4f1ee";
-                    e.currentTarget.style.color = "#5c544c";
-                    e.currentTarget.style.borderColor = "#ebe7e3";
+                    e.currentTarget.style.background = neutral[100];
+                    e.currentTarget.style.color = neutral[600];
+                    e.currentTarget.style.borderColor = neutral[200];
                   }}
                 >
                   {s.icon}
@@ -373,7 +374,7 @@ export default function Footer() {
                   fontWeight: 700,
                   letterSpacing: "0.10em",
                   textTransform: "uppercase",
-                  color: "#261f1a",
+                  color: neutral[800],
                   marginBottom: 16,
                 }}
               >
@@ -395,15 +396,15 @@ export default function Footer() {
                       to={link.to}
                       style={{
                         fontSize: "0.875rem",
-                        color: "#8a8179",
+                        color: neutral[500],
                         textDecoration: "none",
                         transition: "color 0.15s",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = "#ff5a5f";
+                        e.currentTarget.style.color = brand[500];
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.color = "#8a8179";
+                        e.currentTarget.style.color = neutral[500];
                       }}
                     >
                       {link.label}
@@ -440,7 +441,7 @@ export default function Footer() {
                   alignItems: "center",
                   gap: 8,
                   padding: "9px 16px",
-                  background: "#261f1a",
+                  background: neutral[800],
                   borderRadius: 10,
                   textDecoration: "none",
                 }}
@@ -458,7 +459,7 @@ export default function Footer() {
                 <span
                   style={{
                     fontSize: "0.875rem",
-                    color: "#fff",
+                    color: neutral[0],
                     fontWeight: 600,
                     lineHeight: 1,
                   }}
@@ -481,7 +482,7 @@ export default function Footer() {
                 border: "1px solid #d6d0ca",
                 borderRadius: 8,
                 fontSize: "0.8125rem",
-                color: "#5c544c",
+                color: neutral[600],
                 cursor: "pointer",
                 fontFamily: "inherit",
                 fontWeight: 500,
@@ -499,7 +500,7 @@ export default function Footer() {
                 border: "1px solid #d6d0ca",
                 borderRadius: 8,
                 fontSize: "0.8125rem",
-                color: "#5c544c",
+                color: neutral[600],
                 cursor: "pointer",
                 fontFamily: "inherit",
                 fontWeight: 500,
@@ -521,7 +522,7 @@ export default function Footer() {
             gap: 12,
           }}
         >
-          <p style={{ fontSize: "0.8rem", color: "#b8b0a8" }}>
+          <p style={{ fontSize: "0.8rem", color: neutral[400] }}>
             © {new Date().getFullYear()} WanderLust Private Limited · All rights
             reserved.
           </p>
@@ -537,11 +538,11 @@ export default function Footer() {
                 to={link.to}
                 style={{
                   fontSize: "0.8rem",
-                  color: "#b8b0a8",
+                  color: neutral[400],
                   textDecoration: "none",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#5c544c")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#b8b0a8")}
+                onMouseEnter={(e) => (e.currentTarget.style.color = neutral[600])}
+                onMouseLeave={(e) => (e.currentTarget.style.color = neutral[400])}
               >
                 {link.label}
               </Link>
