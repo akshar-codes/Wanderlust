@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../../store/auth.store";
 import { useLogout } from "../../hooks/useAuth";
 import { useColorModeContext } from "../../hooks/useColorMode";
+import { useNotifications, useUnreadCount, useMarkRead, useMarkAllRead } from "../../hooks/useNotifications";
 import { Moon, Sun } from "lucide-react";
 
 /* ── Framer variants ─────────────────────────────────────────── */
@@ -144,6 +145,7 @@ function NavSearch({ onSubmitSearch }) {
 function NotificationMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handler = (e) => {
@@ -153,31 +155,21 @@ function NotificationMenu() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const notifications = [
-    {
-      id: 1,
-      title: "New review on your listing",
-      body: "Someone left a 5★ review!",
-      time: "2m ago",
-      unread: true,
-    },
-    {
-      id: 2,
-      title: "Booking request",
-      body: "Alice wants to book Mountain Retreat",
-      time: "1h ago",
-      unread: true,
-    },
-    {
-      id: 3,
-      title: "Price drop alert",
-      body: "A saved listing dropped in price",
-      time: "3h ago",
-      unread: false,
-    },
-  ];
+  const { data } = useNotifications({ page: 1, limit: 5 });
+  const { data: unreadData } = useUnreadCount();
+  const markRead = useMarkRead();
+  const markAllRead = useMarkAllRead();
 
-  const unreadCount = notifications.filter((n) => n.unread).length;
+  const notifications = data?.notifications || [];
+  const unreadCount = unreadData?.count || 0;
+
+  const handleNotificationClick = (n) => {
+    if (!n.read) markRead.mutate(n.id);
+    if (n.link) {
+      navigate(n.link);
+      setOpen(false);
+    }
+  };
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -220,7 +212,7 @@ function NotificationMenu() {
                 border: "2px solid #fdfcfb",
               }}
             >
-              {unreadCount}
+              {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           )}
         </motion.button>
@@ -271,6 +263,8 @@ function NotificationMenu() {
                   Notifications
                 </span>
                 <button
+                  onClick={() => markAllRead.mutate()}
+                  disabled={markAllRead.isPending || unreadCount === 0}
                   style={{
                     fontSize: "0.75rem",
                     color: brand[500],
@@ -284,76 +278,84 @@ function NotificationMenu() {
                 </button>
               </div>
             </div>
-            {notifications.map((n) => (
-              <motion.div
-                key={n.id}
-                whileHover={{ background: "rgba(250,248,246,1)" }}
-                style={{
-                  display: "flex",
-                  gap: 12,
-                  padding: "14px 20px",
-                  background: n.unread ? "rgba(255,90,95,0.04)" : "transparent",
-                  borderBottom: "1px solid rgba(230,224,218,0.4)",
-                  cursor: "pointer",
-                  alignItems: "flex-start",
-                }}
-              >
-                <div
+            {notifications.length === 0 ? (
+              <div style={{ padding: "30px 20px", textAlign: "center", color: neutral[500], fontSize: "0.875rem" }}>
+                No new notifications.
+              </div>
+            ) : (
+              notifications.map((n) => (
+                <motion.div
+                  key={n.id}
+                  onClick={() => handleNotificationClick(n)}
+                  whileHover={{ background: "rgba(250,248,246,1)" }}
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: n.unread ? "rgba(255,90,95,0.12)" : neutral[100],
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
+                    gap: 12,
+                    padding: "14px 20px",
+                    background: !n.read ? "rgba(255,90,95,0.04)" : "transparent",
+                    borderBottom: "1px solid rgba(230,224,218,0.4)",
+                    cursor: "pointer",
+                    alignItems: "flex-start",
                   }}
                 >
-                  <Bell size={15} color={n.unread ? brand[500] : neutral[500]} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p
-                    style={{
-                      fontSize: "0.8125rem",
-                      fontWeight: 600,
-                      color: neutral[800],
-                      marginBottom: 2,
-                    }}
-                  >
-                    {n.title}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "0.75rem",
-                      color: neutral[500],
-                      marginBottom: 4,
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {n.body}
-                  </p>
-                  <p style={{ fontSize: "0.7rem", color: neutral[400] }}>
-                    {n.time}
-                  </p>
-                </div>
-                {n.unread && (
                   <div
                     style={{
-                      width: 7,
-                      height: 7,
-                      borderRadius: 999,
-                      background: brand[500],
+                      width: 36,
+                      height: 36,
+                      borderRadius: 10,
+                      background: !n.read ? "rgba(255,90,95,0.12)" : neutral[100],
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       flexShrink: 0,
-                      marginTop: 5,
                     }}
-                  />
-                )}
-              </motion.div>
-            ))}
+                  >
+                    <Bell size={15} color={!n.read ? brand[500] : neutral[500]} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p
+                      style={{
+                        fontSize: "0.8125rem",
+                        fontWeight: 600,
+                        color: neutral[800],
+                        marginBottom: 2,
+                      }}
+                    >
+                      {n.title}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.75rem",
+                        color: neutral[500],
+                        marginBottom: 4,
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {n.body}
+                    </p>
+                    <p style={{ fontSize: "0.7rem", color: neutral[400] }}>
+                      {new Date(n.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  {!n.read && (
+                    <div
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: 999,
+                        background: brand[500],
+                        flexShrink: 0,
+                        marginTop: 5,
+                      }}
+                    />
+                  )}
+                </motion.div>
+              ))
+            )}
             <div style={{ padding: "12px 20px" }}>
               <Link
-                to="#"
+                to="/notifications"
+                onClick={() => setOpen(false)}
                 style={{
                   fontSize: "0.8125rem",
                   color: brand[500],
