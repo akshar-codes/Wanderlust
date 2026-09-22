@@ -1,5 +1,7 @@
 import * as reviewRepo from "../repositories/review.repository.js";
 import * as listingRepo from "../repositories/listing.repository.js";
+import * as userRepo from "../repositories/user.repository.js";
+import * as notificationService from "./notification.service.js";
 import { cloudinary } from "../config/cloudConfig.js";
 import AppError from "../utils/AppError.js";
 
@@ -17,6 +19,9 @@ export const createReview = async (listingId, reviewData, authorId) => {
 
   await reviewRepo.addReviewToListing(listingId, review._id);
   await listingRepo.recalculateRating(listingId);
+
+  const actor = await userRepo.findById(authorId);
+  await notificationService.createReviewNotification("review_received", review, listing, actor);
 
   return review;
 };
@@ -84,6 +89,9 @@ export const upsertHostReply = async (listingId, reviewId, text, hostId) => {
   const updated = isEdit
     ? await reviewRepo.editHostReply(reviewId, text)
     : await reviewRepo.setHostReply(reviewId, text);
+
+  const actor = await userRepo.findById(hostId);
+  await notificationService.createReviewNotification("review_reply", updated, listing, actor);
 
   return updated;
 };

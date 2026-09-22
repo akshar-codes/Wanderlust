@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import * as bookingRepo from "../repositories/booking.repository.js";
 import * as listingRepo from "../repositories/listing.repository.js";
+import * as userRepo from "../repositories/user.repository.js";
+import * as notificationService from "./notification.service.js";
 import AppError from "../utils/AppError.js";
 import logger from "../utils/logger.js";
 
@@ -128,7 +130,11 @@ export const createBooking = async (guestId, payload) => {
 
   await listingRepo.incrementCounter(listing._id, "bookingCount", 1);
 
-  return bookingRepo.findById(booking._id);
+  const populatedBooking = await bookingRepo.findById(booking._id);
+  const actor = await userRepo.findById(guestId);
+  await notificationService.createBookingNotification("booking_created", populatedBooking, actor);
+
+  return populatedBooking;
 };
 
 // ── Read ───────────────────────────────────────────────────────────────────────
@@ -166,11 +172,16 @@ export const cancelBooking = async (bookingId, userId, reason) => {
     );
   }
 
-  return bookingRepo.updateStatus(bookingId, "cancelled", {
+  const updatedBooking = await bookingRepo.updateStatus(bookingId, "cancelled", {
     cancelledAt: new Date(),
     cancelledBy: userId,
     cancellationReason: reason?.trim() || null,
   });
+  
+  const actor = await userRepo.findById(userId);
+  await notificationService.createBookingNotification("booking_cancelled", updatedBooking, actor);
+  
+  return updatedBooking;
 };
 
 // ── Host workflow ──────────────────────────────────────────────────────────────
@@ -192,7 +203,12 @@ export const confirmBooking = async (bookingId, hostId) => {
   }
 
   logger.info("Booking confirmed by host", { bookingId, hostId });
-  return bookingRepo.updateStatus(bookingId, "confirmed");
+  const updatedBooking = await bookingRepo.updateStatus(bookingId, "confirmed");
+  
+  const actor = await userRepo.findById(hostId);
+  await notificationService.createBookingNotification("booking_confirmed", updatedBooking, actor);
+  
+  return updatedBooking;
 };
 
 export const declineBooking = async (bookingId, hostId, reason) => {
@@ -220,11 +236,16 @@ export const declineBooking = async (bookingId, hostId, reason) => {
 
   logger.info("Booking declined by host", { bookingId, hostId, reason });
 
-  return bookingRepo.updateStatus(bookingId, "cancelled", {
+  const updatedBooking = await bookingRepo.updateStatus(bookingId, "cancelled", {
     cancelledAt: new Date(),
     cancelledBy: hostId,
     cancellationReason: reason?.trim() || "Declined by host",
   });
+  
+  const actor = await userRepo.findById(hostId);
+  await notificationService.createBookingNotification("booking_declined", updatedBooking, actor);
+  
+  return updatedBooking;
 };
 
 export const completeBooking = async (bookingId, hostId) => {
@@ -248,7 +269,12 @@ export const completeBooking = async (bookingId, hostId) => {
     );
   }
 
-  return bookingRepo.updateStatus(bookingId, "completed");
+  const updatedBooking = await bookingRepo.updateStatus(bookingId, "completed");
+  
+  const actor = await userRepo.findById(hostId);
+  await notificationService.createBookingNotification("booking_completed", updatedBooking, actor);
+  
+  return updatedBooking;
 };
 
 // ── Admin ────────────────────────────────────────────────────────────────────
