@@ -13,8 +13,10 @@ import twoFactorRoutes from "./twoFactor.routes.js";
 import userRoutes from "./user.routes.js";
 import wishlistRoutes from "./wishlist.routes.js";
 import wishlistCollectionRoutes from "./wishlistCollection.routes.js";
+import notificationRoutes from "./notification.routes.js";
 
 const router = express.Router();
+
 
 import mongoose from "mongoose";
 
@@ -43,6 +45,7 @@ router.use("/search", searchRoutes);
 router.use("/users", userRoutes);
 router.use("/wishlist", wishlistRoutes);
 router.use("/wishlists", wishlistCollectionRoutes);
+router.use("/notifications", notificationRoutes);
 
 router.use((_req, res) =>
   res.status(404).json({
