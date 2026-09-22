@@ -26,6 +26,10 @@ export class AppError extends Error {
     return new AppError(403, message, { code: "FORBIDDEN" });
   }
 
+  static conflict(message = "Conflict") {
+    return new AppError(409, message, { code: "CONFLICT" });
+  }
+
   static validationError(details, summary = "Validation failed") {
     return new AppError(422, summary, {
       code: "VALIDATION_ERROR",

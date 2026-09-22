@@ -69,23 +69,6 @@ export const createBooking = async (guestId, payload) => {
     );
   }
 
-  const overlapping = await bookingRepo.findOverlapping(
-    listing._id,
-    checkInDate,
-    checkOutDate,
-  );
-  if (overlapping.length > 0) {
-    throw AppError.badRequest("These dates are not available for this listing");
-  }
-
-  const blockedOverlap = (listing.availabilityCalendar ?? []).some(
-    (b) =>
-      checkInDate < new Date(b.endDate) && checkOutDate > new Date(b.startDate),
-  );
-  if (blockedOverlap) {
-    throw AppError.badRequest("These dates are blocked by the host");
-  }
-
   const nightlyPrice = listing.pricing?.nightlyPrice ?? listing.price ?? 0;
   const cleaningFee = listing.pricing?.cleaningFee ?? 0;
   const serviceFee = listing.pricing?.serviceFee ?? 0;
@@ -93,9 +76,41 @@ export const createBooking = async (guestId, payload) => {
   const taxes = Math.round((subtotal + cleaningFee + serviceFee) * GST_RATE);
   const total = subtotal + cleaningFee + serviceFee + taxes;
 
-  // Pre-generate the blocked-calendar entry's id so it can later be removed
-  // — precisely, and only this entry — if the booking is declined/cancelled.
   const blockedDateId = new mongoose.Types.ObjectId();
+
+  const overlapping = await bookingRepo.findOverlapping(
+    listing._id,
+    checkInDate,
+    checkOutDate,
+  );
+  
+  if (overlapping.length > 0) {
+    throw AppError.conflict("These dates are no longer available");
+  }
+
+  const blockedOverlap = (listing.availabilityCalendar ?? []).some(
+    (b) =>
+      checkInDate < new Date(b.endDate) && checkOutDate > new Date(b.startDate),
+  );
+  if (blockedOverlap) {
+    throw AppError.conflict("These dates are blocked by the host");
+  }
+
+  const updatedListing = await listingRepo.addBlockedDateAtomic(
+    listing._id,
+    checkInDate,
+    checkOutDate,
+    {
+      _id: blockedDateId,
+      startDate: checkInDate,
+      endDate: checkOutDate,
+      reason: "booked",
+    }
+  );
+
+  if (!updatedListing) {
+    throw AppError.conflict("These dates are no longer available");
+  }
 
   const booking = await bookingRepo.create({
     listing: listing._id,
@@ -111,14 +126,6 @@ export const createBooking = async (guestId, payload) => {
     blockedDateId,
   });
 
-  // Provisionally reserve the dates so other guests can't double-book while
-  // the host reviews this request.
-  await listingRepo.addBlockedDate(listing._id, {
-    _id: blockedDateId,
-    startDate: checkInDate,
-    endDate: checkOutDate,
-    reason: "booked",
-  });
   await listingRepo.incrementCounter(listing._id, "bookingCount", 1);
 
   return bookingRepo.findById(booking._id);
