@@ -27,6 +27,7 @@ import WishlistPage from "./pages/WishlistPage";
 import SharedWishlistPage from "./pages/SharedWishlistPage";
 import AdminLayout from "./pages/admin/AdminLayout";
 import LoginPage from "./pages/auth/LoginPage";
+import TwoFactorChallengePage from "./pages/auth/TwoFactorChallengePage";
 import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
@@ -170,6 +171,14 @@ export default function App() {
                     element={
                       <GuestRoute>
                         <LoginPage />
+                      </GuestRoute>
+                    }
+                  />
+                  <Route
+                    path="login/2fa"
+                    element={
+                      <GuestRoute>
+                        <TwoFactorChallengePage />
                       </GuestRoute>
                     }
                   />

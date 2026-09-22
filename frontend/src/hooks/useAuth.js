@@ -12,13 +12,34 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data.requiresTwoFactor) {
+        navigate("/login/2fa", { state: { from: location.state?.from } });
+        return;
+      }
       toast.success("Welcome back!");
       const returnTo = location.state?.from || "/listings";
       navigate(returnTo, { replace: true });
     },
     onError: (err) =>
       toast.error(err.message || "Invalid username or password"),
+  });
+}
+
+export function useVerify2fa() {
+  const { verify2fa } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  return useMutation({
+    mutationFn: verify2fa,
+    onSuccess: () => {
+      toast.success("Welcome back!");
+      const returnTo = location.state?.from || "/listings";
+      navigate(returnTo, { replace: true });
+    },
+    onError: (err) =>
+      toast.error(err.message || "Invalid authentication code"),
   });
 }
 

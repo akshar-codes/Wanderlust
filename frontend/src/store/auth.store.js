@@ -36,6 +36,15 @@ export const useAuthStore = create(
 
       login: async (credentials) => {
         const data = await authService.login(credentials);
+        if (data.requiresTwoFactor) {
+          return data;
+        }
+        set({ user: data.user, isAuthenticated: true });
+        return data;
+      },
+
+      verify2fa: async (payload) => {
+        const data = await authService.verify2fa(payload);
         set({ user: data.user, isAuthenticated: true });
         return data;
       },

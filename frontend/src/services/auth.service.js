@@ -60,4 +60,31 @@ export const authService = {
     const res = await api.delete(`/auth/unlink/${provider}`);
     return res.data.data;
   },
+
+  // ── 2FA ───────────────────────────────────────────────────────────────────────
+
+  verify2fa: async (data) => {
+    const res = await api.post("/2fa/verify", data);
+    return res.data.data;
+  },
+
+  generate2fa: async () => {
+    const res = await api.post("/2fa/generate");
+    return res.data.data;
+  },
+
+  enable2fa: async (data) => {
+    const res = await api.post("/2fa/enable", data);
+    return res.data.data;
+  },
+
+  disable2fa: async (data) => {
+    const res = await api.post("/2fa/disable", data);
+    return res.data.data;
+  },
+
+  generateRecoveryCodes: async (data) => {
+    const res = await api.post("/2fa/recovery-codes", data);
+    return res.data.data;
+  },
 };
