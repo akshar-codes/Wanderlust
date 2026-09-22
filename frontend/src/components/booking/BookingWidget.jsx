@@ -12,6 +12,7 @@ import { Textarea } from "../ui/Input";
 import { useAuthStore } from "../../store/auth.store";
 import { useIsOwner } from "../../hooks/useCurrentUser";
 import { useCreateBooking } from "../../hooks/useBookings";
+import { formatPrice } from "../../utils/currency";
 import { neutral, brand, radii, shadows } from "../../theme/tokens";
 
 // Mirrors backend/src/services/booking.service.js GST_RATE — keep in sync.
@@ -32,6 +33,7 @@ export default function BookingWidget({ listing }) {
   const { isAuthenticated } = useAuthStore();
   const isOwner = useIsOwner(listing?.owner?._id ?? listing?.owner);
   const { mutate: createBooking, isPending } = useCreateBooking();
+  
 
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
@@ -113,7 +115,7 @@ export default function BookingWidget({ listing }) {
         <Typography
           sx={{ fontSize: "1.375rem", fontWeight: 700, color: neutral[800] }}
         >
-          ₹{nightlyPrice.toLocaleString("en-IN")}
+          {formatPrice(nightlyPrice)}
         </Typography>
         <Typography sx={{ color: neutral[500], fontSize: "0.9375rem" }}>
           / night
@@ -245,7 +247,7 @@ export default function BookingWidget({ listing }) {
           <Divider sx={{ my: 1.5 }} />
           {[
             [
-              `₹${nightlyPrice.toLocaleString("en-IN")} × ${nights} night${nights > 1 ? "s" : ""}`,
+              `${formatPrice(nightlyPrice)} × ${nights} night${nights > 1 ? "s" : ""}`,
               subtotal,
             ],
             ...(cleaningFee ? [["Cleaning fee", cleaningFee]] : []),
@@ -260,7 +262,7 @@ export default function BookingWidget({ listing }) {
                 {label}
               </Typography>
               <Typography variant="body2" sx={{ color: neutral[700] }}>
-                ₹{amount.toLocaleString("en-IN")}
+                {formatPrice(amount)}
               </Typography>
             </Box>
           ))}
@@ -270,7 +272,7 @@ export default function BookingWidget({ listing }) {
               Total
             </Typography>
             <Typography sx={{ fontWeight: 700, color: brand[600] }}>
-              ₹{total.toLocaleString("en-IN")}
+              {formatPrice(total)}
             </Typography>
           </Box>
         </Box>

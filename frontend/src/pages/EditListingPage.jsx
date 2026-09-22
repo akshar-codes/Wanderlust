@@ -35,6 +35,7 @@ import DraftVisibilityPanel from "../components/listings/edit/DraftVisibilityPan
 import ConfirmChangesDialog from "../components/listings/edit/ConfirmChangesDialog";
 
 import { neutral, brand, radii, shadows } from "../theme/tokens";
+import { formatPrice } from "../utils/currency";
 
 // ── Listing → editable-shape mapping ────────────────────────────────────────
 
@@ -128,8 +129,8 @@ function buildPatchPayload(original, candidate) {
     changes.push({
       key: "pricing",
       label: "Price per night",
-      oldValue: `₹${Number(original.price || 0).toLocaleString("en-IN")}`,
-      newValue: `₹${Number(candidate.price || 0).toLocaleString("en-IN")}`,
+      oldValue: formatPrice(Number(original.price || 0)),
+      newValue: formatPrice(Number(candidate.price || 0)),
     });
   }
 

@@ -10,6 +10,7 @@ import { useAuthStore } from "../../store/auth.store";
 import { useIsOwner } from "../../hooks/useCurrentUser";
 import { useCreateBooking } from "../../hooks/useBookings";
 import { brand, neutral, radii } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 // Mirrors backend/src/services/booking.service.js GST_RATE — keep in sync.
 const GST_RATE = 0.18;
@@ -261,20 +262,20 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
 
                 <p style={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800], marginBottom: 12 }}>Price breakdown</p>
                 {[
-                  [`₹${nightlyPrice.toLocaleString("en-IN")} × ${nights} night${nights > 1 ? "s" : ""}`, subtotal],
+                  [`${formatPrice(nightlyPrice)} × ${nights} night${nights > 1 ? "s" : ""}`, subtotal],
                   ...(cleaningFee ? [["Cleaning fee", cleaningFee]] : []),
                   ...(serviceFee ? [["Service fee", serviceFee]] : []),
                   ["Taxes (GST 18%)", taxes],
                 ].map(([label, amount]) => (
                   <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
                     <span style={{ fontSize: "0.875rem", color: neutral[500] }}>{label}</span>
-                    <span style={{ fontSize: "0.875rem", color: neutral[700] }}>₹{amount.toLocaleString("en-IN")}</span>
+                    <span style={{ fontSize: "0.875rem", color: neutral[700] }}>{formatPrice(amount)}</span>
                   </div>
                 ))}
                 <div style={{ height: 1, background: neutral[200], margin: "10px 0" }} />
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontWeight: 700, color: neutral[800] }}>Total</span>
-                  <span style={{ fontWeight: 700, color: brand[600] }}>₹{total.toLocaleString("en-IN")}</span>
+                  <span style={{ fontWeight: 700, color: brand[600] }}>{formatPrice(total)}</span>
                 </div>
                 <p style={{ fontSize: "0.75rem", color: neutral[400], marginTop: 16 }}>
                   You won't be charged until the host confirms your request.
@@ -300,7 +301,7 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
             <div>
               {nights > 0 && (
                 <>
-                  <span style={{ fontWeight: 700, fontSize: "1rem", color: neutral[800] }}>₹{total.toLocaleString("en-IN")}</span>
+                  <span style={{ fontWeight: 700, fontSize: "1rem", color: neutral[800] }}>{formatPrice(total)}</span>
                   <span style={{ fontSize: "0.75rem", color: neutral[500], display: "block" }}>
                     {nights} night{nights > 1 ? "s" : ""} total
                   </span>

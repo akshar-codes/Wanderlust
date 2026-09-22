@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Star, MapPin, TrendingUp } from "lucide-react";
 import WishlistHeartButton from "../wishlist/WishlistHeartButton";
 import { cloudinaryUrl } from "../../utils/cloudinaryUrl";
+import { formatPrice } from "../../utils/currency";
 
 const CATEGORY_ICONS = {
   trending: "🔥",
@@ -19,6 +20,9 @@ const CATEGORY_ICONS = {
 };
 
 export default function ListingCard({ listing, variant = "default", showTax = false, index = 0, noLink = false }) {
+  const navigate = useNavigate();
+  
+  const wishlisted = useWishlistStatus(listing._id);
   const { _id, title, location, country, price, pricing, images, image, category, averageRating, reviewCount, featured } = listing;
 
   const activePrice = pricing?.nightlyPrice ?? price ?? 0;
@@ -206,7 +210,7 @@ export default function ListingCard({ listing, variant = "default", showTax = fa
                     color: "var(--color-text)",
                   }}
                 >
-                  ₹{displayPrice}
+                  {formatPrice(displayPrice)}
                 </span>
                 <span style={{ color: "var(--color-text-secondary)", fontSize: "0.8125rem" }}>
                   {" "}

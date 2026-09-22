@@ -6,6 +6,7 @@ import { Input } from "../../../ui/Input";
 import { Counter } from "../../../ui/Counter";
 import { pricingSchema } from "../../../../schemas/listingWizard";
 import { neutral, brand, radii } from "../../../../theme/tokens";
+import { formatPrice } from "../../../../utils/currency";
 
 const GST_RATE = 0.18;
 
@@ -25,6 +26,7 @@ const StepPricing = forwardRef(function StepPricing(
     mode: "onChange",
   });
 
+  
   const price = Number(watch("price")) || 0;
   const cleaningFee = Number(watch("cleaningFee")) || 0;
   const serviceFee = Number(watch("serviceFee")) || 0;
@@ -151,7 +153,7 @@ const StepPricing = forwardRef(function StepPricing(
               {label}
             </Typography>
             <Typography variant="body2" sx={{ color: neutral[700] }}>
-              ₹{amount.toLocaleString("en-IN")}
+              {formatPrice(amount)}
             </Typography>
           </Box>
         ))}
@@ -161,7 +163,7 @@ const StepPricing = forwardRef(function StepPricing(
             Guest pays
           </Typography>
           <Typography sx={{ fontWeight: 700, color: brand[600] }}>
-            ₹{guestTotal.toLocaleString("en-IN")}
+            {formatPrice(guestTotal)}
           </Typography>
         </Box>
       </Box>

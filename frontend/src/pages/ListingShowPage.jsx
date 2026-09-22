@@ -57,6 +57,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { reviewSchema } from "../schemas";
 import toast from "react-hot-toast";
 import { cloudinaryUrl } from "../utils/cloudinaryUrl";
+import { formatPrice } from "../utils/currency";
 
 // ─── Amenity icon map ─────────────────────────────────────────────────────────
 const AMENITY_ICONS = {
@@ -2121,7 +2122,7 @@ export default function ListingShowPage() {
                                 color: neutral[800],
                               }}
                             >
-                              ₹{Number(similar.price).toLocaleString("en-IN")}
+                              {formatPrice(Number(similar.price))}
                               <span
                                 style={{
                                   fontWeight: 400,

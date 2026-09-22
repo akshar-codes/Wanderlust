@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import { formatPrice } from "../../utils/currency";
 import {
   brand,
   neutral,
@@ -179,7 +180,7 @@ export function ListingCard({ listing, to, loading = false, actions }) {
             {location}, {country}
           </Typography>
           <Typography sx={{ fontSize: "0.9rem" }}>
-            <strong>₹{Number(price).toLocaleString("en-IN")}</strong>
+            <strong>{formatPrice(Number(price))}</strong>
             <Box component="span" sx={{ color: neutral[500] }}>
               {" "}
               / night

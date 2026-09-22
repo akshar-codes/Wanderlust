@@ -33,6 +33,7 @@ import { Card, StatsCard } from "../components/ui/Card";
 import { Modal, ConfirmModal, AlertModal } from "../components/ui/Modal";
 import { Table } from "../components/ui/Table";
 import { colors } from "../theme/tokens";
+import { formatPrice } from "../utils/currency";
 
 // ── Sample data ───────────────────────────────────────────────────────────────
 const SAMPLE_LISTINGS = [
@@ -85,7 +86,7 @@ const TABLE_COLS = [
     key: "price",
     label: "Price / night",
     sortable: true,
-    render: (r) => `₹${r.price.toLocaleString("en-IN")}`,
+    render: (r) => formatPrice(r.price),
   },
   {
     key: "status",

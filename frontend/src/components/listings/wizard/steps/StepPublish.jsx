@@ -73,6 +73,9 @@ export default function StepPublish({
   onSubmit,
   submitting,
 }) {
+  
+  const publishMutation = usePublishListing();
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box>
@@ -106,6 +109,28 @@ export default function StepPublish({
           />
         </Box>
       )}
+
+      {/* Preview Section */}
+      <Box
+        sx={{
+          bgcolor: neutral[50],
+          p: 3,
+          borderRadius: radii["2xl"],
+          border: `1px solid ${neutral[200]}`,
+        }}
+      >
+        <Typography sx={{ fontWeight: 600, mb: 2 }}>Preview</Typography>
+        <Card
+          image={data.images?.[0]?.url}
+          title={data.title || "Listing Title"}
+          subtitle={`${data.location?.city || "City"}, ${
+            data.location?.country || "Country"
+          }`}
+          price={data.price}
+          formatPrice={formatPrice}
+          rating={null}
+        />
+      </Box>
 
       <Box
         sx={{

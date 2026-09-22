@@ -8,6 +8,7 @@ import { CATEGORIES } from "../constants/categories";
 import { useListings } from "../hooks/useListings";
 import { useIsMobile } from "../hooks/useIsMobile";
 import ListingCard from "../components/listings/ListingCard";
+import { formatPrice } from "../utils/currency";
 
 // ─── Inline styles injected once ─────────────────────────────────────────────
 const GLOBAL_CSS = `
@@ -454,7 +455,7 @@ function ExperienceCard({ exp, index }) {
             <span
               style={{ fontWeight: 700, fontSize: "0.95rem", color: neutral[800] }}
             >
-              ₹{exp.price.toLocaleString("en-IN")}
+              {formatPrice(exp.price)}
             </span>
             <span style={{ color: neutral[500], fontSize: "0.78rem" }}>
               {" "}
@@ -1987,7 +1988,7 @@ function HostCTASection() {
                   marginBottom: 4,
                 }}
               >
-                ₹45,000
+                {formatPrice(45000)}
               </p>
               <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
                 per month for 3-bed homes

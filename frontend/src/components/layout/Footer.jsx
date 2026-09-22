@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { brand, neutral, semantic } from "../../theme/tokens";
 import { motion } from "framer-motion";
+import { useCurrency } from "../../hooks/useCurrency";
+import { formatPrice } from "../../utils/currency";
 import {
   Compass,
   Twitter,
@@ -106,6 +108,7 @@ const badges = [
 ];
 
 export default function Footer() {
+  const { currency } = useCurrency();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -506,7 +509,7 @@ export default function Footer() {
                 fontWeight: 500,
               }}
             >
-              ₹ INR
+              {currency}
             </button>
           </div>
         </div>
