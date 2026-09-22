@@ -22,6 +22,7 @@ import { Select } from "../../components/ui/Input";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { useAdminStats, useAdminAnalytics } from "../../hooks/useAdmin";
 import { brand, neutral, semantic, teal, radii } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 const RANGE_OPTIONS = [
   { value: "7d", label: "Last 7 days" },
@@ -51,7 +52,7 @@ const CATEGORY_COLORS = [
 ];
 
 function formatCurrency(v) {
-  return `₹${Number(v ?? 0).toLocaleString("en-IN")}`;
+  return formatPrice(Number(v ?? 0));
 }
 
 function formatDateLabel(dateStr) {
@@ -195,7 +196,7 @@ export default function AdminOverviewPage() {
                     tick={{ fontSize: 11, fill: neutral[400] }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={(v) => `₹${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`}
+                    tickFormatter={(v) => formatPrice(v)}
                     width={48}
                   />
                   <Tooltip

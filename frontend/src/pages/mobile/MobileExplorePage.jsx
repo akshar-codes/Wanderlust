@@ -9,6 +9,7 @@ import WishlistHeartButton from "../../components/wishlist/WishlistHeartButton";
 import Spinner from "../../components/common/Spinner";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { brand, neutral, radii } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 const CATEGORIES = [
   { key: null, icon: "⊞", label: "All" },
@@ -53,7 +54,7 @@ function MobileListingRow({ listing }) {
       </p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontWeight: 700, fontSize: "0.875rem", color: neutral[800] }}>
-          ₹{Number(listing.price).toLocaleString("en-IN")}
+          {formatPrice(Number(listing.price))}
           <span style={{ fontWeight: 400, color: neutral[500] }}> / night</span>
         </span>
         <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: neutral[700] }}>★ {Number(rating).toFixed(1)}</span>

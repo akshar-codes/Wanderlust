@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Table } from "../../ui/Table";
 import { useListingPerformance } from "../../../hooks/useAnalytics";
 import { neutral, brand, radii } from "../../../theme/tokens";
+import { formatPrice } from "../../../utils/currency";
 
 function StatusChip({ draft, status }) {
   if (draft) {
@@ -89,7 +90,7 @@ export default function ListingPerformanceSection({ range }) {
       key: "periodRevenue",
       label: "Revenue",
       sortable: true,
-      render: (row) => `₹${row.periodRevenue.toLocaleString("en-IN")}`,
+      render: (row) => formatPrice(row.periodRevenue),
     },
     { key: "periodBookings", label: "Bookings", sortable: true },
     {

@@ -15,6 +15,7 @@ import { useUserListings, USER_LISTINGS_KEY } from "../../hooks/useUser";
 import { useDeleteListing, LISTINGS_KEY } from "../../hooks/useListings";
 import listingsService from "../../services/listings.service";
 import { neutral } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 function StatusChip({ listing }) {
   if (listing.draft) {
@@ -74,9 +75,14 @@ function useSetListingPublished() {
 export default function MyListingsSection() {
   const navigate = useNavigate();
   const user = useCurrentUser();
-  const { data: listings = [], isLoading } = useUserListings(user?.username);
+  const [page, setPage] = useState(1);
+  const [deleteId, setDeleteId] = useState(null);
+  const { data, isLoading, isError } = useMyListings(user?.username, { page });
+  
 
-  const { mutate: deleteListing, isPending: deleting } = useDeleteListing();
+  const deleteMutation = useDeleteListing();
+  const deleteListing = deleteMutation.mutate;
+  const deleting = deleteMutation.isPending;
   const {
     mutate: setPublished,
     isPending: togglingPublish,
@@ -136,7 +142,7 @@ export default function MyListingsSection() {
       key: "price",
       label: "Price / night",
       sortable: true,
-      render: (row) => `₹${Number(row.price ?? 0).toLocaleString("en-IN")}`,
+      render: (row) => formatPrice(Number(row.price ?? 0)),
     },
     {
       key: "averageRating",

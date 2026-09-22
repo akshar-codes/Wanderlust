@@ -12,6 +12,7 @@ import {
   useAdminUpdateBookingStatus,
 } from "../../hooks/useBookings";
 import { neutral } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
@@ -93,7 +94,7 @@ export default function AdminBookingsPage() {
     {
       key: "total",
       label: "Total",
-      render: (row) => `₹${(row.pricing?.total ?? 0).toLocaleString("en-IN")}`,
+      render: (row) => formatPrice((row.pricing?.total ?? 0)),
     },
     {
       key: "status",

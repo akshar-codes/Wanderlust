@@ -8,15 +8,13 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { TrendingUp, TrendingDown, IndianRupee, Receipt } from "lucide-react";
+import { TrendingUp, TrendingDown, IndianRupee, Receipt, ArrowUpRight } from "lucide-react";
 import { StatsCard } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
 import { useRevenueAnalytics } from "../../../hooks/useAnalytics";
+import { useCurrency } from "../../../hooks/useCurrency";
 import { brand, neutral, radii } from "../../../theme/tokens";
-
-function formatCurrency(v) {
-  return `₹${Number(v ?? 0).toLocaleString("en-IN")}`;
-}
+import { formatPrice } from "../../../utils/currency";
 
 function formatDateLabel(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-IN", {
@@ -46,13 +44,14 @@ function ChartTooltip({ active, payload, label }) {
       <Typography
         sx={{ fontWeight: 700, fontSize: "0.875rem", color: brand[600] }}
       >
-        {formatCurrency(payload[0]?.value)}
+        {formatPrice(payload[0]?.value)}
       </Typography>
     </Box>
   );
 }
 
 export default function RevenueAnalyticsSection({ range, listingId }) {
+  const { currency } = useCurrency();
   const params = listingId ? { range, listingId } : { range };
   const { data, isLoading } = useRevenueAnalytics(params);
 
@@ -84,7 +83,7 @@ export default function RevenueAnalyticsSection({ range, listingId }) {
         <Grid item xs={12} sm={4}>
           <StatsCard
             label="Total revenue"
-            value={isLoading ? "—" : formatCurrency(summary.totalRevenue)}
+            value={isLoading ? "—" : formatPrice(summary.totalRevenue)}
             icon={<IndianRupee size={18} />}
             trend={isPositive ? "up" : "down"}
             trendValue={`${isPositive ? "+" : ""}${summary.revenueChangePct ?? 0}% vs prev. period`}
@@ -100,7 +99,7 @@ export default function RevenueAnalyticsSection({ range, listingId }) {
         <Grid item xs={12} sm={4}>
           <StatsCard
             label="Avg. booking value"
-            value={isLoading ? "—" : formatCurrency(summary.avgBookingValue)}
+            value={isLoading ? "—" : formatPrice(summary.avgBookingValue)}
             icon={
               isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />
             }
@@ -149,9 +148,10 @@ export default function RevenueAnalyticsSection({ range, listingId }) {
               tick={{ fontSize: 11, fill: neutral[400] }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v) =>
-                `₹${v >= 1000 ? `${Math.round(v / 1000)}k` : v}`
-              }
+              tickFormatter={(v) => {
+                if (v >= 1000) return `${currency}${Math.round(v / 1000)}k`;
+                return `${currency}${v}`;
+              }}
               width={48}
             />
             <Tooltip content={<ChartTooltip />} />

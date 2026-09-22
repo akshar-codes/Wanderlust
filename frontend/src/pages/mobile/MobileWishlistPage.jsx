@@ -6,6 +6,7 @@ import { useWishlist, useWishlistCollection, useRemoveFromWishlist } from "../..
 import Spinner from "../../components/common/Spinner";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { neutral, radii } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 const REVEAL_WIDTH = 84;
 
@@ -80,7 +81,7 @@ function SwipeableRow({ item, collectionId, onRemove }) {
             </p>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontWeight: 700, fontSize: "0.8125rem", color: neutral[800] }}>
-                ₹{Number(listing.price).toLocaleString("en-IN")}
+                {formatPrice(Number(listing.price))}
                 <span style={{ fontWeight: 400, color: neutral[500] }}>/night</span>
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: "0.75rem", fontWeight: 600, color: neutral[700] }}>

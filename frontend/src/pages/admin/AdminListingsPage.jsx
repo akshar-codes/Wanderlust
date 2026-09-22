@@ -10,6 +10,7 @@ import { ConfirmModal } from "../../components/ui/Modal";
 import { useAdminListings, useUpdateListingStatus } from "../../hooks/useAdmin";
 import { LISTING_CATEGORIES } from "../../schemas";
 import { neutral } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
@@ -102,7 +103,7 @@ export default function AdminListingsPage() {
     {
       key: "price",
       label: "Price / night",
-      render: (row) => `₹${Number(row.price ?? 0).toLocaleString("en-IN")}`,
+      render: (row) => formatPrice(Number(row.price ?? 0)),
     },
     {
       key: "status",

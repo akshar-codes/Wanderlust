@@ -9,6 +9,7 @@ import MobileBookingFlow from "../../components/mobile/MobileBookingFlow";
 import ListingMap from "../../components/map/ListingMap";
 import ReviewsSection from "../../components/reviews/ReviewsSection";
 import { brand, neutral, radii } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 /**
  * Mobile-optimized listing detail screen: swipeable gallery up top, compact
@@ -248,7 +249,7 @@ export default function MobileListingDetailPage() {
       >
         <div>
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: neutral[800] }}>
-            ₹{nightlyPrice.toLocaleString("en-IN")}
+            {formatPrice(nightlyPrice)}
           </span>
           <span style={{ fontSize: "0.8125rem", color: neutral[500] }}> / night</span>
         </div>

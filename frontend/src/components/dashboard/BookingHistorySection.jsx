@@ -10,6 +10,7 @@ import { Skeleton } from "../ui/Skeleton";
 import { ConfirmModal } from "../ui/Modal";
 import { useMyBookings, useCancelBooking } from "../../hooks/useBookings";
 import { neutral, brand, radii } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 const PAGE_LIMIT = 10;
 
@@ -175,7 +176,7 @@ function BookingCard({ booking, onCancel }) {
           <Typography
             sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800] }}
           >
-            ₹{booking.pricing?.total?.toLocaleString("en-IN")}
+            {formatPrice(booking.pricing?.total || 0)}
             <Box component="span" sx={{ color: neutral[500], fontWeight: 400 }}>
               {" "}
               total
@@ -211,11 +212,13 @@ function BookingCard({ booking, onCancel }) {
 export default function BookingHistorySection() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState(undefined);
-  const { data, isLoading } = useMyBookings({
+  const { data, isLoading, isError } = useMyBookings({
     page,
     limit: PAGE_LIMIT,
     status,
   });
+  
+  const cancelMutation = useCancelBooking();
   const { mutate: cancelBooking, isPending: cancelling } = useCancelBooking();
   const [pendingCancel, setPendingCancel] = useState(null);
 

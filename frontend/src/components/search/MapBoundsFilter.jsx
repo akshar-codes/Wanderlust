@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Map, RefreshCw, X } from "lucide-react";
+import { formatPrice } from "../../utils/currency";
 
 // ─── Marker cluster (simple, no external dep) ────────────────────────────────
 // Each visible listing gets a price pill pin on the map.
@@ -114,7 +115,7 @@ export default function MapBoundsFilter({
           box-shadow: 0 2px 8px rgba(0,0,0,0.14);
           transition: transform 0.15s, background 0.15s;
         `;
-        el.textContent = `₹${Math.round(listing.price / 100)}K`;
+        el.textContent = formatPrice(listing.price);
         el.title = listing.title;
 
         el.addEventListener("mouseenter", () => {
@@ -134,7 +135,7 @@ export default function MapBoundsFilter({
               <strong style="font-size:13px;color:#261f1a">${listing.title}</strong><br>
               <span style="font-size:12px;color:#8a8179">${listing.location}, ${listing.country}</span><br>
               <span style="font-size:13px;font-weight:700;color:#ff5a5f">
-                ₹${listing.price?.toLocaleString("en-IN")} / night
+                ${formatPrice(listing.price)} / night
               </span>
             </div>
           `);

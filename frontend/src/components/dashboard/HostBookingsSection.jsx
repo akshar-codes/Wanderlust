@@ -23,6 +23,7 @@ import {
   useCompleteBooking,
 } from "../../hooks/useBookings";
 import { neutral, brand, radii } from "../../theme/tokens";
+import { formatPrice } from "../../utils/currency";
 
 const PAGE_LIMIT = 10;
 
@@ -96,9 +97,10 @@ function DeclineModal({ open, onClose, onConfirm, loading }) {
 function BookingRow({ booking, onDecline }) {
   const { listing, guest } = booking;
   const statusStyle = STATUS_STYLES[booking.status] ?? STATUS_STYLES.pending;
-  const { mutate: confirmBooking, isPending: confirming } = useConfirmBooking();
-  const { mutate: completeBooking, isPending: completing } =
-    useCompleteBooking();
+  const confirmMutation = useConfirmBooking();
+  const declineMutation = useDeclineBooking();
+  const completeMutation = useCompleteBooking();
+  
 
   const canComplete =
     booking.status === "confirmed" && new Date(booking.checkOut) <= new Date();
@@ -212,7 +214,7 @@ function BookingRow({ booking, onDecline }) {
           <Typography
             sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800] }}
           >
-            ₹{booking.pricing?.total?.toLocaleString("en-IN")}
+            {formatPrice(booking.pricing?.total || 0)}
             <Box component="span" sx={{ color: neutral[500], fontWeight: 400 }}>
               {" "}
               total
