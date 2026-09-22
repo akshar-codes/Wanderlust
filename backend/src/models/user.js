@@ -118,6 +118,13 @@ const userSchema = new Schema(
       default: null,
       select: false,
     },
+    twoFactor: {
+      secret: { type: String, select: false },
+      recoveryCodes: { type: [String], select: false },
+      recoveryCodesGeneratedAt: { type: Date, select: false },
+      failedAttempts: { type: Number, default: 0, select: false },
+      lockedUntil: { type: Date, select: false },
+    },
     profileCompletion: {
       type: Number,
       min: 0,

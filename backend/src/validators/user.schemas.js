@@ -24,7 +24,6 @@ export const updateSettingsBodySchema = z.object({
   currency: z.enum(CURRENCIES).optional(),
   timezone: z.string().trim().max(80).optional(),
   theme: z.enum(THEMES).optional(),
-  twoFactorEnabled: z.boolean().optional(),
   profileVisibility: z.enum(PROFILE_VISIBILITY).optional(),
 });
 

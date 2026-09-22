@@ -9,6 +9,7 @@ import myReviewsRoutes from "./myReviews.routes.js";
 import reportRoutes from "./report.routes.js";
 import reviewRoutes from "./review.routes.js";
 import searchRoutes from "./search.routes.js";
+import twoFactorRoutes from "./twoFactor.routes.js";
 import userRoutes from "./user.routes.js";
 import wishlistRoutes from "./wishlist.routes.js";
 import wishlistCollectionRoutes from "./wishlistCollection.routes.js";
@@ -25,6 +26,7 @@ router.get("/health", (_req, res) =>
 router.use("/admin", adminRoutes);
 router.use("/analytics", analyticsRoutes);
 router.use("/auth", authRoutes);
+router.use("/2fa", twoFactorRoutes);
 router.use("/bookings", bookingRoutes);
 router.use("/listings", listingRoutes);
 router.use("/listings/:listingId/reviews", reviewRoutes);
