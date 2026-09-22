@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 
-import { wanderlustTheme, injectCSSVariables } from "./theme";
+import { ColorModeProvider } from "./hooks/useColorMode";
 import { useAuthStore } from "./store/auth.store";
 import AppLayout from "./components/layout/AppLayout";
 import ErrorBoundary from "./components/common/ErrorBoundary";
@@ -60,7 +60,6 @@ function AuthInit({ children }) {
   const init = useAuthStore((s) => s.init);
   useEffect(() => {
     init();
-    injectCSSVariables();
   }, [init]);
   return children;
 }
@@ -69,7 +68,7 @@ export default function App() {
   const isDev = import.meta.env.DEV;
 
   return (
-    <ThemeProvider theme={wanderlustTheme}>
+    <ColorModeProvider>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
@@ -228,6 +227,6 @@ export default function App() {
           </ErrorBoundary>
         </BrowserRouter>
       </QueryClientProvider>
-    </ThemeProvider>
+    </ColorModeProvider>
   );
 }

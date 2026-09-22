@@ -157,25 +157,14 @@
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
+  
+  color-scheme: light;
 }
 
 /* ─── 4. Dark Mode Custom Properties ───────────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #0f0b08;
-    --color-surface: #1a1410;
-    --color-surface-2: #221c17;
-    --color-surface-3: #2c241e;
-    --color-border: #3a302a;
-    --color-border-strong: #4a3e38;
-    --color-text: #f5f0eb;
-    --color-text-secondary: #b0a89e;
-    --color-text-muted: #7a7068;
-  }
-}
-
-/* Manual dark mode class (for ThemeProvider toggle) */
+/* Manual dark mode class (applied to root by ColorModeProvider) */
 .dark {
+  color-scheme: dark;
   --color-bg: #0f0b08;
   --color-surface: #1a1410;
   --color-surface-2: #221c17;
