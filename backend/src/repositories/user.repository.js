@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import { makeRegexFilter } from "../utils/escapeRegex.js";
 
 // ── Basic lookups ─────────────────────────────────────────────────────────────
 
@@ -163,7 +164,7 @@ export const findPaginatedAdmin = async ({
   if (status === "active") filter.isActive = true;
   if (status === "suspended") filter.isActive = false;
   if (search) {
-    const regex = { $regex: search.trim(), $options: "i" };
+    const regex = makeRegexFilter(search);
     filter.$or = [
       { username: regex },
       { email: regex },

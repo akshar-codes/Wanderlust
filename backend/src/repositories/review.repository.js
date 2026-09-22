@@ -1,5 +1,6 @@
 import Review from "../models/review.js";
 import Listing from "../models/listing.js";
+import { makeRegexFilter } from "../utils/escapeRegex.js";
 
 // ── Basic CRUD ────────────────────────────────────────────────────────────────
 
@@ -49,7 +50,7 @@ export const findPaginated = async (
   if (ratingFilter) baseMatch.rating = Number(ratingFilter);
   if (withPhotos) baseMatch["photos.0"] = { $exists: true };
   if (keyword) {
-    baseMatch.comment = { $regex: keyword.trim(), $options: "i" };
+    baseMatch.comment = makeRegexFilter(keyword);
   }
 
   const sortDoc = SORT_MAP[sort] ?? SORT_MAP.recent;
@@ -188,7 +189,7 @@ export const findPaginatedAdmin = async ({
 } = {}) => {
   const filter = {};
   if (rating) filter.rating = Number(rating);
-  if (search) filter.comment = { $regex: search.trim(), $options: "i" };
+  if (search) filter.comment = makeRegexFilter(search);
 
   const skip = (page - 1) * limit;
 

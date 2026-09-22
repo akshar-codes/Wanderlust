@@ -1,4 +1,5 @@
 import Listing from "../models/listing.js";
+import { makeRegexFilter } from "../utils/escapeRegex.js";
 
 // ── Read ───────────────────────────────────────────────────────────────────────
 
@@ -81,7 +82,7 @@ export const findPaginatedAdmin = async ({
   if (status) filter.status = status;
   if (category) filter.category = category;
   if (featured !== undefined) filter.featured = featured;
-  if (search) filter.title = { $regex: search.trim(), $options: "i" };
+  if (search) filter.title = makeRegexFilter(search);
 
   const skip = (page - 1) * limit;
 

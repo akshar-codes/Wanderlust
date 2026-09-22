@@ -1,4 +1,6 @@
 import Listing from "../models/listing.js";
+import AppError from "./../utils/AppError.js";
+import { makeRegexFilter } from "../utils/escapeRegex.js";
 
 const SORT_MAP = {
   createdAt: { createdAt: -1 },
@@ -28,11 +30,12 @@ export const buildSearchFilter = (params = {}) => {
 
   const searchTerm = (q ?? destination ?? "").trim();
   if (searchTerm) {
+    const regexFilter = makeRegexFilter(searchTerm);
     filter.$or = [
-      { title: { $regex: searchTerm, $options: "i" } },
-      { location: { $regex: searchTerm, $options: "i" } },
-      { country: { $regex: searchTerm, $options: "i" } },
-      { description: { $regex: searchTerm, $options: "i" } },
+      { title: regexFilter },
+      { location: regexFilter },
+      { country: regexFilter },
+      { description: regexFilter },
     ];
   }
 
@@ -105,7 +108,7 @@ export const executeSearch = async (params = {}) => {
 export const getAutocompleteSuggestions = async (q, limit = 8) => {
   if (!q || q.trim().length === 0) return [];
 
-  const regex = { $regex: q.trim(), $options: "i" };
+  const regex = makeRegexFilter(q);
   const baseFilter = { status: "active", draft: false };
 
   const [locationDocs, countryDocs, titleDocs] = await Promise.all([
