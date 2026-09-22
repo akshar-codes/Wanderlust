@@ -295,7 +295,7 @@ async function runTests() {
     await emailVerificationService.sendVerificationEmail(user, "127.0.0.1");
 
     // Backdate the existing token's createdAt to bypass the cooldown
-    await EmailVerificationToken.updateMany(
+    await mongoose.connection.db.collection('emailverificationtokens').updateMany(
       { userId: user._id },
       {
         $set: {
@@ -303,7 +303,7 @@ async function runTests() {
             Date.now() - emailVerificationService.RESEND_COOLDOWN_MS - 1000,
           ),
         },
-      },
+      }
     );
 
     const result = await emailVerificationService.resendVerificationEmail(

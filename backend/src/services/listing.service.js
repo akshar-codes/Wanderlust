@@ -63,7 +63,7 @@ async function safeCloudinaryDelete(filename) {
   try {
     await cloudinary.uploader.destroy(filename);
   } catch (err) {
-    console.error("[ListingService] Cloudinary delete failed:", err.message);
+    logger.warn("[ListingService] Cloudinary delete failed:", { message: err.message });
   }
 }
 
