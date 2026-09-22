@@ -21,7 +21,10 @@
     "migrate:008": "node migrations/008_reports.js",
     "test": "node tests/rbac.test.js",
     "test:email-verification": "node tests/emailVerification.test.js",
-    "test:security": "node tests/security/csrf.test.js && node tests/security/regex.test.js && node tests/security/auth.test.js && node tests/security/session.test.js && node tests/security/twoFactor.test.js",
+    "test:booking": "vitest run tests/booking.lifecycle.test.js",
+    "test:booking:concurrency": "vitest run tests/booking.concurrency.test.js",
+    "test:upload": "vitest run tests/security/upload.security.test.js",
+    "test:all": "npm run test && npm run test:email-verification && npm run test:security && npm run test:booking && npm run test:booking:concurrency && npm run test:upload",
     "validate:api": "node src/scripts/validate-openapi.js"
   },
   "author": "Akshar Gupta",
@@ -61,7 +64,8 @@
   "devDependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
     "nodemon": "^3.0.0",
-    "supertest": "^7.2.2"
+    "supertest": "^7.2.2",
+    "vitest": "^2.1.1"
   },
   "allowScripts": {
     "@scarf/scarf@1.4.0": true,
