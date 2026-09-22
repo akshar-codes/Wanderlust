@@ -36,6 +36,7 @@ const corsOptions = {
     "Authorization",
     "X-Requested-With",
     "Accept",
+    "X-CSRF-Token",
   ],
   exposedHeaders: [],
   credentials: true,

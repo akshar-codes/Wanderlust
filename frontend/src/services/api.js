@@ -10,6 +10,15 @@ const api = axios.create({
   },
 });
 
+// ── Request interceptor (CSRF) ─────────────────────────────────────────────────
+api.interceptors.request.use((config) => {
+  if (!["get", "head", "options"].includes(config.method?.toLowerCase())) {
+    const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
+    if (match) config.headers["X-CSRF-Token"] = decodeURIComponent(match[1]);
+  }
+  return config;
+});
+
 // ── Response interceptor ───────────────────────────────────────────────────────
 api.interceptors.response.use(
   (response) => response,

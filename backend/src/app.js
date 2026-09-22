@@ -14,8 +14,10 @@ import hppProtection from "./middlewares/hpp.js";
 import compressionMiddleware from "./middlewares/compression.js";
 import requestLogger from "./middlewares/requestLogger.js";
 import setupSwagger from "./config/swagger.config.js";
+import cookieParser from "cookie-parser";
 
 import { requireActiveAccount } from "./middlewares/rbac.js";
+import { csrfCookie, csrfProtect } from "./middlewares/csrf.js";
 
 import apiRouter from "./routes/index.js";
 
@@ -47,6 +49,7 @@ export default function createApp(sessionMiddleware) {
   // 7. Body parsers + method override
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
+  app.use(cookieParser());
   app.use(methodOverride("_method"));
 
   // 8. HPP
@@ -65,11 +68,14 @@ export default function createApp(sessionMiddleware) {
   // 12. RBAC: reject stale sessions for deactivated accounts
   app.use(requireActiveAccount());
 
+  // 12.5 CSRF Cookie
+  app.use(csrfCookie);
+
   // 13. API docs
   setupSwagger(app);
 
   // 14. Routes
-  app.use("/api", apiRouter);
+  app.use("/api", csrfProtect, apiRouter);
 
   // 15. 404
   app.use((_req, _res, next) => next(AppError.notFound("Page Not Found")));
