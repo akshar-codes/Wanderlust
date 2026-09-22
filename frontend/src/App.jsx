@@ -25,6 +25,7 @@ import SettingsPage from "./pages/SettingsPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import WishlistPage from "./pages/WishlistPage";
 import SharedWishlistPage from "./pages/SharedWishlistPage";
+import NotificationsPage from "./pages/NotificationsPage";
 import AdminLayout from "./pages/admin/AdminLayout";
 import LoginPage from "./pages/auth/LoginPage";
 import TwoFactorChallengePage from "./pages/auth/TwoFactorChallengePage";
@@ -157,6 +158,26 @@ export default function App() {
                   />
                   <Route
                     path="wishlist/:id"
+                    element={
+                      <ProtectedRoute>
+                        <WishlistPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ── Notifications ──────────────────────────────────────── */}
+                  <Route
+                    path="notifications"
+                    element={
+                      <ProtectedRoute>
+                        <NotificationsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ── Wishlists ──────────────────────────────────────────── */}
+                  <Route
+                    path="wishlists"
                     element={
                       <ProtectedRoute>
                         <ResponsiveWishlistCollectionPage />
