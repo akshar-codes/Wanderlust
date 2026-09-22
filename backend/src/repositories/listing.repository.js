@@ -140,8 +140,29 @@ export const recalculateRating = async (listingId) => {
   );
 };
 
-export const incrementCounter = (id, field, amount = 1) =>
-  Listing.findByIdAndUpdate(id, { $inc: { [field]: amount } }, { new: true });
+export const getHostStatsSummary = (ownerId) =>
+  Listing.aggregate([
+    { $match: { owner: ownerId } },
+    {
+      $group: {
+        _id: null,
+        totalPublished: {
+          $sum: {
+            $cond: [
+              { $and: [{ $eq: ["$draft", false] }, { $eq: ["$status", "active"] }] },
+              1,
+              0,
+            ],
+          },
+        },
+        totalWishlisted: { $sum: { $ifNull: ["$wishlistCount", 0] } },
+        totalBookings: { $sum: { $ifNull: ["$bookingCount", 0] } },
+      },
+    },
+  ]);
+
+export const incrementCounter = (id, field, amount = 1, session = null) =>
+  Listing.findByIdAndUpdate(id, { $inc: { [field]: amount } }, { new: true, session });
 
 // ── Images ─────────────────────────────────────────────────────────────────────
 
@@ -178,6 +199,23 @@ export const addBlockedDate = (id, blockedDate) =>
     id,
     { $push: { availabilityCalendar: blockedDate } },
     { new: true, runValidators: true },
+  );
+
+export const addBlockedDateAtomic = (id, checkIn, checkOut, blockedDate, session) =>
+  Listing.findOneAndUpdate(
+    {
+      _id: id,
+      availabilityCalendar: {
+        $not: {
+          $elemMatch: {
+            startDate: { $lt: checkOut },
+            endDate: { $gt: checkIn },
+          },
+        },
+      },
+    },
+    { $push: { availabilityCalendar: blockedDate } },
+    { new: true, session },
   );
 
 export const removeBlockedDate = (id, blockedDateId) =>

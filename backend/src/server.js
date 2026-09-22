@@ -66,12 +66,41 @@ process.on("uncaughtException", (err) => {
 
     configurePassport();
 
-    app.listen(PORT, () =>
+    const httpServer = app.listen(PORT, () =>
       logger.info("Server running", {
         port: PORT,
         env: process.env.NODE_ENV ?? "development",
       }),
     );
+
+    const shutdown = async (signal) => {
+      logger.info(`${signal} received: stopping server`);
+      
+      const shutdownTimer = setTimeout(() => {
+        logger.error("Shutdown timed out. Forcing exit.");
+        process.exit(1);
+      }, 10000);
+
+      httpServer.close(async (err) => {
+        if (err) {
+          logger.error("Error closing server", { error: err.message });
+        }
+        logger.info("HTTP server closed");
+        
+        try {
+          await mongoose.disconnect();
+          logger.info("MongoDB disconnected");
+        } catch (dbErr) {
+          logger.error("Error disconnecting MongoDB", { error: dbErr.message });
+        }
+        
+        clearTimeout(shutdownTimer);
+        process.exit(err ? 1 : 0);
+      });
+    };
+
+    process.on("SIGTERM", () => shutdown("SIGTERM"));
+    process.on("SIGINT", () => shutdown("SIGINT"));
   } catch (err) {
     logger.error("Startup failed", { error: err.message, stack: err.stack });
     process.exit(1);

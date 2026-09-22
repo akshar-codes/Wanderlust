@@ -380,26 +380,26 @@ export const getHostSummary = async (hostId, query) => {
   const { range } = query;
   const { startDate, endDate } = resolveDateRange(range);
 
+  const listingIds = await analyticsRepo.getHostListingIds(hostId);
+
   const [
     revenueSummary,
     bookingSummary,
     activeListingsCount,
     listingsSummary,
-    listingIds,
     bookingsForOccupancy,
+    reviewsOverview,
   ] = await Promise.all([
     analyticsRepo.getRevenueSummary(hostId, { startDate, endDate }),
     analyticsRepo.getBookingTrendsSummary(hostId, { startDate, endDate }),
     analyticsRepo.getActiveListingsCount(hostId),
     analyticsRepo.getHostListingsSummary(hostId),
-    analyticsRepo.getHostListingIds(hostId),
     analyticsRepo.getBookingsInRangeForOccupancy(hostId, {
       startDate,
       endDate,
     }),
+    analyticsRepo.getReviewsOverview(listingIds),
   ]);
-
-  const reviewsOverview = await analyticsRepo.getReviewsOverview(listingIds);
 
   const bookedNights = bookingsForOccupancy.reduce(
     (s, b) => s + overlapNights(b, startDate, endDate),

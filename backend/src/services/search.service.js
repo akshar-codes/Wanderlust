@@ -109,17 +109,34 @@ export const getAutocompleteSuggestions = async (q, limit = 8) => {
   if (!q || q.trim().length === 0) return [];
 
   const regex = makeRegexFilter(q);
-  const baseFilter = { status: "active", draft: false };
 
-  const [locationDocs, countryDocs, titleDocs] = await Promise.all([
-    Listing.distinct("location", { ...baseFilter, location: regex }),
-    Listing.distinct("country", { ...baseFilter, country: regex }),
-    Listing.find(
-      { ...baseFilter, title: regex },
-      { title: 1, location: 1, country: 1, _id: 1 },
-    )
-      .limit(limit)
-      .lean(),
+  const [results] = await Listing.aggregate([
+    {
+      $match: {
+        status: "active",
+        draft: false,
+        $or: [{ location: regex }, { country: regex }, { title: regex }],
+      },
+    },
+    {
+      $facet: {
+        locations: [
+          { $match: { location: regex } },
+          { $group: { _id: "$location" } },
+          { $limit: limit },
+        ],
+        countries: [
+          { $match: { country: regex } },
+          { $group: { _id: "$country" } },
+          { $limit: limit },
+        ],
+        titles: [
+          { $match: { title: regex } },
+          { $project: { title: 1, location: 1, country: 1 } },
+          { $limit: limit },
+        ],
+      },
+    },
   ]);
 
   const suggestions = [];
@@ -133,17 +150,15 @@ export const getAutocompleteSuggestions = async (q, limit = 8) => {
     }
   };
 
-  locationDocs
-    .slice(0, limit)
-    .forEach((loc) => push({ type: "location", label: loc, icon: "📍" }));
+  (results.locations || []).forEach((doc) =>
+    push({ type: "location", label: doc._id, icon: "📍" }),
+  );
 
-  countryDocs
-    .slice(0, limit)
-    .forEach((country) =>
-      push({ type: "country", label: country, icon: "🌍" }),
-    );
+  (results.countries || []).forEach((doc) =>
+    push({ type: "country", label: doc._id, icon: "🌍" }),
+  );
 
-  titleDocs.forEach((doc) =>
+  (results.titles || []).forEach((doc) =>
     push({
       type: "listing",
       label: doc.title,

@@ -4,6 +4,7 @@ import * as reviewService from "./review.service.js";
 import AppError from "../utils/AppError.js";
 import { cloudinary } from "../config/cloudConfig.js";
 import User from "../models/user.js";
+import logger from "../utils/logger.js";
 
 // ── Registration ──────────────────────────────────────────────────────────────
 
@@ -36,30 +37,19 @@ export const getHostStats = async (username) => {
   const user = await userRepo.findByUsername(username);
   if (!user || !user.isActive) throw AppError.notFound("User not found");
 
-  const [listings, reviewSummary] = await Promise.all([
-    listingRepo.findByOwner(user._id),
+  const [stats, reviewSummary] = await Promise.all([
+    listingRepo.getHostStatsSummary(user._id),
     reviewService.getHostReviewSummary(user._id),
   ]);
 
-  const publishedListings = listings.filter(
-    (l) => !l.draft && l.status === "active",
-  );
-
-  const totalWishlisted = listings.reduce(
-    (sum, l) => sum + (l.wishlistCount ?? 0),
-    0,
-  );
-  const totalBookings = listings.reduce(
-    (sum, l) => sum + (l.bookingCount ?? 0),
-    0,
-  );
+  const summary = stats[0] ?? { totalPublished: 0, totalWishlisted: 0, totalBookings: 0 };
 
   return {
-    totalListings: publishedListings.length,
+    totalListings: summary.totalPublished,
     totalReviews: reviewSummary.totalReviews,
     averageRating: reviewSummary.averageRating,
-    totalWishlisted,
-    totalBookings,
+    totalWishlisted: summary.totalWishlisted,
+    totalBookings: summary.totalBookings,
     memberSince: user.createdAt,
   };
 };
@@ -98,7 +88,7 @@ export const updateAvatar = async (userId, file) => {
 
   if (oldPublicId) {
     cloudinary.uploader.destroy(oldPublicId).catch((err) => {
-      console.error("[UserService] Cloudinary avatar delete failed:", err);
+      logger.warn("[UserService] Cloudinary avatar delete failed:", { error: err.message });
     });
   }
 
@@ -119,7 +109,7 @@ export const removeAvatar = async (userId) => {
 
   if (oldPublicId) {
     cloudinary.uploader.destroy(oldPublicId).catch((err) => {
-      console.error("[UserService] Cloudinary avatar delete failed:", err);
+      logger.warn("[UserService] Cloudinary avatar delete failed:", { error: err.message });
     });
   }
 

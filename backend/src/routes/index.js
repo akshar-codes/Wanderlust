@@ -16,10 +16,17 @@ import wishlistCollectionRoutes from "./wishlistCollection.routes.js";
 
 const router = express.Router();
 
+import mongoose from "mongoose";
+
 router.get("/health", (_req, res) =>
   res.json({
     success: true,
-    data: { status: "ok", ts: new Date().toISOString() },
+    data: { 
+      status: "ok", 
+      db: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+      uptime: process.uptime(),
+      ts: new Date().toISOString() 
+    },
   }),
 );
 
