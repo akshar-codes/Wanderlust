@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import { neutral, brand } from "../../theme/tokens";
 
 export default function CategoryFilters({ showTax, onTaxToggle }) {
   const [params] = useSearchParams();
@@ -74,7 +74,11 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04, duration: 0.3 }}
             >
-              <Link to={to} style={{ textDecoration: "none" }} aria-current={isActive ? "page" : undefined}>
+              <Link
+                to={to}
+                style={{ textDecoration: "none" }}
+                aria-current={isActive ? "page" : undefined}
+              >
                 <motion.div
                   whileHover={{ y: -2, scale: 1.03 }}
                   whileTap={{ scale: 0.96 }}

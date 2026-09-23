@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, MapPin, TrendingUp } from "lucide-react";
 import WishlistHeartButton from "../wishlist/WishlistHeartButton";
 import { cloudinaryUrl } from "../../utils/cloudinaryUrl";
 import { formatPrice } from "../../utils/currency";
+import { useWishlistStatus } from "../../hooks/useWishlist";
 
 const CATEGORY_ICONS = {
   trending: "🔥",
@@ -19,16 +20,33 @@ const CATEGORY_ICONS = {
   boats: "⛵",
 };
 
-export default function ListingCard({ listing, variant = "default", showTax = false, index = 0, noLink = false }) {
+export default function ListingCard({
+  listing,
+  variant = "default",
+  showTax = false,
+  index = 0,
+  noLink = false,
+}) {
   const navigate = useNavigate();
-  
+
   const wishlisted = useWishlistStatus(listing._id);
-  const { _id, title, location, country, price, pricing, images, image, category, averageRating, reviewCount, featured } = listing;
+  const {
+    _id,
+    title,
+    location,
+    country,
+    price,
+    pricing,
+    images,
+    image,
+    category,
+    averageRating,
+    reviewCount,
+    featured,
+  } = listing;
 
   const activePrice = pricing?.nightlyPrice ?? price ?? 0;
-  const displayPrice = showTax
-    ? (activePrice * 1.18).toLocaleString("en-IN")
-    : activePrice.toLocaleString("en-IN");
+  const displayPrice = showTax ? activePrice * 1.18 : activePrice;
 
   const seed = _id ? parseInt(_id.slice(-4), 16) : index;
   const rating = averageRating ?? (4.2 + (seed % 8) * 0.1).toFixed(1);
@@ -41,7 +59,10 @@ export default function ListingCard({ listing, variant = "default", showTax = fa
   const Wrapper = noLink ? "div" : Link;
   const wrapperProps = noLink
     ? { style: { display: "block" } }
-    : { to: `/listings/${_id}`, style: { textDecoration: "none", color: "inherit", display: "block" } };
+    : {
+        to: `/listings/${_id}`,
+        style: { textDecoration: "none", color: "inherit", display: "block" },
+      };
 
   return (
     <motion.div
@@ -180,7 +201,10 @@ export default function ListingCard({ listing, variant = "default", showTax = fa
 
             <h3
               style={{
-                fontFamily: variant === "default" ? "var(--font-display)" : "var(--font-body)",
+                fontFamily:
+                  variant === "default"
+                    ? "var(--font-display)"
+                    : "var(--font-body)",
                 fontSize: variant === "default" ? "1.05rem" : "0.9375rem",
                 fontWeight: variant === "default" ? 400 : 700,
                 color: "var(--color-text)",
@@ -212,7 +236,12 @@ export default function ListingCard({ listing, variant = "default", showTax = fa
                 >
                   {formatPrice(displayPrice)}
                 </span>
-                <span style={{ color: "var(--color-text-secondary)", fontSize: "0.8125rem" }}>
+                <span
+                  style={{
+                    color: "var(--color-text-secondary)",
+                    fontSize: "0.8125rem",
+                  }}
+                >
                   {" "}
                   / night
                 </span>
@@ -240,7 +269,12 @@ export default function ListingCard({ listing, variant = "default", showTax = fa
                 >
                   {rating}
                 </span>
-                <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-text-muted)",
+                  }}
+                >
                   ({reviews})
                 </span>
               </div>
