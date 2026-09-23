@@ -340,8 +340,8 @@ export default function Footer() {
                   whileHover={{ scale: 1.12, y: -2 }}
                   whileTap={{ scale: 0.92 }}
                   style={{
-                    width: 34,
-                    height: 34,
+                    width: 40,
+                    height: 40,
                     borderRadius: 10,
                     background: neutral[100],
                     border: "1px solid #ebe7e3",
@@ -480,7 +480,7 @@ export default function Footer() {
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                padding: "8px 12px",
+                padding: "10px 16px",
                 background: "none",
                 border: "1px solid #d6d0ca",
                 borderRadius: 8,
@@ -498,7 +498,7 @@ export default function Footer() {
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                padding: "8px 12px",
+                padding: "10px 16px",
                 background: "none",
                 border: "1px solid #d6d0ca",
                 borderRadius: 8,

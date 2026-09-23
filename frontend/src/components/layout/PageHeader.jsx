@@ -115,6 +115,7 @@ export function PageHeader({
           )}
           {typeof title === "string" ? (
             <Typography
+              component="h1"
               sx={{
                 fontFamily: fonts.display,
                 fontWeight: 400,

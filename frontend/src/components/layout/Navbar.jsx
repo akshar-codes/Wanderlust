@@ -24,6 +24,7 @@ import { useLogout } from "../../hooks/useAuth";
 import { useColorModeContext } from "../../hooks/useColorMode";
 import { useNotifications, useUnreadCount, useMarkRead, useMarkAllRead } from "../../hooks/useNotifications";
 import { Moon, Sun } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 /* ── Framer variants ─────────────────────────────────────────── */
 const BRAND_GRADIENT = `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`;
@@ -94,6 +95,7 @@ function NavSearch({ onSubmitSearch }) {
       <Search size={15} style={{ color: "#b0a89e", flexShrink: 0 }} />
       <input
         type="search"
+        aria-label="Search destinations"
         value={query}
         onChange={handleQuery}
         onFocus={() => setFocused(true)}
@@ -145,6 +147,7 @@ function NavSearch({ onSubmitSearch }) {
 function NotificationMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -163,6 +166,11 @@ function NotificationMenu() {
   const notifications = data?.notifications || [];
   const unreadCount = unreadData?.count || 0;
 
+  useFocusTrap(dropdownRef, {
+    enabled: open,
+    onEscape: () => setOpen(false),
+  });
+
   const handleNotificationClick = (n) => {
     if (!n.read) markRead.mutate(n.id);
     if (n.link) {
@@ -175,6 +183,9 @@ function NotificationMenu() {
     <div ref={ref} style={{ position: "relative" }}>
       <Tooltip title="Notifications" placement="bottom">
         <motion.button
+          aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
+          aria-expanded={open}
+          aria-haspopup="dialog"
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.94 }}
           onClick={() => setOpen((o) => !o)}
@@ -221,6 +232,10 @@ function NotificationMenu() {
       <AnimatePresence>
         {open && (
           <motion.div
+            ref={dropdownRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Notifications"
             variants={menuVariants}
             initial="hidden"
             animate="visible"
@@ -284,12 +299,16 @@ function NotificationMenu() {
               </div>
             ) : (
               notifications.map((n) => (
-                <motion.div
+                <motion.button
+                  type="button"
                   key={n.id}
                   onClick={() => handleNotificationClick(n)}
                   whileHover={{ background: "rgba(250,248,246,1)" }}
                   style={{
                     display: "flex",
+                    width: "100%",
+                    textAlign: "left",
+                    border: "none",
                     gap: 12,
                     padding: "14px 20px",
                     background: !n.read ? "rgba(255,90,95,0.04)" : "transparent",
@@ -349,7 +368,7 @@ function NotificationMenu() {
                       }}
                     />
                   )}
-                </motion.div>
+                </motion.button>
               ))
             )}
             <div style={{ padding: "12px 20px" }}>
@@ -377,6 +396,7 @@ function NotificationMenu() {
 function UserMenu({ user, onLogout, isPending }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const dropdownRef = useRef(null);
   const initial = user?.username?.[0]?.toUpperCase() ?? "U";
 
   useEffect(() => {
@@ -388,6 +408,11 @@ function UserMenu({ user, onLogout, isPending }) {
   }, []);
 
   const { mode, toggle } = useColorModeContext();
+
+  useFocusTrap(dropdownRef, {
+    enabled: open,
+    onEscape: () => setOpen(false),
+  });
 
   const items = [
     {
@@ -418,6 +443,9 @@ function UserMenu({ user, onLogout, isPending }) {
   return (
     <div ref={ref} style={{ position: "relative" }}>
       <motion.button
+        aria-label={`Account menu for ${user?.username ?? "user"}`}
+        aria-expanded={open}
+        aria-haspopup="dialog"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.97 }}
         onClick={() => setOpen((o) => !o)}
@@ -434,6 +462,7 @@ function UserMenu({ user, onLogout, isPending }) {
         }}
       >
         <Avatar
+          src={user?.avatar}
           sx={{
             width: 30,
             height: 30,
@@ -461,6 +490,10 @@ function UserMenu({ user, onLogout, isPending }) {
       <AnimatePresence>
         {open && (
           <motion.div
+            ref={dropdownRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Account menu"
             variants={menuVariants}
             initial="hidden"
             animate="visible"
@@ -723,6 +756,7 @@ function MobileDrawer({
             </span>
           </div>
           <motion.button
+            aria-label="Close navigation menu"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.93 }}
             onClick={onClose}
@@ -761,6 +795,7 @@ function MobileDrawer({
           >
             <Search size={15} color={neutral[500]} />
             <input
+              aria-label="Search destinations"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
