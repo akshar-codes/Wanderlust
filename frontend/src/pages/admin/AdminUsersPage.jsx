@@ -178,6 +178,7 @@ export default function AdminUsersPage() {
       </Box>
 
       <Table
+        ariaLabel="Users table"
         columns={columns}
         rows={users}
         rowKey="_id"

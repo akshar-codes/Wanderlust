@@ -163,6 +163,7 @@ export default function AdminBookingsPage() {
         />
       ) : (
         <Table
+          ariaLabel="Bookings table"
           columns={columns}
           rows={bookings}
           rowKey="_id"

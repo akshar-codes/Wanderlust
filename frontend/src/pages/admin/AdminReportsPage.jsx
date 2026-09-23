@@ -292,6 +292,7 @@ export default function AdminReportsPage() {
         />
       ) : (
         <Table
+          ariaLabel="Reports table"
           columns={columns}
           rows={reports}
           rowKey="_id"

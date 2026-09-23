@@ -202,6 +202,7 @@ export default function AdminListingsPage() {
       </Box>
 
       <Table
+        ariaLabel="Listings table"
         columns={columns}
         rows={listings}
         rowKey="_id"

@@ -105,6 +105,7 @@ export default function AdminLayout() {
                   key={key}
                   component="button"
                   type="button"
+                  aria-current={active ? "page" : undefined}
                   onClick={() => goTo(key)}
                   sx={{
                     display: "flex",

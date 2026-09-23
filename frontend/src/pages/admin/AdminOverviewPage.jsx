@@ -76,7 +76,13 @@ function ChartPanel({ title, children }) {
       <Typography sx={{ fontWeight: 700, fontSize: "1rem", color: neutral[800], mb: 2 }}>
         {title}
       </Typography>
-      {children}
+      <Box
+        role="region"
+        aria-label={`${title} chart`}
+        sx={{ width: "100%", height: "calc(100% - 32px)" }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 }

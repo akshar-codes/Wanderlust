@@ -169,6 +169,7 @@ export default function AdminReviewsPage() {
       </Box>
 
       <Table
+        ariaLabel="Reviews table"
         columns={columns}
         rows={reviews}
         rowKey="_id"
