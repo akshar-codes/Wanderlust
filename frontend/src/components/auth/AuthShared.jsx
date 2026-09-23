@@ -54,6 +54,7 @@ export function AuthCard({ children, maxWidth = 440 }) {
       </div>
 
       <motion.div
+        className="auth-card-inner"
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -439,8 +440,12 @@ export function PasswordStrength({ password }) {
   const { score, label, color } = getStrength(password);
   if (!password) return null;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <div style={{ display: "flex", gap: 4 }}>
+    <div
+      aria-live="polite"
+      aria-atomic="true"
+      style={{ display: "flex", flexDirection: "column", gap: 4 }}
+    >
+      <div style={{ display: "flex", gap: 4 }} aria-hidden="true">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
@@ -454,7 +459,9 @@ export function PasswordStrength({ password }) {
           />
         ))}
       </div>
-      <p style={{ fontSize: "0.72rem", color, fontWeight: 600 }}>{label}</p>
+      <p style={{ fontSize: "0.72rem", color, fontWeight: 600 }}>
+        Password strength: {label}
+      </p>
     </div>
   );
 }

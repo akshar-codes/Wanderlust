@@ -61,7 +61,7 @@ export default function TwoFactorChallengePage() {
           type="text"
           placeholder={useRecovery ? "XXXXX-XXXXX" : "000000"}
           error={errors.code?.message}
-          {...register("code", { required: "This field is required" })}
+          register={register("code", { required: "This field is required" })}
         />
 
         <SubmitButton isSubmitting={isPending}>Verify</SubmitButton>
