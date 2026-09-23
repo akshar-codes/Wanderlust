@@ -295,6 +295,7 @@ function FilterDrawer({
               </motion.button>
             )}
             <motion.button
+              aria-label="Close filters"
               whileTap={{ scale: 0.94 }}
               onClick={onClose}
               style={{
@@ -339,6 +340,7 @@ function FilterDrawer({
               {[0, 3, 3.5, 4, 4.5, 4.8].map((r) => (
                 <motion.button
                   key={r}
+                  aria-pressed={local.rating === r}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => update("rating", r)}
                   style={{
@@ -452,6 +454,7 @@ function FilterDrawer({
                 return (
                   <motion.button
                     key={key}
+                    aria-pressed={Boolean(isSelected)}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => {
                       const next = isSelected
@@ -783,7 +786,7 @@ function ActiveChips({ filters, onRemove }) {
           }}
         >
           {chip.label}
-          <X size={12} strokeWidth={2.5} />
+          <X size={12} strokeWidth={2.5} aria-hidden="true" />
         </motion.button>
       ))}
     </motion.div>
@@ -1024,12 +1027,14 @@ export default function ListingsPage() {
           }}
         >
           {[
-            { mode: "grid", icon: <Grid3X3 size={15} />, label: "Grid" },
-            { mode: "list", icon: <List size={15} />, label: "List" },
-            { mode: "map", icon: <Map size={15} />, label: "Map" },
+            { mode: "grid", icon: <Grid3X3 size={15} />, label: "Grid view" },
+            { mode: "list", icon: <List size={15} />, label: "List view" },
+            { mode: "map", icon: <Map size={15} />, label: "Map view" },
           ].map(({ mode, icon, label }) => (
             <Tooltip key={mode} title={label} placement="top">
               <motion.button
+                aria-label={label}
+                aria-pressed={viewMode === mode}
                 whileTap={{ scale: 0.93 }}
                 onClick={() => setViewMode(mode)}
                 style={{
@@ -1052,6 +1057,7 @@ export default function ListingsPage() {
 
         {/* Results count */}
         <span
+          aria-live="polite"
           style={{
             marginLeft: "auto",
             fontSize: "0.8125rem",
@@ -1094,7 +1100,8 @@ export default function ListingsPage() {
       </AnimatePresence>
 
       {/* ── Main Content ──────────────────────────────────────────────── */}
-      <AnimatePresence mode="wait">
+      <div aria-busy={isFetching}>
+        <AnimatePresence mode="wait">
         {isLoading ? (
           <motion.div
             key="loading"
@@ -1267,6 +1274,7 @@ export default function ListingsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
 
       {/* ── Filter Drawer ──────────────────────────────────────────────── */}
       <FilterDrawer

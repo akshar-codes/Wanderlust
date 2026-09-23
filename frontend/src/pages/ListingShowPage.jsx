@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { brand, neutral, semantic, shadows } from "../theme/tokens";
 import { CATEGORY_ICONS } from "../constants/categories";
+import { useFocusTrap } from "../hooks/useFocusTrap";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Tooltip,
@@ -148,6 +149,12 @@ function getSecondaryGalleryCellStyle(index, secondaryCount) {
 // ─── Lightbox ─────────────────────────────────────────────────────────────────
 function Lightbox({ images, startIndex, onClose }) {
   const [index, setIndex] = useState(startIndex);
+  const containerRef = useRef(null);
+
+  useFocusTrap(containerRef, {
+    enabled: true,
+    onEscape: onClose,
+  });
 
   const prev = useCallback(
     () => setIndex((i) => (i - 1 + images.length) % images.length),
@@ -158,18 +165,16 @@ function Lightbox({ images, startIndex, onClose }) {
     [images.length],
   );
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft") prev();
-      if (e.key === "ArrowRight") next();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onClose, prev, next]);
-
   return (
     <motion.div
+      ref={containerRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image viewer"
+      onKeyDown={(e) => {
+        if (e.key === "ArrowLeft") prev();
+        if (e.key === "ArrowRight") next();
+      }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -187,6 +192,7 @@ function Lightbox({ images, startIndex, onClose }) {
     >
       {/* Close */}
       <motion.button
+        aria-label="Close image viewer"
         whileHover={{ scale: 1.08 }}
         onClick={onClose}
         style={{
@@ -255,6 +261,7 @@ function Lightbox({ images, startIndex, onClose }) {
       {images.length > 1 && (
         <>
           <motion.button
+            aria-label="Previous image"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.94 }}
             onClick={(e) => {
@@ -280,6 +287,7 @@ function Lightbox({ images, startIndex, onClose }) {
             <ChevronLeft size={22} color={neutral[0]} />
           </motion.button>
           <motion.button
+            aria-label="Next image"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.94 }}
             onClick={(e) => {
@@ -322,6 +330,7 @@ function Lightbox({ images, startIndex, onClose }) {
           {images.map((img, i) => (
             <motion.button
               key={i}
+              aria-label={`Photo ${i + 1} of ${images.length}`}
               whileHover={{ scale: 1.06 }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -360,6 +369,13 @@ function Lightbox({ images, startIndex, onClose }) {
 function ShareSheet({ open, onClose, listing }) {
   const url = window.location.href;
   const [copied, setCopied] = useState(false);
+  const containerRef = useRef(null);
+
+  useFocusTrap(containerRef, {
+    enabled: open,
+    onEscape: onClose,
+  });
+
   const copyLink = () => {
     navigator.clipboard.writeText(url);
     setCopied(true);
@@ -386,6 +402,10 @@ function ShareSheet({ open, onClose, listing }) {
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={containerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="share-sheet-title"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -423,6 +443,7 @@ function ShareSheet({ open, onClose, listing }) {
               }}
             >
               <h3
+                id="share-sheet-title"
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.3rem",
@@ -433,12 +454,13 @@ function ShareSheet({ open, onClose, listing }) {
                 Share this listing
               </h3>
               <button
+                aria-label="Close share sheet"
                 onClick={onClose}
                 style={{
                   background: neutral[100],
                   border: "none",
-                  width: 32,
-                  height: 32,
+                  width: 44,
+                  height: 44,
                   borderRadius: "50%",
                   display: "flex",
                   alignItems: "center",
@@ -579,11 +601,12 @@ function ShareSheet({ open, onClose, listing }) {
 // ─── Star Picker (inline) ─────────────────────────────────────────────────────
 function StarPicker({ value, onChange }) {
   return (
-    <div style={{ display: "flex", gap: 4 }}>
+    <div style={{ display: "flex", gap: 4 }} role="group" aria-label="Rate this listing">
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
           type="button"
+          aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
           onClick={() => onChange(star)}
           style={{
             background: "none",
@@ -2211,7 +2234,7 @@ export default function ListingShowPage() {
 
       {/* Responsive overrides */}
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
           .show-layout {
             grid-template-columns: 1fr !important;
           }

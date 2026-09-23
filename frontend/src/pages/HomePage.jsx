@@ -788,7 +788,18 @@ function HeroSearch({ listings }) {
           }}
         >
           {/* WHERE */}
-          <div style={fieldStyle("where")} onClick={() => setFocused("where")}>
+          <div
+            style={fieldStyle("where")}
+            onClick={() => setFocused("where")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setFocused("where");
+              }
+            }}
+          >
             <p
               style={{
                 fontSize: "0.65rem",
@@ -822,7 +833,18 @@ function HeroSearch({ listings }) {
           </div>
 
           {/* WHEN */}
-          <div style={fieldStyle("when")} onClick={() => setFocused("when")}>
+          <div
+            style={fieldStyle("when")}
+            onClick={() => setFocused("when")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setFocused("when");
+              }
+            }}
+          >
             <p
               style={{
                 fontSize: "0.65rem",
@@ -859,6 +881,14 @@ function HeroSearch({ listings }) {
           <div
             style={fieldStyle("guests")}
             onClick={() => setFocused("guests")}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setFocused("guests");
+              }
+            }}
           >
             <p
               style={{
