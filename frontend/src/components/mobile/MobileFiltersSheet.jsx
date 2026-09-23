@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -18,6 +18,7 @@ import PriceRangeSlider from "../search/PriceRangeSlider";
 import { Counter } from "../ui/Counter";
 import { usePriceHistogram } from "../../hooks/useSearch";
 import { brand, neutral } from "../../theme/tokens";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const AMENITIES_OPTIONS = [
   { key: "wifi", label: "Wifi", icon: <Wifi size={16} /> },
@@ -40,9 +41,16 @@ const AMENITIES_OPTIONS = [
  */
 export default function MobileFiltersSheet({ open, onClose, filters, onApply, onReset }) {
   const [local, setLocal] = useState(filters);
+  const containerRef = useRef(null);
+
   useEffect(() => {
     if (open) setLocal(filters);
   }, [open, filters]);
+
+  useFocusTrap(containerRef, {
+    enabled: Boolean(open),
+    onEscape: onClose,
+  });
 
   const { data: histogram, isLoading: histLoading } = usePriceHistogram(filters);
   const update = (k, v) => setLocal((f) => ({ ...f, [k]: v }));
@@ -58,6 +66,10 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={containerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-filters-title"
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
@@ -99,9 +111,10 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
               <ArrowLeft size={18} color={neutral[700]} />
             </button>
             <h2
+              id="mobile-filters-title"
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
-                fontSize: "1.15rem",
+                fontSize: "1.1rem",
                 color: neutral[800],
                 margin: 0,
               }}
@@ -127,12 +140,13 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
 
             <FDivider />
 
-            <FSection title="Minimum rating">
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {[0, 3, 3.5, 4, 4.5, 4.8].map((r) => (
+            <FSection title="Guest rating">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                {[0, 3, 4, 4.5, 4.8].map((r) => (
                   <button
                     key={r}
-                    onClick={() => update("rating", r || undefined)}
+                    onClick={() => update("rating", r)}
+                    aria-pressed={(local.rating ?? 0) === r}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -168,12 +182,13 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
             <FDivider />
 
             <FSection title="Amenities">
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div className="amenity-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {AMENITIES_OPTIONS.map(({ key, label, icon }) => {
                   const selected = local.amenities?.includes(key);
                   return (
                     <button
                       key={key}
+                      aria-pressed={Boolean(selected)}
                       onClick={() => {
                         const next = selected
                           ? (local.amenities ?? []).filter((a) => a !== key)

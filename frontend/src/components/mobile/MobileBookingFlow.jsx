@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, X, Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -11,6 +11,7 @@ import { useIsOwner } from "../../hooks/useCurrentUser";
 import { useCreateBooking } from "../../hooks/useBookings";
 import { brand, neutral, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 // Mirrors backend/src/services/booking.service.js GST_RATE — keep in sync.
 const GST_RATE = 0.18;
@@ -34,6 +35,7 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
   const { isAuthenticated } = useAuthStore();
   const isOwner = useIsOwner(listing?.owner?._id ?? listing?.owner);
   const { mutate: createBooking, isPending } = useCreateBooking();
+  const containerRef = useRef(null);
 
   const [stepIdx, setStepIdx] = useState(0);
   const [checkIn, setCheckIn] = useState(null);
@@ -74,6 +76,11 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
     setTimeout(reset, 300);
   };
 
+  useFocusTrap(containerRef, {
+    enabled: Boolean(open),
+    onEscape: handleClose,
+  });
+
   const handleReserve = () => {
     if (!isAuthenticated) {
       toast.error("Log in to book this stay");
@@ -100,6 +107,10 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={containerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-booking-title"
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
@@ -136,6 +147,7 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
             </button>
             <div style={{ flex: 1 }}>
               <p
+                aria-live="polite"
                 style={{
                   fontSize: "0.6875rem",
                   fontWeight: 700,
@@ -147,7 +159,7 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
               >
                 Step {stepIdx + 1} of {STEPS.length}
               </p>
-              <h2 style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: "1.1rem", color: neutral[800], margin: 0 }}>
+              <h2 id="mobile-booking-title" style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: "1.1rem", color: neutral[800], margin: 0 }}>
                 {step === "dates" && "Select dates"}
                 {step === "guests" && "Add guests"}
                 {step === "review" && "Review & pay"}

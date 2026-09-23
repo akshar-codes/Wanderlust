@@ -5,6 +5,7 @@ import { X, Search as SearchIcon, ArrowLeft } from "lucide-react";
 import { useAutocomplete } from "../../hooks/useSearch";
 import { Counter } from "../ui/Counter";
 import { brand, neutral, radii } from "../../theme/tokens";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const CATEGORIES = [
   { key: null, icon: "⊞", label: "Any" },
@@ -30,6 +31,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
   const [category, setCategory] = useState(null);
   const [guests, setGuests] = useState(1);
   const inputRef = useRef(null);
+  const containerRef = useRef(null);
 
   const { data: suggestions = [], isFetching } = useAutocomplete(query, {
     enabled: open && step === "where" && query.trim().length >= 1,
@@ -44,6 +46,11 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
     }
   }, [open, initialQuery]);
 
+  useFocusTrap(containerRef, {
+    enabled: Boolean(open),
+    onEscape: onClose,
+  });
+
   const handleSubmit = () => {
     const params = new URLSearchParams();
     if (query.trim()) params.set("q", query.trim());
@@ -57,6 +64,10 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={containerRef}
+          role="search"
+          aria-modal="true"
+          aria-label="Search destinations"
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
@@ -113,6 +124,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
               <SearchIcon size={16} color={neutral[400]} />
               <input
                 ref={inputRef}
+                aria-label="Search destinations"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setStep("where")}
@@ -241,6 +253,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                       {CATEGORIES.map((c) => (
                         <button
                           key={c.label}
+                          aria-pressed={category === c.key}
                           onClick={() => {
                             setCategory(c.key);
                             setStep("who");

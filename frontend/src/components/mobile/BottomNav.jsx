@@ -38,7 +38,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      aria-label="Primary"
+      aria-label="Primary navigation"
       style={{
         position: "fixed",
         bottom: 0,
@@ -60,6 +60,7 @@ export default function BottomNav() {
           <Link
             key={tab.key}
             to={tab.to}
+            aria-current={active ? "page" : undefined}
             onClick={(e) => handleTap(tab, e)}
             style={{
               flex: 1,
