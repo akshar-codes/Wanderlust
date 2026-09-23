@@ -56,6 +56,7 @@ export function Table({
   pagination,
   stickyHeader = false,
   maxHeight,
+  ariaLabel = "data table",
   sx,
 }) {
   const [order, setOrder] = useState("asc");
@@ -84,7 +85,7 @@ export function Table({
           ...(maxHeight ? { maxHeight, overflow: "auto" } : {}),
         }}
       >
-        <MuiTable stickyHeader={stickyHeader} aria-label="data table">
+        <MuiTable stickyHeader={stickyHeader} aria-label={ariaLabel}>
           {/* ── Head ─────────────────────────────────────────────────── */}
           <TableHead>
             <TableRow>

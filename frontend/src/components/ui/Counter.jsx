@@ -31,11 +31,12 @@ export function Counter({ label, hint, value, onChange, min = 0, max = 50 }) {
         <Box
           component="button"
           type="button"
+          aria-label={`Decrease ${label.toLowerCase()}`}
           onClick={dec}
           disabled={value <= min}
           sx={{
-            width: 32,
-            height: 32,
+            width: 40,
+            height: 40,
             borderRadius: "50%",
             border: `1.5px solid ${neutral[300]}`,
             display: "flex",
@@ -50,17 +51,18 @@ export function Counter({ label, hint, value, onChange, min = 0, max = 50 }) {
         >
           <Minus size={14} />
         </Box>
-        <Typography sx={{ minWidth: 20, textAlign: "center", fontWeight: 700 }}>
+        <Typography aria-live="polite" sx={{ minWidth: 20, textAlign: "center", fontWeight: 700 }}>
           {value}
         </Typography>
         <Box
           component="button"
           type="button"
+          aria-label={`Increase ${label.toLowerCase()}`}
           onClick={inc}
           disabled={value >= max}
           sx={{
-            width: 32,
-            height: 32,
+            width: 40,
+            height: 40,
             borderRadius: "50%",
             border: `1.5px solid ${neutral[300]}`,
             display: "flex",

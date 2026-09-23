@@ -85,9 +85,15 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
           >
             {collections.map((c) => (
               <Box
+                component="button"
+                type="button"
                 key={c._id}
                 onClick={() => !toggling && handleToggle(c._id)}
                 sx={{
+                  width: "100%",
+                  textAlign: "left",
+                  border: "none",
+                  background: "none",
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
@@ -192,8 +198,14 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
           </Box>
         ) : (
           <Box
+            component="button"
+            type="button"
             onClick={() => setCreatingNew(true)}
             sx={{
+              width: "100%",
+              textAlign: "left",
+              border: "none",
+              background: "none",
               display: "flex",
               alignItems: "center",
               gap: 1,
