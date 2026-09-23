@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 import { Heart, X, Star, MapPin, RotateCcw } from "lucide-react";
@@ -131,6 +131,19 @@ export default function SwipeableListingStack({ listings = [] }) {
     },
     [isAuthenticated, toggleWishlist],
   );
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (remaining.length === 0) return;
+      if (e.key === "ArrowLeft") {
+        handleSwiped("left", remaining[0]);
+      } else if (e.key === "ArrowRight") {
+        handleSwiped("right", remaining[0]);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [remaining, handleSwiped]);
 
   if (listings.length === 0) return null;
 

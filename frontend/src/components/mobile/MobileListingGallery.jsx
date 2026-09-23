@@ -41,6 +41,9 @@ export default function MobileListingGallery({ images = [], title, onImageTap })
   return (
     <div
       ref={containerRef}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={`${title} images`}
       style={{ position: "relative", width: "100%", aspectRatio: "4/3", overflow: "hidden", background: neutral[100] }}
     >
       <AnimatePresence initial={false}>
@@ -98,6 +101,8 @@ export default function MobileListingGallery({ images = [], title, onImageTap })
 
       {images.length > 1 && (
         <div
+          aria-live="polite"
+          aria-atomic="true"
           style={{
             position: "absolute",
             top: 14,
