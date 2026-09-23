@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CssBaseline } from "@mui/material";
+import { MotionConfig } from "framer-motion";
 
 import { ColorModeProvider } from "./hooks/useColorMode";
 import { useAuthStore } from "./store/auth.store";
@@ -75,8 +76,9 @@ export default function App() {
         <BrowserRouter>
           <ErrorBoundary>
             <AuthInit>
-              <Routes>
-                <Route path="/" element={<AppLayout />}>
+              <MotionConfig reducedMotion="user">
+                <Routes>
+                  <Route path="/" element={<AppLayout />}>
                   {/* ── Public ───────────────────────────────────────────── */}
                   <Route index element={<HomePage />} />
                   <Route path="listings" element={<ResponsiveListingsPage />} />
@@ -243,7 +245,8 @@ export default function App() {
                   {/* ── 404 ──────────────────────────────────────────────── */}
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>
-              </Routes>
+                </Routes>
+              </MotionConfig>
             </AuthInit>
           </ErrorBoundary>
         </BrowserRouter>

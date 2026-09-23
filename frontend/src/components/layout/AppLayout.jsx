@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AnimatePresence, motion } from "framer-motion";
@@ -42,6 +43,11 @@ export default function AppLayout() {
   const showBottomNav =
     isMobile && !HIDE_BOTTOM_NAV_PATTERN.test(location.pathname);
 
+  useEffect(() => {
+    // Focus main content on route change to support screen readers
+    document.getElementById("main-content")?.focus();
+  }, [location.pathname]);
+
   return (
     <div
       style={{
@@ -54,10 +60,13 @@ export default function AppLayout() {
       <Navbar searchMode={searchMode} />
 
       <main
+        id="main-content"
+        tabIndex={-1}
         style={{
           flex: 1,
           width: "100%",
           maxWidth: 1280,
+          outline: "none",
           marginInline: "auto",
           padding: showBottomNav
             ? "0 16px calc(env(safe-area-inset-bottom, 0px) + 92px)"

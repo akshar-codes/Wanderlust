@@ -186,6 +186,11 @@
     padding: 0;
   }
 
+  *:focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
   html {
     font-size: 16px;
     scroll-behavior: smooth;
@@ -307,6 +312,32 @@
     scrollbar-width: thin;
     scrollbar-color: var(--color-neutral-300) transparent;
   }
+}
+
+/* skip link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 10000;
+  padding: 8px 18px;
+  background: #ff5a5f;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: 0 0 10px 10px;
+  text-decoration: none;
+  transition: top 0.15s;
+}
+.skip-link:focus { top: 0; }
+
+/* MobileFiltersSheet amenities responsive */
+@media (max-width: 360px) {
+  .amenity-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .hide-on-mobile { display: none !important; }
 }
 
 /* ─── 6. Component Layer ─────────────────────────────────────────────────── */
@@ -2125,3 +2156,4 @@
     border: 1px solid #ccc;
   }
 }
+
