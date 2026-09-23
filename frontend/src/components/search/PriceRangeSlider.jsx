@@ -191,12 +191,13 @@ export default function PriceRangeSlider({
 // ─── Editable price input ─────────────────────────────────────────────────────
 function PriceInput({ label, value, min, max, currency, onChange }) {
   return (
-    <div
+    <label
       style={{
         flex: 1,
         display: "flex",
         flexDirection: "column",
         gap: 4,
+        cursor: "text",
       }}
     >
       <span
@@ -252,6 +253,6 @@ function PriceInput({ label, value, min, max, currency, onChange }) {
           }}
         />
       </div>
-    </div>
+    </label>
   );
 }

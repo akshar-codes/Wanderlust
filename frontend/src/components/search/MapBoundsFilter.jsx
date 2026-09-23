@@ -219,7 +219,12 @@ export default function MapBoundsFilter({
       className={className}
     >
       {/* Map container */}
-      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+      <div
+        ref={containerRef}
+        role="application"
+        aria-label="Interactive map of listings"
+        style={{ width: "100%", height: "100%" }}
+      />
 
       {/* Control overlay */}
       <div
@@ -274,7 +279,7 @@ export default function MapBoundsFilter({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={clearBounds}
-              title="Clear map filter"
+              aria-label="Clear map filter"
               style={{
                 width: 36,
                 height: 36,

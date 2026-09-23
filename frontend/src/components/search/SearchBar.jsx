@@ -4,10 +4,12 @@ import { Search, X, Loader2, MapPin } from "lucide-react";
 import { useAutocomplete } from "../../hooks/useSearch";
 
 // ─── Sub-component: Suggestion row ────────────────────────────────────────────
-function SuggestionRow({ item, isHighlighted, onSelect }) {
+function SuggestionRow({ id, item, isHighlighted, onSelect }) {
   return (
-    <motion.button
-      type="button"
+    <motion.div
+      id={id}
+      role="option"
+      aria-selected={isHighlighted}
       onMouseDown={(e) => {
         e.preventDefault();
         onSelect(item);
@@ -82,7 +84,7 @@ function SuggestionRow({ item, isHighlighted, onSelect }) {
       >
         {item.type}
       </span>
-    </motion.button>
+    </motion.div>
   );
 }
 
@@ -265,10 +267,9 @@ export default function SearchBar({
               }}
               aria-label="Clear search"
               style={{
-                width: 22,
-                height: 22,
-                borderRadius: "50%",
-                background: "#e8e3de",
+                width: 40,
+                height: 40,
+                background: "transparent",
                 border: "none",
                 display: "flex",
                 alignItems: "center",
@@ -276,9 +277,22 @@ export default function SearchBar({
                 cursor: "pointer",
                 flexShrink: 0,
                 padding: 0,
+                marginRight: -4,
               }}
             >
-              <X size={11} color="#5c544c" strokeWidth={2.5} />
+              <div
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: "#e8e3de",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <X size={11} color="#5c544c" strokeWidth={2.5} />
+              </div>
             </motion.button>
           )}
         </AnimatePresence>
@@ -343,7 +357,7 @@ export default function SearchBar({
                 "0 20px 60px rgba(61,43,26,0.14), 0 4px 16px rgba(61,43,26,0.06)",
               overflow: "hidden",
               zIndex: 1000,
-              minWidth: 320,
+              minWidth: "min(320px, calc(100vw - 32px))",
             }}
           >
             {/* Loading skeleton */}
@@ -384,13 +398,9 @@ export default function SearchBar({
 
             {/* Suggestions */}
             {suggestions.map((item, i) => (
-              <div
-                key={`${item.type}-${item.label}`}
-                id={`suggestion-${i}`}
-                role="option"
-                aria-selected={i === highlightedIndex}
-              >
+              <div key={`${item.type}-${item.label}`}>
                 <SuggestionRow
+                  id={`suggestion-${i}`}
                   item={item}
                   isHighlighted={i === highlightedIndex}
                   onSelect={handleSelect}

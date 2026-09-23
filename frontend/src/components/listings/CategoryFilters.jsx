@@ -28,6 +28,8 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
     >
       {/* Scroll left */}
       <motion.button
+        className="hide-on-mobile"
+        aria-label="Scroll left"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => scroll(-1)}
@@ -72,7 +74,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04, duration: 0.3 }}
             >
-              <Link to={to} style={{ textDecoration: "none" }}>
+              <Link to={to} style={{ textDecoration: "none" }} aria-current={isActive ? "page" : undefined}>
                 <motion.div
                   whileHover={{ y: -2, scale: 1.03 }}
                   whileTap={{ scale: 0.96 }}
@@ -92,7 +94,6 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
                     flexShrink: 0,
                     transition: "border-color 0.15s, background 0.15s",
                   }}
-                  aria-current={isActive ? "page" : undefined}
                 >
                   <span style={{ fontSize: "1.35rem", lineHeight: 1 }}>
                     {icon}
@@ -137,6 +138,8 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
 
       {/* Scroll right */}
       <motion.button
+        className="hide-on-mobile"
+        aria-label="Scroll right"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => scroll(1)}
