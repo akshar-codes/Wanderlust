@@ -223,7 +223,7 @@ function TokenVerification({ token }) {
 
   useEffect(() => {
     verifyEmail(token);
-  }, [token]);
+  }, [token, verifyEmail]);
 
   if (isPending) {
     return (

@@ -1,5 +1,4 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { neutral } from "../../theme/tokens";
 import { useAuthStore } from "../../store/auth.store";
 import Spinner from "../common/Spinner";
 

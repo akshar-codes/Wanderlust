@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
+import { Mail, ArrowLeft } from "lucide-react";
 import { useForgotPassword } from "../../hooks/useAuth";
 import {
   AuthCard,
@@ -163,6 +163,7 @@ export default function ForgotPasswordPage() {
   } = useForm({ resolver: zodResolver(schema) });
 
   const onSubmit = ({ email }) => {
+    reset();
     forgotPassword(email, {
       onSuccess: () => setSentTo(email),
     });
@@ -170,6 +171,7 @@ export default function ForgotPasswordPage() {
 
   const handleResend = () => {
     const email = sentTo || getValues("email");
+    reset();
     forgotPassword(email, {
       onSuccess: () => setSentTo(email),
     });

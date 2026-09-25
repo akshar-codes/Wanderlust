@@ -1,9 +1,7 @@
-import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSearchParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { ShieldCheck, AlertTriangle } from "lucide-react";
 import { useResetPassword } from "../../hooks/useAuth";
 import {

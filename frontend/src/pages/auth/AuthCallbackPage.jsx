@@ -20,7 +20,7 @@ const ERROR_MESSAGES = {
 export default function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { init, isAuthenticated } = useAuthStore();
+  const { init } = useAuthStore();
   const [status, setStatus] = useState("loading"); // "loading" | "success" | "error"
   const [errorMsg, setErrorMsg] = useState("");
 
