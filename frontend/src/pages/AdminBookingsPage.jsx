@@ -20,6 +20,7 @@ import {
   useAdminUpdateBookingStatus,
 } from "../hooks/useBookings";
 import { neutral } from "../theme/tokens";
+import { BOOKING_STATUS_COLORS as STATUS_STYLES } from "../utils/statusColors";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
@@ -28,13 +29,6 @@ const STATUS_OPTIONS = [
   { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
 ];
-
-const STATUS_STYLES = {
-  pending: { bg: "#fef9c3", color: "#b45309" },
-  confirmed: { bg: "#dcfce7", color: "#15803d" },
-  completed: { bg: "#e0e7ff", color: "#3730a3" },
-  cancelled: { bg: "#fee2e2", color: "#b91c1c" },
-};
 
 const ALL_STATUSES = ["pending", "confirmed", "completed", "cancelled"];
 
@@ -75,7 +69,7 @@ export default function AdminBookingsPage() {
               sx={{
                 fontWeight: 700,
                 fontSize: "0.8125rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 textDecoration: "none",
                 "&:hover": { textDecoration: "underline" },
               }}
@@ -83,7 +77,10 @@ export default function AdminBookingsPage() {
               {row.listing.title}
             </Typography>
           ) : (
-            <Typography variant="caption" sx={{ color: neutral[400] }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--color-text-muted)" }}
+            >
               Deleted listing
             </Typography>
           )}

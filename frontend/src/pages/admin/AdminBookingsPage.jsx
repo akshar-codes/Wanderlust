@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Box, Typography, Chip, Stack, MenuItem, Select as MuiSelect } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Chip,
+  Stack,
+  MenuItem,
+  Select as MuiSelect,
+} from "@mui/material";
 import { CalendarCheck } from "lucide-react";
 
 import { Table } from "../../components/ui/Table";
@@ -13,6 +20,7 @@ import {
 } from "../../hooks/useBookings";
 import { neutral } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
+import { BOOKING_STATUS_COLORS as STATUS_STYLES } from "../../utils/statusColors";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
@@ -21,13 +29,6 @@ const STATUS_OPTIONS = [
   { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
 ];
-
-const STATUS_STYLES = {
-  pending: { bg: "#fef9c3", color: "#b45309" },
-  confirmed: { bg: "#dcfce7", color: "#15803d" },
-  completed: { bg: "#e0e7ff", color: "#3730a3" },
-  cancelled: { bg: "#fee2e2", color: "#b91c1c" },
-};
 
 const ALL_STATUSES = ["pending", "confirmed", "completed", "cancelled"];
 const PAGE_LIMIT = 20;
@@ -50,7 +51,8 @@ export default function AdminBookingsPage() {
     limit: PAGE_LIMIT,
     status: status || undefined,
   });
-  const { mutate: updateStatus, isPending: updating } = useAdminUpdateBookingStatus();
+  const { mutate: updateStatus, isPending: updating } =
+    useAdminUpdateBookingStatus();
 
   const bookings = data?.bookings ?? [];
   const pagination = data?.pagination;
@@ -69,7 +71,7 @@ export default function AdminBookingsPage() {
               sx={{
                 fontWeight: 700,
                 fontSize: "0.8125rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 textDecoration: "none",
                 "&:hover": { textDecoration: "underline" },
               }}
@@ -77,24 +79,32 @@ export default function AdminBookingsPage() {
               {row.listing.title}
             </Typography>
           ) : (
-            <Typography variant="caption" sx={{ color: neutral[400] }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--color-text-muted)" }}
+            >
               Deleted listing
             </Typography>
           )}
         </Box>
       ),
     },
-    { key: "guest", label: "Guest", render: (row) => row.guest?.username ?? "—" },
+    {
+      key: "guest",
+      label: "Guest",
+      render: (row) => row.guest?.username ?? "—",
+    },
     { key: "host", label: "Host", render: (row) => row.host?.username ?? "—" },
     {
       key: "dates",
       label: "Dates",
-      render: (row) => `${formatDate(row.checkIn)} → ${formatDate(row.checkOut)}`,
+      render: (row) =>
+        `${formatDate(row.checkIn)} → ${formatDate(row.checkOut)}`,
     },
     {
       key: "total",
       label: "Total",
-      render: (row) => formatPrice((row.pricing?.total ?? 0)),
+      render: (row) => formatPrice(row.pricing?.total ?? 0),
     },
     {
       key: "status",
@@ -105,7 +115,12 @@ export default function AdminBookingsPage() {
           <Chip
             label={row.status}
             size="small"
-            sx={{ bgcolor: s.bg, color: s.color, fontWeight: 700, textTransform: "capitalize" }}
+            sx={{
+              bgcolor: s.bg,
+              color: s.color,
+              fontWeight: 700,
+              textTransform: "capitalize",
+            }}
           />
         );
       },
@@ -192,7 +207,9 @@ export default function AdminBookingsPage() {
         title={`Change status to "${pendingChange?.status}"?`}
         message="This overrides the booking's current status directly. The guest and host are not automatically notified."
         confirmLabel="Confirm change"
-        confirmVariant={pendingChange?.status === "cancelled" ? "danger" : "primary"}
+        confirmVariant={
+          pendingChange?.status === "cancelled" ? "danger" : "primary"
+        }
       />
     </Box>
   );
