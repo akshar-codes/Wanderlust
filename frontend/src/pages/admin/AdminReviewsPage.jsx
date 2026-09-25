@@ -26,7 +26,9 @@ function RatingDisplay({ value }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
       <Star size={13} fill="#f59e0b" stroke="none" />
-      <Typography sx={{ fontWeight: 700, fontSize: "0.8125rem" }}>{value}</Typography>
+      <Typography sx={{ fontWeight: 700, fontSize: "0.8125rem" }}>
+        {value}
+      </Typography>
     </Box>
   );
 }
@@ -69,7 +71,7 @@ export default function AdminReviewsPage() {
             target="_blank"
             sx={{
               fontSize: "0.8125rem",
-              color: neutral[700],
+              color: "var(--color-text)",
               textDecoration: "none",
               "&:hover": { textDecoration: "underline" },
               whiteSpace: "nowrap",
@@ -85,7 +87,11 @@ export default function AdminReviewsPage() {
           "Deleted listing"
         ),
     },
-    { key: "rating", label: "Rating", render: (row) => <RatingDisplay value={row.rating} /> },
+    {
+      key: "rating",
+      label: "Rating",
+      render: (row) => <RatingDisplay value={row.rating} />,
+    },
     {
       key: "comment",
       label: "Comment",
@@ -93,7 +99,7 @@ export default function AdminReviewsPage() {
         <Typography
           variant="body2"
           sx={{
-            color: neutral[600],
+            color: "var(--color-text-secondary)",
             maxWidth: 320,
             display: "-webkit-box",
             WebkitLineClamp: 2,
@@ -121,7 +127,12 @@ export default function AdminReviewsPage() {
       label: "",
       render: (row) => (
         <Stack direction="row" spacing={0.5}>
-          <IconButton color="danger" label="Delete review" size="sm" onClick={() => setPendingDelete(row)}>
+          <IconButton
+            color="danger"
+            label="Delete review"
+            size="sm"
+            onClick={() => setPendingDelete(row)}
+          >
             <Trash2 size={15} />
           </IconButton>
         </Stack>
@@ -153,7 +164,9 @@ export default function AdminReviewsPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            startAdornment={<Search size={16} color={neutral[400]} />}
+            startAdornment={
+              <Search size={16} color={"var(--color-text-muted)"} />
+            }
           />
         </Box>
         <Box sx={{ width: 160 }}>

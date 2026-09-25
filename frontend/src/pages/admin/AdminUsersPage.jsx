@@ -8,6 +8,7 @@ import { SearchInput, Select } from "../../components/ui/Input";
 import { ConfirmModal } from "../../components/ui/Modal";
 import { useAdminUsers, useUpdateUserStatus } from "../../hooks/useAdmin";
 import { neutral } from "../../theme/tokens";
+import { STATUS_CHIP } from "../../utils/statusColors";
 
 const ROLE_OPTIONS = [
   { value: "", label: "All roles" },
@@ -49,10 +50,21 @@ export default function AdminUsersPage() {
       label: "User",
       render: (row) => (
         <Box sx={{ minWidth: 180 }}>
-          <Typography sx={{ fontWeight: 700, fontSize: "0.8125rem", color: neutral[800] }}>
-            {row.firstName ? `${row.firstName} ${row.lastName ?? ""}` : `@${row.username}`}
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: "0.8125rem",
+              color: "var(--color-text)",
+            }}
+          >
+            {row.firstName
+              ? `${row.firstName} ${row.lastName ?? ""}`
+              : `@${row.username}`}
           </Typography>
-          <Typography variant="caption" sx={{ color: neutral[500] }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "var(--color-text-secondary)" }}
+          >
             {row.email}
           </Typography>
         </Box>
@@ -68,8 +80,18 @@ export default function AdminUsersPage() {
           sx={{
             textTransform: "capitalize",
             fontWeight: 700,
-            bgcolor: row.role === "admin" ? "#ede9fe" : row.role === "host" ? "#dbeafe" : neutral[100],
-            color: row.role === "admin" ? "#6d28d9" : row.role === "host" ? "#1e40af" : neutral[700],
+            bgcolor:
+              row.role === "admin"
+                ? "#ede9fe"
+                : row.role === "host"
+                  ? "#dbeafe"
+                  : "var(--color-surface-2)",
+            color:
+              row.role === "admin"
+                ? "#6d28d9"
+                : row.role === "host"
+                  ? "#1e40af"
+                  : "var(--color-text)",
           }}
         />
       ),
@@ -79,9 +101,9 @@ export default function AdminUsersPage() {
       label: "Verified",
       render: (row) =>
         row.emailVerified ? (
-          <Chip label="Verified" size="small" sx={{ bgcolor: "#dcfce7", color: "#15803d", fontWeight: 700 }} />
+          <Chip label="Verified" size="small" sx={STATUS_CHIP.success} />
         ) : (
-          <Chip label="Unverified" size="small" sx={{ bgcolor: "#fef9c3", color: "#b45309", fontWeight: 700 }} />
+          <Chip label="Unverified" size="small" sx={STATUS_CHIP.warning} />
         ),
     },
     {
@@ -89,9 +111,9 @@ export default function AdminUsersPage() {
       label: "Status",
       render: (row) =>
         row.isActive ? (
-          <Chip label="Active" size="small" sx={{ bgcolor: "#dcfce7", color: "#15803d", fontWeight: 700 }} />
+          <Chip label="Active" size="small" sx={STATUS_CHIP.success} />
         ) : (
-          <Chip label="Suspended" size="small" sx={{ bgcolor: "#fee2e2", color: "#b91c1c", fontWeight: 700 }} />
+          <Chip label="Suspended" size="small" sx={STATUS_CHIP.error} />
         ),
     },
     {
@@ -110,7 +132,10 @@ export default function AdminUsersPage() {
       label: "",
       render: (row) =>
         row.role === "admin" ? (
-          <Typography variant="caption" sx={{ color: neutral[400] }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "var(--color-text-muted)" }}
+          >
             —
           </Typography>
         ) : (
@@ -121,7 +146,9 @@ export default function AdminUsersPage() {
                 size="sm"
                 startIcon={<ShieldOff size={13} />}
                 sx={{ color: "error.main" }}
-                onClick={() => setPendingAction({ user: row, nextIsActive: false })}
+                onClick={() =>
+                  setPendingAction({ user: row, nextIsActive: false })
+                }
               >
                 Suspend
               </Button>
@@ -130,7 +157,9 @@ export default function AdminUsersPage() {
                 variant="ghost"
                 size="sm"
                 startIcon={<ShieldCheck size={13} />}
-                onClick={() => setPendingAction({ user: row, nextIsActive: true })}
+                onClick={() =>
+                  setPendingAction({ user: row, nextIsActive: true })
+                }
               >
                 Reactivate
               </Button>
@@ -152,7 +181,9 @@ export default function AdminUsersPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            startAdornment={<Search size={16} color={neutral[400]} />}
+            startAdornment={
+              <Search size={16} color={"var(--color-text-muted)"} />
+            }
           />
         </Box>
         <Box sx={{ width: 160 }}>
@@ -198,18 +229,27 @@ export default function AdminUsersPage() {
         onConfirm={() => {
           if (!pendingAction) return;
           updateStatus(
-            { username: pendingAction.user.username, isActive: pendingAction.nextIsActive },
+            {
+              username: pendingAction.user.username,
+              isActive: pendingAction.nextIsActive,
+            },
             { onSuccess: () => setPendingAction(null) },
           );
         }}
         loading={updating}
-        title={pendingAction?.nextIsActive ? "Reactivate this user?" : "Suspend this user?"}
+        title={
+          pendingAction?.nextIsActive
+            ? "Reactivate this user?"
+            : "Suspend this user?"
+        }
         message={
           pendingAction?.nextIsActive
             ? "This will restore the user's access to their account."
             : "This will immediately sign the user out and block access to their account until reactivated."
         }
-        confirmLabel={pendingAction?.nextIsActive ? "Yes, reactivate" : "Yes, suspend"}
+        confirmLabel={
+          pendingAction?.nextIsActive ? "Yes, reactivate" : "Yes, suspend"
+        }
         confirmVariant={pendingAction?.nextIsActive ? "primary" : "danger"}
       />
     </Box>

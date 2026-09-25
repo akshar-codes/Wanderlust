@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Typography, Chip, Stack, MenuItem, Select as MuiSelect } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Chip,
+  Stack,
+  MenuItem,
+  Select as MuiSelect,
+} from "@mui/material";
 import { Search, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -11,6 +18,7 @@ import { useAdminListings, useUpdateListingStatus } from "../../hooks/useAdmin";
 import { LISTING_CATEGORIES } from "../../schemas";
 import { neutral } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
+import { LISTING_STATUS_COLORS as STATUS_STYLES } from "../../utils/statusColors";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
@@ -27,13 +35,6 @@ const CATEGORY_OPTIONS = [
     label: c.charAt(0).toUpperCase() + c.slice(1),
   })),
 ];
-
-const STATUS_STYLES = {
-  active: { bg: "#dcfce7", color: "#15803d" },
-  inactive: { bg: "#f4f1ee", color: "#5c544c" },
-  suspended: { bg: "#fee2e2", color: "#b91c1c" },
-  deleted: { bg: "#fee2e2", color: "#b91c1c" },
-};
 
 const ALL_STATUSES = ["active", "inactive", "suspended", "deleted"];
 const PAGE_LIMIT = 20;
@@ -52,7 +53,8 @@ export default function AdminListingsPage() {
     status: status || undefined,
     category: category || undefined,
   });
-  const { mutate: updateStatus, isPending: updating } = useUpdateListingStatus();
+  const { mutate: updateStatus, isPending: updating } =
+    useUpdateListingStatus();
 
   const listings = data?.listings ?? [];
   const pagination = data?.pagination;
@@ -62,19 +64,33 @@ export default function AdminListingsPage() {
       key: "title",
       label: "Listing",
       render: (row) => (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, minWidth: 220 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1.25,
+            minWidth: 220,
+          }}
+        >
           <Box
             component="img"
             src={row.image?.url}
             alt=""
-            sx={{ width: 44, height: 44, borderRadius: "10px", objectFit: "cover", bgcolor: neutral[100], flexShrink: 0 }}
+            sx={{
+              width: 44,
+              height: 44,
+              borderRadius: "10px",
+              objectFit: "cover",
+              bgcolor: "var(--color-surface-2)",
+              flexShrink: 0,
+            }}
           />
           <Box sx={{ minWidth: 0 }}>
             <Typography
               sx={{
                 fontWeight: 700,
                 fontSize: "0.8125rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -83,7 +99,10 @@ export default function AdminListingsPage() {
             >
               {row.title}
             </Typography>
-            <Typography variant="caption" sx={{ color: neutral[500] }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--color-text-secondary)" }}
+            >
               {row.location}, {row.country}
             </Typography>
           </Box>
@@ -98,7 +117,9 @@ export default function AdminListingsPage() {
     {
       key: "category",
       label: "Category",
-      render: (row) => <span style={{ textTransform: "capitalize" }}>{row.category}</span>,
+      render: (row) => (
+        <span style={{ textTransform: "capitalize" }}>{row.category}</span>
+      ),
     },
     {
       key: "price",
@@ -146,7 +167,11 @@ export default function AdminListingsPage() {
             onChange={(e) => {
               const nextStatus = e.target.value;
               if (!nextStatus) return;
-              setPendingChange({ id: row._id, title: row.title, status: nextStatus });
+              setPendingChange({
+                id: row._id,
+                title: row.title,
+                status: nextStatus,
+              });
             }}
             sx={{ minWidth: 130, fontSize: "0.8125rem" }}
           >
@@ -176,7 +201,9 @@ export default function AdminListingsPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            startAdornment={<Search size={16} color={neutral[400]} />}
+            startAdornment={
+              <Search size={16} color={"var(--color-text-muted)"} />
+            }
           />
         </Box>
         <Box sx={{ width: 170 }}>
@@ -229,11 +256,16 @@ export default function AdminListingsPage() {
         loading={updating}
         title={`Change status to "${pendingChange?.status}"?`}
         message={`This will update the status of "${pendingChange?.title}". Guests will ${
-          pendingChange?.status === "active" ? "be able to" : "no longer be able to"
+          pendingChange?.status === "active"
+            ? "be able to"
+            : "no longer be able to"
         } find or book this listing.`}
         confirmLabel="Confirm change"
         confirmVariant={
-          pendingChange?.status === "suspended" || pendingChange?.status === "deleted" ? "danger" : "primary"
+          pendingChange?.status === "suspended" ||
+          pendingChange?.status === "deleted"
+            ? "danger"
+            : "primary"
         }
       />
     </Box>

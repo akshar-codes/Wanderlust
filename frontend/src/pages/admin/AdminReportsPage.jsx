@@ -10,6 +10,7 @@ import { Select, Textarea } from "../../components/ui/Input";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { useReports, useResolveReport } from "../../hooks/useReports";
 import { neutral, brand, radii } from "../../theme/tokens";
+import { STATUS_CHIP } from "../../utils/statusColors";
 
 const PAGE_LIMIT = 20;
 
@@ -38,7 +39,7 @@ const ACTION_OPTIONS = [
 function TargetPreview({ report }) {
   if (!report.target) {
     return (
-      <Typography variant="caption" sx={{ color: neutral[400] }}>
+      <Typography variant="caption" sx={{ color: "var(--color-text-muted)" }}>
         Content no longer available
       </Typography>
     );
@@ -52,7 +53,12 @@ function TargetPreview({ report }) {
             component="img"
             src={report.target.image}
             alt=""
-            sx={{ width: 36, height: 36, borderRadius: "8px", objectFit: "cover" }}
+            sx={{
+              width: 36,
+              height: 36,
+              borderRadius: "8px",
+              objectFit: "cover",
+            }}
           />
         )}
         <Typography
@@ -62,7 +68,7 @@ function TargetPreview({ report }) {
           sx={{
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: neutral[800],
+            color: "var(--color-text)",
             textDecoration: "none",
             "&:hover": { color: brand[600] },
           }}
@@ -78,7 +84,7 @@ function TargetPreview({ report }) {
       <Typography
         variant="body2"
         sx={{
-          color: neutral[600],
+          color: "var(--color-text-secondary)",
           maxWidth: 260,
           display: "-webkit-box",
           WebkitLineClamp: 2,
@@ -92,7 +98,13 @@ function TargetPreview({ report }) {
   }
 
   return (
-    <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, color: neutral[800] }}>
+    <Typography
+      sx={{
+        fontSize: "0.8125rem",
+        fontWeight: 600,
+        color: "var(--color-text)",
+      }}
+    >
       @{report.target.username}
     </Typography>
   );
@@ -121,7 +133,14 @@ function ResolveModal({ report, onClose }) {
             loading={isPending}
             onClick={() =>
               resolve(
-                { id: report._id, payload: { status: "dismissed", resolutionAction: "none", resolutionNote } },
+                {
+                  id: report._id,
+                  payload: {
+                    status: "dismissed",
+                    resolutionAction: "none",
+                    resolutionNote,
+                  },
+                },
                 { onSuccess: onClose },
               )
             }
@@ -133,7 +152,14 @@ function ResolveModal({ report, onClose }) {
             loading={isPending}
             onClick={() =>
               resolve(
-                { id: report._id, payload: { status: "resolved", resolutionAction, resolutionNote } },
+                {
+                  id: report._id,
+                  payload: {
+                    status: "resolved",
+                    resolutionAction,
+                    resolutionNote,
+                  },
+                },
                 { onSuccess: onClose },
               )
             }
@@ -145,7 +171,10 @@ function ResolveModal({ report, onClose }) {
     >
       <Stack spacing={2.5} pt={1}>
         <Box>
-          <Typography variant="overline" sx={{ color: neutral[500] }}>
+          <Typography
+            variant="overline"
+            sx={{ color: "var(--color-text-secondary)" }}
+          >
             Reported {report.targetType}
           </Typography>
           <Box sx={{ mt: 0.5 }}>
@@ -155,7 +184,10 @@ function ResolveModal({ report, onClose }) {
 
         <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
           <Box>
-            <Typography variant="caption" sx={{ color: neutral[500], display: "block" }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--color-text-secondary)", display: "block" }}
+            >
               Reason
             </Typography>
             <Chip
@@ -165,10 +197,15 @@ function ResolveModal({ report, onClose }) {
             />
           </Box>
           <Box>
-            <Typography variant="caption" sx={{ color: neutral[500], display: "block" }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--color-text-secondary)", display: "block" }}
+            >
               Reported by
             </Typography>
-            <Typography sx={{ fontSize: "0.8125rem", fontWeight: 600, mt: 0.5 }}>
+            <Typography
+              sx={{ fontSize: "0.8125rem", fontWeight: 600, mt: 0.5 }}
+            >
               @{report.reportedBy?.username ?? "unknown"}
             </Typography>
           </Box>
@@ -176,10 +213,25 @@ function ResolveModal({ report, onClose }) {
 
         {report.description && (
           <Box>
-            <Typography variant="caption" sx={{ color: neutral[500], display: "block", mb: 0.5 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "var(--color-text-secondary)",
+                display: "block",
+                mb: 0.5,
+              }}
+            >
               Reporter's notes
             </Typography>
-            <Typography variant="body2" sx={{ color: neutral[700], bgcolor: neutral[50], p: 1.5, borderRadius: radii.md }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "var(--color-text)",
+                bgcolor: "var(--color-surface-2)",
+                p: 1.5,
+                borderRadius: radii.md,
+              }}
+            >
               {report.description}
             </Typography>
           </Box>
@@ -220,10 +272,18 @@ export default function AdminReportsPage() {
       key: "targetType",
       label: "Type",
       render: (row) => (
-        <Chip label={row.targetType} size="small" sx={{ textTransform: "capitalize", fontWeight: 700 }} />
+        <Chip
+          label={row.targetType}
+          size="small"
+          sx={{ textTransform: "capitalize", fontWeight: 700 }}
+        />
       ),
     },
-    { key: "target", label: "Content", render: (row) => <TargetPreview report={row} /> },
+    {
+      key: "target",
+      label: "Content",
+      render: (row) => <TargetPreview report={row} />,
+    },
     {
       key: "reason",
       label: "Reason",
@@ -250,19 +310,25 @@ export default function AdminReportsPage() {
       label: "",
       render: (row) =>
         row.status === "pending" ? (
-          <Button variant="outline" size="sm" onClick={() => setActiveReport(row)}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setActiveReport(row)}
+          >
             Review
           </Button>
         ) : (
           <Chip
-            icon={row.status === "resolved" ? <Check size={12} /> : <X size={12} />}
+            icon={
+              row.status === "resolved" ? <Check size={12} /> : <X size={12} />
+            }
             label={row.status}
             size="small"
             sx={{
               textTransform: "capitalize",
-              fontWeight: 700,
-              bgcolor: row.status === "resolved" ? "#dcfce7" : "#f4f1ee",
-              color: row.status === "resolved" ? "#15803d" : neutral[600],
+              ...(row.status === "resolved"
+                ? STATUS_CHIP.success
+                : STATUS_CHIP.neutral),
             }}
           />
         ),
@@ -287,7 +353,9 @@ export default function AdminReportsPage() {
         <EmptyState
           variant="generic"
           icon={<Flag size={36} />}
-          title={status === "pending" ? "No pending reports" : `No ${status} reports`}
+          title={
+            status === "pending" ? "No pending reports" : `No ${status} reports`
+          }
           body="Reported listings, reviews, and users will appear here for moderation."
         />
       ) : (
@@ -307,7 +375,10 @@ export default function AdminReportsPage() {
         />
       )}
 
-      <ResolveModal report={activeReport} onClose={() => setActiveReport(null)} />
+      <ResolveModal
+        report={activeReport}
+        onClose={() => setActiveReport(null)}
+      />
     </Box>
   );
 }
