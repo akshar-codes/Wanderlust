@@ -17,17 +17,32 @@ import notificationRoutes from "./notification.routes.js";
 
 const router = express.Router();
 
-
 import mongoose from "mongoose";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+let pkg = { version: "unknown" };
+try {
+  pkg = JSON.parse(
+    fs.readFileSync(
+      path.resolve(path.dirname(__filename), "../../../package.json"),
+      "utf-8",
+    ),
+  );
+} catch (e) {}
 
 router.get("/health", (_req, res) =>
   res.json({
     success: true,
-    data: { 
-      status: "ok", 
+    data: {
+      status: "ok",
       db: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
       uptime: process.uptime(),
-      ts: new Date().toISOString() 
+      version: pkg.version,
+      nodeVersion: process.version,
+      memoryUsage: process.memoryUsage().rss,
+      ts: new Date().toISOString(),
     },
   }),
 );
