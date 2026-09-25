@@ -38,4 +38,22 @@ export const handlers = [
       { status: 201 },
     );
   }),
+
+  http.get("/api/listings", () => {
+    return HttpResponse.json({ listings: [], total: 0 });
+  }),
+  http.get("/api/listings/:id", () => {
+    return HttpResponse.json({
+      _id: "1",
+      title: "Test Listing",
+      price: 100,
+      owner: { _id: "u1" },
+    });
+  }),
+  http.get("/api/listings/:id/reviews", () => {
+    return HttpResponse.json({ reviews: [] });
+  }),
+  http.post("/api/auth/forgot-password", () => {
+    return HttpResponse.json({ success: true });
+  }),
 ];
