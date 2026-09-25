@@ -7,7 +7,6 @@ import { Button } from "../../components/ui/Button";
 import { SearchInput, Select } from "../../components/ui/Input";
 import { ConfirmModal } from "../../components/ui/Modal";
 import { useAdminUsers, useUpdateUserStatus } from "../../hooks/useAdmin";
-import { neutral } from "../../theme/tokens";
 import { STATUS_CHIP } from "../../utils/statusColors";
 
 const ROLE_OPTIONS = [

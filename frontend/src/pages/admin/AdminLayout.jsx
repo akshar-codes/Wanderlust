@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { PageHeader } from "../../components/layout/PageHeader";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { useAdminStats } from "../../hooks/useAdmin";
 
 import AdminOverviewPage from "./AdminOverviewPage";

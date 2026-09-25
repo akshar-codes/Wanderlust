@@ -9,7 +9,7 @@ import { Button } from "../../components/ui/Button";
 import { Select, Textarea } from "../../components/ui/Input";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { useReports, useResolveReport } from "../../hooks/useReports";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { STATUS_CHIP } from "../../utils/statusColors";
 
 const PAGE_LIMIT = 20;

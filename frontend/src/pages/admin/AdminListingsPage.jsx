@@ -16,7 +16,6 @@ import { IconButton } from "../../components/ui/Button";
 import { ConfirmModal } from "../../components/ui/Modal";
 import { useAdminListings, useUpdateListingStatus } from "../../hooks/useAdmin";
 import { LISTING_CATEGORIES } from "../../schemas";
-import { neutral } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 import { LISTING_STATUS_COLORS as STATUS_STYLES } from "../../utils/statusColors";
 

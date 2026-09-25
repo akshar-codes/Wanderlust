@@ -18,7 +18,6 @@ import {
   useAdminBookings,
   useAdminUpdateBookingStatus,
 } from "../../hooks/useBookings";
-import { neutral } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 import { BOOKING_STATUS_COLORS as STATUS_STYLES } from "../../utils/statusColors";
 

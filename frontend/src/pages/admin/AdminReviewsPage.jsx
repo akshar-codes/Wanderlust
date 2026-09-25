@@ -9,7 +9,6 @@ import { IconButton } from "../../components/ui/Button";
 import { ConfirmModal } from "../../components/ui/Modal";
 import { useAdminReviews } from "../../hooks/useAdmin";
 import { useDeleteReview } from "../../hooks/useReviews";
-import { neutral } from "../../theme/tokens";
 
 const RATING_OPTIONS = [
   { value: "", label: "All ratings" },

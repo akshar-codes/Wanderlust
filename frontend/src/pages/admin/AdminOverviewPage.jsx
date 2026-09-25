@@ -28,7 +28,7 @@ import { StatsCard } from "../../components/ui/Card";
 import { Select } from "../../components/ui/Input";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { useAdminStats, useAdminAnalytics } from "../../hooks/useAdmin";
-import { brand, neutral, semantic, teal, radii } from "../../theme/tokens";
+import { brand, semantic, teal, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 
 const RANGE_OPTIONS = [
