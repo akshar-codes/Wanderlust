@@ -63,10 +63,10 @@ export function AuthCard({ children, maxWidth = 440 }) {
           zIndex: 1,
           width: "100%",
           maxWidth,
-          background: "rgba(255,255,255,0.94)",
+          background: "var(--color-surface)",
           backdropFilter: "blur(28px) saturate(1.6)",
           WebkitBackdropFilter: "blur(28px) saturate(1.6)",
-          border: "1.5px solid rgba(230,224,218,0.8)",
+          border: "1.5px solid var(--color-nav-border)",
           borderRadius: 28,
           padding: "44px 40px",
           display: "flex",
@@ -106,7 +106,7 @@ export function AuthBrand() {
         style={{
           fontFamily: "'DM Serif Display', Georgia, serif",
           fontSize: "1.1rem",
-          color: "#261f1a",
+          color: "var(--color-text)",
         }}
       >
         Wanderlust
@@ -205,7 +205,7 @@ export function FormInput({
           style={{
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: "#5c544c",
+            color: "var(--color-text-secondary)",
             display: "flex",
             alignItems: "center",
             gap: 4,
@@ -228,9 +228,11 @@ export function FormInput({
             padding: isPassword ? "12px 44px 12px 16px" : "12px 16px",
             fontSize: "0.9375rem",
             fontFamily: "inherit",
-            color: "#261f1a",
-            background: error ? "#fff9f9" : "#faf8f6",
-            border: `1.5px solid ${error ? "#fca5a5" : "#d6d0ca"}`,
+            color: "var(--color-text)",
+            background: error
+              ? "var(--color-surface-2)"
+              : "var(--color-surface-2)",
+            border: `1.5px solid ${error ? "#fca5a5" : "var(--color-border-strong)"}`,
             borderRadius: 12,
             outline: "none",
             transition:
@@ -240,14 +242,18 @@ export function FormInput({
           }}
           onFocus={(e) => {
             e.target.style.borderColor = error ? "#ef4444" : "#ff5a5f";
-            e.target.style.background = "#fff";
+            e.target.style.background = "var(--color-surface)";
             e.target.style.boxShadow = error
               ? "0 0 0 3px rgba(239,68,68,0.14)"
               : "0 0 0 3px rgba(255,90,95,0.14)";
           }}
           onBlur={(e) => {
-            e.target.style.borderColor = error ? "#fca5a5" : "#d6d0ca";
-            e.target.style.background = error ? "#fff9f9" : "#faf8f6";
+            e.target.style.borderColor = error
+              ? "#fca5a5"
+              : "var(--color-border-strong)";
+            e.target.style.background = error
+              ? "var(--color-surface-2)"
+              : "var(--color-surface-2)";
             e.target.style.boxShadow = "none";
           }}
         />
@@ -264,7 +270,7 @@ export function FormInput({
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#b8b0a8",
+              color: "var(--color-text-muted)",
               padding: 2,
               display: "flex",
               alignItems: "center",
@@ -276,7 +282,13 @@ export function FormInput({
         )}
       </div>
       {hint && !error && (
-        <p style={{ fontSize: "0.75rem", color: "#b8b0a8", lineHeight: 1.4 }}>
+        <p
+          style={{
+            fontSize: "0.75rem",
+            color: "var(--color-text-muted)",
+            lineHeight: 1.4,
+          }}
+        >
           {hint}
         </p>
       )}
@@ -313,11 +325,17 @@ export function AuthDivider({ label = "or" }) {
         margin: "4px 0",
       }}
     >
-      <div style={{ flex: 1, height: 1, background: "#ebe7e3" }} />
-      <span style={{ fontSize: "0.75rem", color: "#b8b0a8", fontWeight: 500 }}>
+      <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
+      <span
+        style={{
+          fontSize: "0.75rem",
+          color: "var(--color-text-muted)",
+          fontWeight: 500,
+        }}
+      >
         {label}
       </span>
-      <div style={{ flex: 1, height: 1, background: "#ebe7e3" }} />
+      <div style={{ flex: 1, height: 1, background: "var(--color-border)" }} />
     </div>
   );
 }
@@ -338,13 +356,13 @@ export function SubmitButton({ isPending, label, loadingLabel }) {
         padding: "14px",
         width: "100%",
         background: isPending
-          ? "#f4f1ee"
+          ? "var(--color-surface-2)"
           : "linear-gradient(135deg, #ff5a5f, #e84040)",
         border: "none",
         borderRadius: 14,
         fontWeight: 700,
         fontSize: "0.9375rem",
-        color: isPending ? "#b8b0a8" : "#fff",
+        color: isPending ? "var(--color-text-muted)" : "var(--color-surface)",
         cursor: isPending ? "not-allowed" : "pointer",
         fontFamily: "inherit",
         boxShadow: isPending ? "none" : "0 4px 20px rgba(255,90,95,0.28)",
@@ -360,7 +378,7 @@ export function SubmitButton({ isPending, label, loadingLabel }) {
               width: 16,
               height: 16,
               borderRadius: "50%",
-              border: "2px solid #d6d0ca",
+              border: "2px solid var(--color-border-strong)",
               borderTopColor: "#ff5a5f",
               flexShrink: 0,
             }}
@@ -379,7 +397,7 @@ export function GoogleButton({ label = "Continue with Google" }) {
   return (
     <motion.a
       href="/api/auth/google"
-      whileHover={{ scale: 1.01, background: "#faf8f6" }}
+      whileHover={{ scale: 1.01, background: "var(--color-surface-2)" }}
       whileTap={{ scale: 0.98 }}
       style={{
         display: "flex",
@@ -387,12 +405,12 @@ export function GoogleButton({ label = "Continue with Google" }) {
         justifyContent: "center",
         gap: 10,
         padding: "12px",
-        background: "#fff",
-        border: "1.5px solid #d6d0ca",
+        background: "var(--color-surface)",
+        border: "1.5px solid var(--color-border-strong)",
         borderRadius: 14,
         fontWeight: 600,
         fontSize: "0.875rem",
-        color: "#3d3630",
+        color: "var(--color-text)",
         textDecoration: "none",
         fontFamily: "inherit",
         transition: "all 0.15s",
@@ -453,7 +471,7 @@ export function PasswordStrength({ password }) {
               flex: 1,
               height: 3,
               borderRadius: 2,
-              background: i <= score ? color : "#ebe7e3",
+              background: i <= score ? color : "var(--color-border)",
               transition: "background 0.25s",
             }}
           />
@@ -472,10 +490,10 @@ export function AuthFooter({ children }) {
     <p
       style={{
         fontSize: "0.875rem",
-        color: "#8a8179",
+        color: "var(--color-text-secondary)",
         textAlign: "center",
         paddingTop: 8,
-        borderTop: "1px solid #ebe7e3",
+        borderTop: "1px solid var(--color-border)",
       }}
     >
       {children}

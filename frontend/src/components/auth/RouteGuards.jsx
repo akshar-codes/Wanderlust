@@ -12,13 +12,19 @@ function SplashLoader() {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100svh",
-        background: neutral[50],
+        background: "var(--color-surface-2)",
         gap: 16,
         flexDirection: "column",
       }}
     >
       <Spinner size={36} />
-      <p style={{ fontSize: "0.875rem", color: neutral[500], fontWeight: 500 }}>
+      <p
+        style={{
+          fontSize: "0.875rem",
+          color: "var(--color-text-secondary)",
+          fontWeight: 500,
+        }}
+      >
         Loading Wanderlust…
       </p>
     </div>

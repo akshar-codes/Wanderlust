@@ -76,18 +76,6 @@ export const useAuthStore = create(
         const { user } = get();
         if (user) set({ user: { ...user, emailVerified: true } });
       },
-
-      // ── Role helpers ──────────────────────────────────────────────────────
-      get isAdmin() {
-        return get().user?.role === "admin";
-      },
-      get isHost() {
-        const role = get().user?.role;
-        return role === "host" || role === "admin";
-      },
-      get isEmailVerified() {
-        return get().user?.emailVerified === true;
-      },
     }),
     {
       name: "wl-auth",
@@ -111,3 +99,15 @@ export const useAuthStore = create(
     },
   ),
 );
+
+// ── Reactive selector hooks (replaces non-reactive ES6 getters) ──────────────
+export const useIsAdmin = () => useAuthStore((s) => s.user?.role === "admin");
+
+export const useIsHost = () =>
+  useAuthStore((s) => {
+    const role = s.user?.role;
+    return role === "host" || role === "admin";
+  });
+
+export const useIsEmailVerified = () =>
+  useAuthStore((s) => s.user?.emailVerified === true);

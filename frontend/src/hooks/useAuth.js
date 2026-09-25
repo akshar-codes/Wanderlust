@@ -21,8 +21,13 @@ export function useLogin() {
       const returnTo = location.state?.from || "/listings";
       navigate(returnTo, { replace: true });
     },
-    onError: (err) =>
-      toast.error(err.message || "Invalid username or password"),
+    onError: (err) => {
+      if (err.backendUnavailable) {
+        err.message =
+          "We're facing some technical issues. Please try again shortly.";
+      }
+      toast.error(err.message || "Invalid username or password");
+    },
   });
 }
 
@@ -38,8 +43,7 @@ export function useVerify2fa() {
       const returnTo = location.state?.from || "/listings";
       navigate(returnTo, { replace: true });
     },
-    onError: (err) =>
-      toast.error(err.message || "Invalid authentication code"),
+    onError: (err) => toast.error(err.message || "Invalid authentication code"),
   });
 }
 
