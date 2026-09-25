@@ -156,7 +156,7 @@ function Section({ icon, title, subtitle, children, defaultExpanded = true }) {
       disableGutters
       elevation={0}
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: `${radii.xl} !important`,
         overflow: "hidden",
         "&:before": { display: "none" },
@@ -164,7 +164,9 @@ function Section({ icon, title, subtitle, children, defaultExpanded = true }) {
       }}
     >
       <AccordionSummary
-        expandIcon={<ChevronDown size={18} color={neutral[500]} />}
+        expandIcon={
+          <ChevronDown size={18} color={"var(--color-text-secondary)"} />
+        }
       >
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <Box sx={{ color: brand[500], display: "flex" }}>{icon}</Box>
@@ -173,13 +175,16 @@ function Section({ icon, title, subtitle, children, defaultExpanded = true }) {
               sx={{
                 fontWeight: 700,
                 fontSize: "0.9375rem",
-                color: neutral[800],
+                color: "var(--color-text)",
               }}
             >
               {title}
             </Typography>
             {subtitle && (
-              <Typography variant="caption" sx={{ color: neutral[500] }}>
+              <Typography
+                variant="caption"
+                sx={{ color: "var(--color-text-secondary)" }}
+              >
                 {subtitle}
               </Typography>
             )}
@@ -277,7 +282,7 @@ function EditListingContent({ listing }) {
       <Stack spacing={3} sx={{ mb: 12 }}>
         <Box
           sx={{
-            border: `1px solid ${neutral[200]}`,
+            border: `1px solid var(--color-border)`,
             borderRadius: radii.xl,
             p: { xs: 2.5, sm: 3 },
             boxShadow: shadows.card,
@@ -352,9 +357,9 @@ function EditListingContent({ listing }) {
           bottom: 0,
           left: 0,
           right: 0,
-          bgcolor: "rgba(255,255,255,0.97)",
+          bgcolor: "var(--color-dropdown-bg)",
           backdropFilter: "blur(12px)",
-          borderTop: `1px solid ${neutral[200]}`,
+          borderTop: `1px solid var(--color-border)`,
           px: { xs: 2.5, md: 4 },
           py: 2,
           display: "flex",
@@ -410,7 +415,7 @@ export default function EditListingPage() {
           sx={{
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
           }}
         >
           Listing not found

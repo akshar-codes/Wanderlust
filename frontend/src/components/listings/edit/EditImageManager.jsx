@@ -61,7 +61,7 @@ export default function EditImageManager({ listingId, images = [] }) {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <Typography variant="body2" sx={{ color: neutral[500] }}>
+      <Typography variant="body2" sx={{ color: "var(--color-text-secondary)" }}>
         Photo changes are saved immediately — no need to click "Save changes".
       </Typography>
 
@@ -83,7 +83,7 @@ export default function EditImageManager({ listingId, images = [] }) {
                 borderRadius: radii.lg,
                 overflow: "hidden",
                 aspectRatio: "4/3",
-                border: `1.5px solid ${img.isPrimary ? brand[500] : neutral[200]}`,
+                border: `1.5px solid ${img.isPrimary ? brand[500] : "var(--color-border)"}`,
                 opacity: busy ? 0.7 : 1,
               }}
             >
@@ -128,8 +128,8 @@ export default function EditImageManager({ listingId, images = [] }) {
                     position: "absolute",
                     top: 6,
                     left: 6,
-                    bgcolor: "rgba(255,255,255,0.92)",
-                    color: neutral[700],
+                    bgcolor: "var(--color-surface)",
+                    color: "var(--color-text)",
                     borderRadius: 999,
                     px: 1,
                     py: 0.25,
@@ -193,9 +193,9 @@ export default function EditImageManager({ listingId, images = [] }) {
         }}
         onClick={() => !busy && inputRef.current?.click()}
         sx={{
-          border: `2px dashed ${dragOver ? brand[500] : neutral[300]}`,
+          border: `2px dashed ${dragOver ? brand[500] : "var(--color-border-strong)"}`,
           borderRadius: radii.xl,
-          bgcolor: dragOver ? brand[50] : neutral[50],
+          bgcolor: dragOver ? brand[50] : "var(--color-surface-2)",
           py: 4,
           px: 3,
           display: "flex",
@@ -210,14 +210,21 @@ export default function EditImageManager({ listingId, images = [] }) {
         {uploading ? (
           <CircularProgress size={22} sx={{ color: brand[500] }} />
         ) : (
-          <UploadCloud size={24} color={dragOver ? brand[500] : neutral[400]} />
+          <UploadCloud
+            size={24}
+            color={dragOver ? brand[500] : "var(--color-text-muted)"}
+          />
         )}
         <Typography
-          sx={{ fontWeight: 600, fontSize: "0.875rem", color: neutral[700] }}
+          sx={{
+            fontWeight: 600,
+            fontSize: "0.875rem",
+            color: "var(--color-text)",
+          }}
         >
           {uploading ? "Uploading…" : "Drag photos here, or click to browse"}
         </Typography>
-        <Typography variant="caption" sx={{ color: neutral[400] }}>
+        <Typography variant="caption" sx={{ color: "var(--color-text-muted)" }}>
           JPG, PNG, or WebP · up to 10MB each · {images.length}/{MAX_IMAGES}{" "}
           used
         </Typography>

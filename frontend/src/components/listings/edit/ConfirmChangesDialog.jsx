@@ -29,7 +29,10 @@ export default function ConfirmChangesDialog({
       }
     >
       <Stack spacing={1.5} sx={{ pt: 1 }}>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           {changes.length} field{changes.length === 1 ? "" : "s"} will be
           updated on this listing.
         </Typography>
@@ -38,7 +41,7 @@ export default function ConfirmChangesDialog({
           <Box
             key={c.key}
             sx={{
-              border: `1px solid ${neutral[200]}`,
+              border: `1px solid var(--color-border)`,
               borderRadius: "12px",
               p: 1.5,
             }}
@@ -47,7 +50,7 @@ export default function ConfirmChangesDialog({
               sx={{
                 fontWeight: 700,
                 fontSize: "0.8125rem",
-                color: neutral[700],
+                color: "var(--color-text)",
                 mb: 0.5,
               }}
             >
@@ -69,7 +72,7 @@ export default function ConfirmChangesDialog({
               >
                 {String(c.oldValue ?? "").trim() || "—"}
               </Typography>
-              <ArrowRight size={14} color={neutral[400]} />
+              <ArrowRight size={14} color={"var(--color-text-muted)"} />
               <Typography
                 variant="body2"
                 sx={{

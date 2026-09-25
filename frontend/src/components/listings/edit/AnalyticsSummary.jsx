@@ -2,34 +2,21 @@ import { Box, Grid, Typography, Chip } from "@mui/material";
 import { Star, Heart, CalendarCheck, MessageSquare } from "lucide-react";
 import { StatsCard } from "../../ui/Card";
 import { neutral, brand } from "../../../theme/tokens";
+import { STATUS_CHIP } from "../../../utils/statusColors";
 
 function StatusChip({ draft, status }) {
   if (draft) {
-    return (
-      <Chip
-        label="Draft"
-        size="small"
-        sx={{ bgcolor: "#fef9c3", color: "#b45309", fontWeight: 700 }}
-      />
-    );
+    return <Chip label="Draft" size="small" sx={STATUS_CHIP.warning} />;
   }
   if (status === "active") {
-    return (
-      <Chip
-        label="Live"
-        size="small"
-        sx={{ bgcolor: "#dcfce7", color: "#15803d", fontWeight: 700 }}
-      />
-    );
+    return <Chip label="Live" size="small" sx={STATUS_CHIP.success} />;
   }
   return (
     <Chip
       label={status}
       size="small"
       sx={{
-        bgcolor: "#fee2e2",
-        color: "#b91c1c",
-        fontWeight: 700,
+        ...STATUS_CHIP.error,
         textTransform: "capitalize",
       }}
     />
@@ -95,7 +82,10 @@ export default function AnalyticsSummary({ listing }) {
         </Grid>
       </Grid>
 
-      <Typography variant="caption" sx={{ color: neutral[500] }}>
+      <Typography
+        variant="caption"
+        sx={{ color: "var(--color-text-secondary)" }}
+      >
         Listed on {createdLabel}
         {listing.slug && (
           <>

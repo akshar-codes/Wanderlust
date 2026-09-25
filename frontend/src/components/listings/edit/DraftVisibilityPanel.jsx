@@ -11,9 +11,9 @@ export default function DraftVisibilityPanel({ draft, onChange }) {
         justifyContent: "space-between",
         gap: 2,
         p: 2.5,
-        border: `1.5px solid ${draft ? "#fde68a" : neutral[200]}`,
+        border: `1.5px solid ${draft ? "#fde68a" : "var(--color-border)"}`,
         borderRadius: "16px",
-        bgcolor: draft ? "#fffbeb" : "#fff",
+        bgcolor: draft ? "#fffbeb" : "var(--color-surface)",
         transition: "all 150ms",
       }}
     >
@@ -25,11 +25,18 @@ export default function DraftVisibilityPanel({ draft, onChange }) {
         )}
         <Box>
           <Typography
-            sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "0.9375rem",
+              color: "var(--color-text)",
+            }}
           >
             {draft ? "Hidden as draft" : "Live and visible"}
           </Typography>
-          <Typography variant="caption" sx={{ color: neutral[500] }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "var(--color-text-secondary)" }}
+          >
             {draft
               ? "This listing won't appear in search results until published."
               : "Guests can find and book this listing."}
