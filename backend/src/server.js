@@ -1,5 +1,6 @@
 // src/server.js
 import "dotenv/config";
+import "./config/validateEnv.js";
 
 import mongoose from "mongoose";
 import session from "express-session";
@@ -66,7 +67,7 @@ process.on("uncaughtException", (err) => {
 
     configurePassport();
 
-    const httpServer = app.listen(PORT, () =>
+    const httpServer = app.listen(PORT, "127.0.0.1", () =>
       logger.info("Server running", {
         port: PORT,
         env: process.env.NODE_ENV ?? "development",
@@ -75,7 +76,7 @@ process.on("uncaughtException", (err) => {
 
     const shutdown = async (signal) => {
       logger.info(`${signal} received: stopping server`);
-      
+
       const shutdownTimer = setTimeout(() => {
         logger.error("Shutdown timed out. Forcing exit.");
         process.exit(1);
@@ -86,14 +87,14 @@ process.on("uncaughtException", (err) => {
           logger.error("Error closing server", { error: err.message });
         }
         logger.info("HTTP server closed");
-        
+
         try {
           await mongoose.disconnect();
           logger.info("MongoDB disconnected");
         } catch (dbErr) {
           logger.error("Error disconnecting MongoDB", { error: dbErr.message });
         }
-        
+
         clearTimeout(shutdownTimer);
         process.exit(err ? 1 : 0);
       });

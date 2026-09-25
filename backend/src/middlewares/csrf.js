@@ -19,9 +19,7 @@ export const csrfCookie = (req, res, next) => {
   next();
 };
 
-/**
- * Verifies that state-changing requests include a matching X-CSRF-Token header.
- */
+import logger from "../utils/logger.js";
 export const csrfProtect = (req, res, next) => {
   // 1. Skip safe methods
   const method = req.method.toLowerCase();
@@ -42,6 +40,7 @@ export const csrfProtect = (req, res, next) => {
   const cookieToken = req.cookies.csrf_token;
 
   if (!headerToken || !cookieToken) {
+    logger.warn(`CSRF Missing: header=${headerToken}, cookie=${cookieToken}`);
     return next(
       new AppError(403, "CSRF token missing", {
         code: "CSRF_VALIDATION_FAILED",
@@ -57,6 +56,9 @@ export const csrfProtect = (req, res, next) => {
       headerBuffer.length !== cookieBuffer.length ||
       !crypto.timingSafeEqual(headerBuffer, cookieBuffer)
     ) {
+      logger.warn(
+        `CSRF Mismatch: header=${headerToken}, cookie=${cookieToken}`,
+      );
       throw new Error("Mismatch");
     }
 
