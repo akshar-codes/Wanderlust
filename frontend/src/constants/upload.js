@@ -2,7 +2,7 @@ export const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
   "image/jpg",
-  "image/webp"
+  "image/webp",
 ];
 
 export const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];

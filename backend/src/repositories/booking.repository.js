@@ -4,7 +4,8 @@ import Booking from "../models/booking.js";
 
 export const create = (data) => Booking.create(data);
 
-export const createWithSession = (data, session) => Booking.create([data], { session }).then(docs => docs[0]);
+export const createWithSession = (data, session) =>
+  Booking.create([data], { session }).then((docs) => docs[0]);
 
 export const updateStatus = (id, status, extra = {}) =>
   Booking.findByIdAndUpdate(

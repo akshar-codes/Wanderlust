@@ -42,7 +42,11 @@ export const getHostStats = async (username) => {
     reviewService.getHostReviewSummary(user._id),
   ]);
 
-  const summary = stats[0] ?? { totalPublished: 0, totalWishlisted: 0, totalBookings: 0 };
+  const summary = stats[0] ?? {
+    totalPublished: 0,
+    totalWishlisted: 0,
+    totalBookings: 0,
+  };
 
   return {
     totalListings: summary.totalPublished,
@@ -88,7 +92,9 @@ export const updateAvatar = async (userId, file) => {
 
   if (oldPublicId) {
     cloudinary.uploader.destroy(oldPublicId).catch((err) => {
-      logger.warn("[UserService] Cloudinary avatar delete failed:", { error: err.message });
+      logger.warn("[UserService] Cloudinary avatar delete failed:", {
+        error: err.message,
+      });
     });
   }
 
@@ -109,7 +115,9 @@ export const removeAvatar = async (userId) => {
 
   if (oldPublicId) {
     cloudinary.uploader.destroy(oldPublicId).catch((err) => {
-      logger.warn("[UserService] Cloudinary avatar delete failed:", { error: err.message });
+      logger.warn("[UserService] Cloudinary avatar delete failed:", {
+        error: err.message,
+      });
     });
   }
 

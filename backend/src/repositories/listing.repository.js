@@ -149,7 +149,12 @@ export const getHostStatsSummary = (ownerId) =>
         totalPublished: {
           $sum: {
             $cond: [
-              { $and: [{ $eq: ["$draft", false] }, { $eq: ["$status", "active"] }] },
+              {
+                $and: [
+                  { $eq: ["$draft", false] },
+                  { $eq: ["$status", "active"] },
+                ],
+              },
               1,
               0,
             ],
@@ -162,7 +167,11 @@ export const getHostStatsSummary = (ownerId) =>
   ]);
 
 export const incrementCounter = (id, field, amount = 1, session = null) =>
-  Listing.findByIdAndUpdate(id, { $inc: { [field]: amount } }, { new: true, session });
+  Listing.findByIdAndUpdate(
+    id,
+    { $inc: { [field]: amount } },
+    { new: true, session },
+  );
 
 // ── Images ─────────────────────────────────────────────────────────────────────
 
@@ -201,7 +210,13 @@ export const addBlockedDate = (id, blockedDate) =>
     { new: true, runValidators: true },
   );
 
-export const addBlockedDateAtomic = (id, checkIn, checkOut, blockedDate, session) =>
+export const addBlockedDateAtomic = (
+  id,
+  checkIn,
+  checkOut,
+  blockedDate,
+  session,
+) =>
   Listing.findOneAndUpdate(
     {
       _id: id,

@@ -85,7 +85,11 @@ export const initiateForgotPassword = async ({ email, requestIp }) => {
   return result;
 };
 
-export const consumeResetToken = async ({ token, newPassword, consumedByIp }) => {
+export const consumeResetToken = async ({
+  token,
+  newPassword,
+  consumedByIp,
+}) => {
   if (!token || typeof token !== "string" || token.trim() === "") {
     throw AppError.badRequest("Reset token is required");
   }

@@ -6,14 +6,17 @@ const dispatch = async (data) => {
   try {
     await notificationRepo.create(data);
   } catch (error) {
-    logger.error("Failed to dispatch notification", { error: error.message, data });
+    logger.error("Failed to dispatch notification", {
+      error: error.message,
+      data,
+    });
   }
 };
 
 export const createBookingNotification = (type, booking, actor) => {
   const isHostActor = String(booking.host) === String(actor._id);
   const recipient = isHostActor ? booking.guest : booking.host;
-  
+
   // Need to extract listing details carefully if populated or just ID
   const listingId = booking.listing?._id || booking.listing;
   const listingTitle = booking.listing?.title || "a listing";
@@ -64,7 +67,7 @@ export const createBookingNotification = (type, booking, actor) => {
       listingId,
       listingTitle,
       actorName,
-    }
+    },
   });
 };
 
@@ -73,7 +76,7 @@ export const createReviewNotification = (type, review, listing, actor) => {
   let title = "";
   let body = "";
   let link = `/listings/${listing._id}`;
-  
+
   const actorName = actor.displayName || actor.username;
 
   switch (type) {
@@ -101,7 +104,7 @@ export const createReviewNotification = (type, review, listing, actor) => {
       listingId: listing._id,
       listingTitle: listing.title,
       actorName,
-    }
+    },
   });
 };
 

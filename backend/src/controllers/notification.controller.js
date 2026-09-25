@@ -27,7 +27,10 @@ export const unreadCount = async (req, res) => {
 };
 
 export const markRead = async (req, res) => {
-  const notification = await notificationService.markRead(req.params.id, req.user._id);
+  const notification = await notificationService.markRead(
+    req.params.id,
+    req.user._id,
+  );
   if (!notification) {
     throw AppError.notFound("Notification not found");
   }

@@ -19,10 +19,10 @@ export const CURRENCIES = {
 export function formatPrice(amountInr, opts = {}) {
   const user = useAuthStore.getState().user;
   const currency = user?.settings?.currency || "INR";
-  
+
   const config = CURRENCIES[currency] || CURRENCIES.INR;
   const converted = amountInr * config.rate;
-  
+
   return new Intl.NumberFormat(config.locale, {
     style: "currency",
     currency: currency,

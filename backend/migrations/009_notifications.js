@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 export default async function migrate() {
   const db = mongoose.connection.db;
 
-  const collections = await db.listCollections({ name: "notifications" }).toArray();
+  const collections = await db
+    .listCollections({ name: "notifications" })
+    .toArray();
   if (collections.length === 0) {
     await db.createCollection("notifications");
   }

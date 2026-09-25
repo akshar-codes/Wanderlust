@@ -30,7 +30,7 @@ const notificationSchema = new Schema(
       actorName: { type: String, default: null },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 notificationSchema.index({ recipient: 1, createdAt: -1 });

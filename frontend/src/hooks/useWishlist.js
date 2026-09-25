@@ -68,7 +68,7 @@ export function useToggleWishlist() {
       if (context?.previousStatus) {
         qc.setQueryData(
           [WISHLIST_STATUS_KEY, context.listingId],
-          context.previousStatus
+          context.previousStatus,
         );
       }
       toast.error(err.message || "Failed to update wishlist");

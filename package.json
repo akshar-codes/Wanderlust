@@ -1,8 +1,11 @@
 {
   "name": "wander-lust-root",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
+    "test:backend": "npm --prefix backend run test:unit",
+    "test:seed": "npm --prefix backend run test:seed",
+    "test:messages": "npm --prefix backend run test:messages",
     "e2e": "node run-e2e.mjs",
     "e2e:ui": "playwright test --ui",
     "e2e:report": "playwright show-report"

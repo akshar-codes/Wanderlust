@@ -6,7 +6,7 @@ export const createReport = async (userId, payload) => {
   const exists = await reportRepo.existsForUserAndTarget(
     payload.targetType,
     payload.targetId,
-    userId
+    userId,
   );
   if (exists) {
     throw AppError.conflict("You have already reported this item");

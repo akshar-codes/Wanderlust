@@ -46,11 +46,13 @@ export default function WishlistHeartButton({
           height: isPill ? "auto" : size,
           padding: isPill ? "8px 16px" : 0,
           borderRadius: isPill ? 999 : "50%",
-          background: isPill 
-            ? (isSaved ? "rgba(255,90,95,0.06)" : "var(--color-surface)")
+          background: isPill
+            ? isSaved
+              ? "rgba(255,90,95,0.06)"
+              : "var(--color-surface)"
             : "var(--color-surface)",
           opacity: isLoading ? 0.6 : 1,
-          border: isPill 
+          border: isPill
             ? `1.5px solid ${isSaved ? "rgba(255,90,95,0.4)" : "var(--color-border)"}`
             : "1px solid var(--color-border)",
           display: "flex",

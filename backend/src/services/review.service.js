@@ -21,7 +21,12 @@ export const createReview = async (listingId, reviewData, authorId) => {
   await listingRepo.recalculateRating(listingId);
 
   const actor = await userRepo.findById(authorId);
-  await notificationService.createReviewNotification("review_received", review, listing, actor);
+  await notificationService.createReviewNotification(
+    "review_received",
+    review,
+    listing,
+    actor,
+  );
 
   return review;
 };
@@ -91,7 +96,12 @@ export const upsertHostReply = async (listingId, reviewId, text, hostId) => {
     : await reviewRepo.setHostReply(reviewId, text);
 
   const actor = await userRepo.findById(hostId);
-  await notificationService.createReviewNotification("review_reply", updated, listing, actor);
+  await notificationService.createReviewNotification(
+    "review_reply",
+    updated,
+    listing,
+    actor,
+  );
 
   return updated;
 };

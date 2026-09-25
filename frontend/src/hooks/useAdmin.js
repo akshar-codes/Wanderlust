@@ -48,7 +48,8 @@ export function useUpdateUserStatus() {
       qc.invalidateQueries({ queryKey: [ADMIN_KEY, "stats"] });
       toast.success(data.message);
     },
-    onError: (err) => toast.error(err.message || "Failed to update user status"),
+    onError: (err) =>
+      toast.error(err.message || "Failed to update user status"),
   });
 }
 

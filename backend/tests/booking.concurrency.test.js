@@ -125,8 +125,18 @@ describe("Booking Concurrency Tests", () => {
     const checkOut2 = new Date(checkIn2);
     checkOut2.setDate(checkOut2.getDate() + 3);
 
-    const payload1 = { listingId: listing._id, checkIn: checkIn1, checkOut: checkOut1, guestsCount: 2 };
-    const payload2 = { listingId: listing._id, checkIn: checkIn2, checkOut: checkOut2, guestsCount: 2 };
+    const payload1 = {
+      listingId: listing._id,
+      checkIn: checkIn1,
+      checkOut: checkOut1,
+      guestsCount: 2,
+    };
+    const payload2 = {
+      listingId: listing._id,
+      checkIn: checkIn2,
+      checkOut: checkOut2,
+      guestsCount: 2,
+    };
 
     const results = await Promise.allSettled([
       bookingService.createBooking(guest1._id, payload1),
@@ -139,7 +149,7 @@ describe("Booking Concurrency Tests", () => {
     expect(fulfilled.length).toBe(1);
     expect(rejected.length).toBe(1);
     expect(rejected[0].reason.statusCode).toBe(409);
-    
+
     const bookings = await Booking.find({ listing: listing._id });
     expect(bookings.length).toBe(1);
   });
@@ -159,8 +169,18 @@ describe("Booking Concurrency Tests", () => {
     const checkOut2 = new Date(checkIn2);
     checkOut2.setDate(checkOut2.getDate() + 3);
 
-    const payload1 = { listingId: listing._id, checkIn: checkIn1, checkOut: checkOut1, guestsCount: 2 };
-    const payload2 = { listingId: listing._id, checkIn: checkIn2, checkOut: checkOut2, guestsCount: 2 };
+    const payload1 = {
+      listingId: listing._id,
+      checkIn: checkIn1,
+      checkOut: checkOut1,
+      guestsCount: 2,
+    };
+    const payload2 = {
+      listingId: listing._id,
+      checkIn: checkIn2,
+      checkOut: checkOut2,
+      guestsCount: 2,
+    };
 
     const results = await Promise.allSettled([
       bookingService.createBooking(guest1._id, payload1),

@@ -65,7 +65,14 @@ export const updateUserStatus = async (req, res, next) => {
 // ── Listing Moderation ─────────────────────────────────────────────────────────
 
 export const listListings = async (req, res) => {
-  const { page = 1, limit = 20, search, status, category, featured } = req.query;
+  const {
+    page = 1,
+    limit = 20,
+    search,
+    status,
+    category,
+    featured,
+  } = req.query;
 
   const result = await adminService.listListings({
     page: Number(page),

@@ -29,14 +29,14 @@ export const markRead = (notificationId, recipientId) => {
   return Notification.findOneAndUpdate(
     { _id: notificationId, recipient: recipientId },
     { $set: { read: true, readAt: new Date() } },
-    { new: true }
+    { new: true },
   );
 };
 
 export const markAllRead = (recipientId) => {
   return Notification.updateMany(
     { recipient: recipientId, read: false },
-    { $set: { read: true, readAt: new Date() } }
+    { $set: { read: true, readAt: new Date() } },
   );
 };
 

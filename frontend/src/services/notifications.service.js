@@ -2,7 +2,9 @@ import api from "./api";
 
 export const notificationsService = {
   getAll: async ({ page = 1, limit = 10 } = {}) => {
-    const { data } = await api.get("/notifications", { params: { page, limit } });
+    const { data } = await api.get("/notifications", {
+      params: { page, limit },
+    });
     return data.data;
   },
   getUnreadCount: async () => {
