@@ -69,13 +69,18 @@ export default function AuthCallbackPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.5rem",
-                  color: "#261f1a",
+                  color: "var(--color-text)",
                   marginBottom: 8,
                 }}
               >
                 Signing you in…
               </h2>
-              <p style={{ fontSize: "0.875rem", color: "#8a8179" }}>
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
                 Just a moment while we set up your session.
               </p>
             </div>
@@ -120,13 +125,18 @@ export default function AuthCallbackPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.5rem",
-                  color: "#261f1a",
+                  color: "var(--color-text)",
                   marginBottom: 6,
                 }}
               >
                 You're in!
               </h2>
-              <p style={{ fontSize: "0.875rem", color: "#8a8179" }}>
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
                 Redirecting you to your dashboard…
               </p>
             </div>
@@ -164,7 +174,7 @@ export default function AuthCallbackPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.5rem",
-                  color: "#261f1a",
+                  color: "var(--color-text)",
                   marginBottom: 8,
                 }}
               >
@@ -173,7 +183,7 @@ export default function AuthCallbackPage() {
               <p
                 style={{
                   fontSize: "0.875rem",
-                  color: "#8a8179",
+                  color: "var(--color-text-secondary)",
                   lineHeight: 1.6,
                   maxWidth: 300,
                 }}
@@ -183,7 +193,7 @@ export default function AuthCallbackPage() {
               <p
                 style={{
                   fontSize: "0.78rem",
-                  color: "#b8b0a8",
+                  color: "var(--color-text-muted)",
                   marginTop: 10,
                 }}
               >

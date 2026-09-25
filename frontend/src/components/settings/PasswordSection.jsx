@@ -27,12 +27,12 @@ export default function PasswordSection() {
             spacing={1.25}
             sx={{ mb: 1 }}
           >
-            <KeyRound size={18} color={neutral[500]} />
+            <KeyRound size={18} color={"var(--color-text-secondary)"} />
             <Typography
               sx={{
                 fontWeight: 700,
                 fontSize: "1.0625rem",
-                color: neutral[800],
+                color: "var(--color-text)",
               }}
             >
               Password
@@ -43,7 +43,11 @@ export default function PasswordSection() {
             <>
               <Typography
                 variant="body2"
-                sx={{ color: neutral[500], mb: 3, lineHeight: 1.7 }}
+                sx={{
+                  color: "var(--color-text-secondary)",
+                  mb: 3,
+                  lineHeight: 1.7,
+                }}
               >
                 For your security, passwords aren't changed in-app. We'll email
                 a secure reset link to <strong>{user?.email}</strong> — follow
@@ -119,14 +123,14 @@ export default function PasswordSection() {
                   sx={{
                     fontWeight: 700,
                     fontSize: "0.875rem",
-                    color: neutral[800],
+                    color: "var(--color-text)",
                   }}
                 >
                   No password set
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ color: neutral[600], mt: 0.25 }}
+                  sx={{ color: "var(--color-text-secondary)", mt: 0.25 }}
                 >
                   You sign in with{" "}
                   {connectedProviders.length

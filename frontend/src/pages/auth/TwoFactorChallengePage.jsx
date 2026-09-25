@@ -36,14 +36,20 @@ export default function TwoFactorChallengePage() {
         style={{
           fontFamily: "'DM Serif Display', Georgia, serif",
           fontSize: "clamp(1.6rem, 3vw, 1.9rem)",
-          color: "#261f1a",
+          color: "var(--color-text)",
           lineHeight: 1.15,
           marginBottom: 2,
         }}
       >
         Two-Factor Authentication
       </h1>
-      <p style={{ fontSize: "0.9rem", color: "#8a8179", marginBottom: 16 }}>
+      <p
+        style={{
+          fontSize: "0.9rem",
+          color: "var(--color-text-secondary)",
+          marginBottom: 16,
+        }}
+      >
         {useRecovery
           ? "Enter one of your recovery codes."
           : "Enter the 6-digit code from your authenticator app."}
@@ -90,7 +96,7 @@ export default function TwoFactorChallengePage() {
         <Link
           to="/login"
           style={{
-            color: "#8a8179",
+            color: "var(--color-text-secondary)",
             fontSize: "0.9rem",
             textDecoration: "none",
           }}

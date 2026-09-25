@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mail, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
@@ -17,16 +17,25 @@ function PendingVerification() {
     error,
   } = useResendVerification();
   const [countdown, setCountdown] = useState(0);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   const handleResend = () => {
     resend(undefined, {
       onSuccess: () => {
         setCountdown(60);
-        const t = setInterval(
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        intervalRef.current = setInterval(
           () =>
             setCountdown((c) => {
               if (c <= 1) {
-                clearInterval(t);
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
                 return 0;
               }
               return c - 1;
@@ -69,7 +78,7 @@ function PendingVerification() {
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "1.7rem",
-            color: "#261f1a",
+            color: "var(--color-text)",
             marginBottom: 8,
           }}
         >
@@ -78,13 +87,13 @@ function PendingVerification() {
         <p
           style={{
             fontSize: "0.9rem",
-            color: "#8a8179",
+            color: "var(--color-text-secondary)",
             lineHeight: 1.65,
             maxWidth: 320,
           }}
         >
           We sent a verification link to{" "}
-          <strong style={{ color: "#3d3630" }}>
+          <strong style={{ color: "var(--color-text)" }}>
             {user?.email || "your email"}
           </strong>
           . Click it to activate your account.
@@ -125,18 +134,24 @@ function PendingVerification() {
 
       <div
         style={{
-          background: "#faf8f6",
-          border: "1px solid #ebe7e3",
+          background: "var(--color-surface-2)",
+          border: "1px solid var(--color-border)",
           borderRadius: 14,
           padding: "16px 20px",
           fontSize: "0.8125rem",
-          color: "#8a8179",
+          color: "var(--color-text-secondary)",
           lineHeight: 1.55,
           width: "100%",
           textAlign: "left",
         }}
       >
-        <p style={{ fontWeight: 600, color: "#5c544c", marginBottom: 8 }}>
+        <p
+          style={{
+            fontWeight: 600,
+            color: "var(--color-text-secondary)",
+            marginBottom: 8,
+          }}
+        >
           Didn't get it?
         </p>
         <ul
@@ -161,7 +176,7 @@ function PendingVerification() {
                 padding: 0,
                 fontFamily: "inherit",
                 fontSize: "inherit",
-                color: countdown === 0 ? "#ff5a5f" : "#b8b0a8",
+                color: countdown === 0 ? "#ff5a5f" : "var(--color-text-muted)",
                 fontWeight: 600,
                 cursor: countdown === 0 ? "pointer" : "default",
                 textDecoration: countdown === 0 ? "underline" : "none",
@@ -184,7 +199,7 @@ function PendingVerification() {
           alignItems: "center",
           gap: 6,
           fontSize: "0.875rem",
-          color: "#8a8179",
+          color: "var(--color-text-secondary)",
           textDecoration: "none",
           fontWeight: 500,
         }}
@@ -223,7 +238,7 @@ function TokenVerification({ token }) {
         }}
       >
         <Spinner size={40} />
-        <p style={{ fontSize: "0.9rem", color: "#8a8179" }}>
+        <p style={{ fontSize: "0.9rem", color: "var(--color-text-secondary)" }}>
           Verifying your email…
         </p>
       </div>
@@ -271,7 +286,7 @@ function TokenVerification({ token }) {
             style={{
               fontFamily: "'DM Serif Display', Georgia, serif",
               fontSize: "1.7rem",
-              color: "#261f1a",
+              color: "var(--color-text)",
               marginBottom: 8,
             }}
           >
@@ -280,7 +295,7 @@ function TokenVerification({ token }) {
           <p
             style={{
               fontSize: "0.9rem",
-              color: "#8a8179",
+              color: "var(--color-text-secondary)",
               lineHeight: 1.65,
               maxWidth: 300,
             }}
@@ -343,7 +358,7 @@ function TokenVerification({ token }) {
             style={{
               fontFamily: "'DM Serif Display', Georgia, serif",
               fontSize: "1.6rem",
-              color: "#261f1a",
+              color: "var(--color-text)",
               marginBottom: 8,
             }}
           >
@@ -352,7 +367,7 @@ function TokenVerification({ token }) {
           <p
             style={{
               fontSize: "0.875rem",
-              color: "#8a8179",
+              color: "var(--color-text-secondary)",
               lineHeight: 1.65,
               maxWidth: 300,
             }}

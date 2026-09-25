@@ -67,7 +67,10 @@ export default function TwoFactorSetup() {
   };
 
   const generateRecoveryCodes = async () => {
-    if (!token) return toast.error("Please enter the code from your app to generate recovery codes");
+    if (!token)
+      return toast.error(
+        "Please enter the code from your app to generate recovery codes",
+      );
     try {
       setLoading(true);
       const data = await authService.generateRecoveryCodes({ token });
@@ -82,21 +85,26 @@ export default function TwoFactorSetup() {
   };
 
   return (
-    <Box sx={{ p: { xs: 2.5, sm: 3 }, borderTop: `1px solid ${neutral[200]}` }}>
+    <Box
+      sx={{ p: { xs: 2.5, sm: 3 }, borderTop: `1px solid var(--color-border)` }}
+    >
       <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 2 }}>
         <ShieldCheck size={18} color={brand[500]} />
         <Typography
           sx={{
             fontWeight: 700,
             fontSize: "1.0625rem",
-            color: neutral[800],
+            color: "var(--color-text)",
           }}
         >
           Two-factor authentication
         </Typography>
       </Stack>
 
-      <Typography variant="body2" sx={{ color: neutral[600], mb: 3 }}>
+      <Typography
+        variant="body2"
+        sx={{ color: "var(--color-text-secondary)", mb: 3 }}
+      >
         Protect your account by requiring an extra step when signing in.
       </Typography>
 
@@ -108,12 +116,22 @@ export default function TwoFactorSetup() {
 
       {qrCodeUrl && (
         <Stack spacing={2} sx={{ maxWidth: 400 }}>
-          <Typography variant="body2" sx={{ color: neutral[800], fontWeight: 500 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "var(--color-text)", fontWeight: 500 }}
+          >
             1. Scan this QR code with your authenticator app
           </Typography>
-          <img src={qrCodeUrl} alt="2FA QR Code" style={{ width: 200, height: 200 }} />
-          
-          <Typography variant="body2" sx={{ color: neutral[800], fontWeight: 500, mt: 2 }}>
+          <img
+            src={qrCodeUrl}
+            alt="2FA QR Code"
+            style={{ width: 200, height: 200 }}
+          />
+
+          <Typography
+            variant="body2"
+            sx={{ color: "var(--color-text)", fontWeight: 500, mt: 2 }}
+          >
             2. Enter the 6-digit code
           </Typography>
           <Input
@@ -122,10 +140,18 @@ export default function TwoFactorSetup() {
             onChange={(e) => setToken(e.target.value)}
           />
           <Stack direction="row" spacing={2}>
-            <Button variant="primary" onClick={handleEnable} disabled={loading || !token}>
+            <Button
+              variant="primary"
+              onClick={handleEnable}
+              disabled={loading || !token}
+            >
               Verify and Enable
             </Button>
-            <Button variant="ghost" onClick={() => setQrCodeUrl("")} disabled={loading}>
+            <Button
+              variant="ghost"
+              onClick={() => setQrCodeUrl("")}
+              disabled={loading}
+            >
               Cancel
             </Button>
           </Stack>
@@ -134,7 +160,11 @@ export default function TwoFactorSetup() {
 
       {isEnabled && recoveryCodes.length === 0 && !showDisableToken && (
         <Stack spacing={2} direction="row">
-          <Button variant="ghost" onClick={() => setShowDisableToken(true)} disabled={loading}>
+          <Button
+            variant="ghost"
+            onClick={() => setShowDisableToken(true)}
+            disabled={loading}
+          >
             Disable 2FA
           </Button>
         </Stack>
@@ -142,7 +172,10 @@ export default function TwoFactorSetup() {
 
       {isEnabled && showDisableToken && (
         <Stack spacing={2} sx={{ maxWidth: 400 }}>
-           <Typography variant="body2" sx={{ color: neutral[800], fontWeight: 500 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "var(--color-text)", fontWeight: 500 }}
+          >
             Enter a 6-digit code to disable 2FA
           </Typography>
           <Input
@@ -151,10 +184,21 @@ export default function TwoFactorSetup() {
             onChange={(e) => setToken(e.target.value)}
           />
           <Stack direction="row" spacing={2}>
-             <Button variant="primary" onClick={handleDisable} disabled={loading || !token}>
+            <Button
+              variant="primary"
+              onClick={handleDisable}
+              disabled={loading || !token}
+            >
               Disable
             </Button>
-            <Button variant="ghost" onClick={() => {setShowDisableToken(false); setToken("");}} disabled={loading}>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowDisableToken(false);
+                setToken("");
+              }}
+              disabled={loading}
+            >
               Cancel
             </Button>
           </Stack>
@@ -163,15 +207,29 @@ export default function TwoFactorSetup() {
 
       {recoveryCodes.length > 0 && (
         <Box sx={{ mt: 3, p: 2, bgcolor: "#fff3cd", borderRadius: 1 }}>
-          <Typography variant="subtitle2" sx={{ color: "#856404", fontWeight: 700, mb: 1 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{ color: "#856404", fontWeight: 700, mb: 1 }}
+          >
             Save your recovery codes
           </Typography>
           <Typography variant="body2" sx={{ color: "#856404", mb: 2 }}>
-            If you lose your device, you can use these recovery codes to access your account. These codes will only be shown once.
+            If you lose your device, you can use these recovery codes to access
+            your account. These codes will only be shown once.
           </Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {recoveryCodes.map((code) => (
-              <Box key={code} sx={{ fontFamily: "monospace", bgcolor: "#fff", px: 1, py: 0.5, borderRadius: 1, border: "1px solid #ffeeba" }}>
+              <Box
+                key={code}
+                sx={{
+                  fontFamily: "monospace",
+                  bgcolor: "var(--color-surface)",
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 1,
+                  border: "1px solid #ffeeba",
+                }}
+              >
                 {code}
               </Box>
             ))}
