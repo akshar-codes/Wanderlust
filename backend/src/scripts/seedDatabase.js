@@ -6,6 +6,10 @@ import Review from "../models/review.js";
 import User from "../models/user.js";
 import Wishlist from "../models/wishlist.js";
 import WishlistCollection from "../models/wishlistCollection.js";
+import Booking from "../models/booking.js";
+import Message from "../models/message.js";
+import Notification from "../models/notification.js";
+import Report from "../models/Report.js";
 
 import { buildCityQuotas } from "../../seeder/utils/cityQuotas.js";
 import {
@@ -20,6 +24,7 @@ import {
 } from "../../seeder/generators/generateReviews.js";
 import { buildAvailabilityCalendar } from "../../seeder/generators/generateAvailability.js";
 import { buildWishlistsForUsers } from "../../seeder/generators/generateWishlists.js";
+import { buildSeedConversations } from "../../seeder/generators/generateConversations.js";
 import { batches, randomInt, pickRange } from "../../seeder/utils/random.js";
 
 // ── Config ───────────────────────────────────────────────────────────────
@@ -30,6 +35,7 @@ const CLEAR_EXISTING = process.env.SEED_CLEAR !== "false"; // default: true
 const LISTING_INSERT_BATCH_SIZE = 200;
 const REVIEW_INSERT_BATCH_SIZE = 500;
 const HOST_COUNT = Number(process.env.SEED_HOST_COUNT ?? 150);
+const BOOKING_COUNT = Number(process.env.SEED_BOOKING_COUNT ?? 120);
 
 if (!MONGO_URL) {
   console.error("❌  MONGO_URL is not set");
@@ -55,12 +61,20 @@ async function clearSeedData() {
     reviewsDeleted,
     wishlistItemsDeleted,
     wishlistCollectionsDeleted,
+    bookingsDeleted,
+    messagesDeleted,
+    notificationsDeleted,
+    reportsDeleted,
     hostsDeleted,
   ] = await Promise.all([
     Listing.deleteMany({}),
     Review.deleteMany({}),
     Wishlist.deleteMany({}),
     WishlistCollection.deleteMany({}),
+    Booking.deleteMany({}),
+    Message.deleteMany({}),
+    Notification.deleteMany({}),
+    Report.deleteMany({}),
     User.deleteMany({
       email: {
         $regex: /@wanderlust-(hosts|travelers)\.com$/,
@@ -71,6 +85,8 @@ async function clearSeedData() {
     `✅  Removed ${listingsDeleted.deletedCount} listings, ` +
       `${reviewsDeleted.deletedCount} reviews, ` +
       `${wishlistItemsDeleted.deletedCount} saved listings across ${wishlistCollectionsDeleted.deletedCount} wishlists, ` +
+      `${bookingsDeleted.deletedCount} bookings, ${messagesDeleted.deletedCount} messages, ${notificationsDeleted.deletedCount} notifications, ` +
+      `${reportsDeleted.deletedCount} reports, ` +
       `${hostsDeleted.deletedCount} generated hosts/travelers`,
   );
 }
@@ -263,17 +279,44 @@ async function seedReviews(insertedListings, hostRecords, travelerRecords) {
 
 // ── Phase: availability ──────────────────────────────────────────────────
 
-async function seedAvailability(insertedListings) {
+async function seedAvailability(insertedListings, bookings = []) {
   logPhase("Refreshing availability calendars");
 
-  const bulkOps = insertedListings.map((listing) => ({
-    updateOne: {
-      filter: { _id: listing._id },
-      update: {
-        $set: { availabilityCalendar: buildAvailabilityCalendar() },
+  const activeBookingsByListing = new Map();
+  for (const booking of bookings) {
+    if (!["pending", "confirmed"].includes(booking.status)) continue;
+    const key = String(booking.listing);
+    const entries = activeBookingsByListing.get(key) ?? [];
+    entries.push(booking);
+    activeBookingsByListing.set(key, entries);
+  }
+
+  const bulkOps = insertedListings.map((listing) => {
+    const activeBookings =
+      activeBookingsByListing.get(String(listing._id)) ?? [];
+    const bookedWindows = activeBookings.map((booking) => ({
+      _id: booking.blockedDateId,
+      startDate: booking.checkIn,
+      endDate: booking.checkOut,
+      reason: "booked",
+    }));
+    const hostBlocks = buildAvailabilityCalendar().filter((block) =>
+      activeBookings.every(
+        (booking) =>
+          block.endDate <= booking.checkIn ||
+          block.startDate >= booking.checkOut,
+      ),
+    );
+
+    return {
+      updateOne: {
+        filter: { _id: listing._id },
+        update: {
+          $set: { availabilityCalendar: [...hostBlocks, ...bookedWindows] },
+        },
       },
-    },
-  }));
+    };
+  });
 
   let updated = 0;
   for (const batch of batches(bulkOps, LISTING_INSERT_BATCH_SIZE)) {
@@ -282,6 +325,78 @@ async function seedAvailability(insertedListings) {
     process.stdout.write(`\r  Updated ${updated}/${bulkOps.length} calendars`);
   }
   console.log(`\n✅  Availability calendars refreshed for ${updated} listings`);
+}
+
+// ── Bookings, conversation messages, and booking notifications ──────────
+
+async function seedConversations(insertedListings, travelerRecords) {
+  logPhase(`Generating ${BOOKING_COUNT} bookings and host/guest conversations`);
+  const { bookings, messages, bookingCountByListing } = buildSeedConversations({
+    listings: insertedListings,
+    travelerRecords,
+    count: BOOKING_COUNT,
+  });
+
+  if (bookings.length) {
+    await Booking.insertMany(bookings, { ordered: false });
+    await Message.insertMany(messages, { ordered: false });
+  }
+
+  const listingById = new Map(
+    insertedListings.map((listing) => [String(listing._id), listing]),
+  );
+  const notificationDocs = bookings.map((booking) => {
+    const listing = listingById.get(String(booking.listing));
+    const isRequest = booking.status === "pending";
+    const isCompleted = booking.status === "completed";
+    return {
+      recipient: isRequest ? booking.host : booking.guest,
+      type: isRequest
+        ? "booking_created"
+        : isCompleted
+          ? "booking_completed"
+          : "booking_confirmed",
+      title: isRequest
+        ? "New booking request"
+        : isCompleted
+          ? "Stay completed"
+          : "Booking confirmed",
+      body: isRequest
+        ? `${listing?.title ?? "Your stay"} has a new booking request.`
+        : `${listing?.title ?? "Your stay"} booking is ${isCompleted ? "complete" : "confirmed"}.`,
+      link: "/dashboard/bookings",
+      read: false,
+      metadata: {
+        bookingId: booking._id,
+        listingId: booking.listing,
+        listingTitle: listing?.title ?? "Stay",
+        actorName: "Wanderlust guest",
+      },
+      createdAt: booking.createdAt,
+      updatedAt: booking.createdAt,
+    };
+  });
+  if (notificationDocs.length)
+    await Notification.insertMany(notificationDocs, { ordered: false });
+
+  const listingOps = insertedListings.map((listing) => ({
+    updateOne: {
+      filter: { _id: listing._id },
+      update: {
+        $set: {
+          bookingCount: bookingCountByListing.get(String(listing._id)) ?? 0,
+        },
+      },
+    },
+  }));
+  for (const batch of batches(listingOps, LISTING_INSERT_BATCH_SIZE)) {
+    await Listing.bulkWrite(batch, { ordered: false });
+  }
+
+  console.log(
+    `✅  ${bookings.length} bookings, ${messages.length} messages, and ${notificationDocs.length} notifications inserted`,
+  );
+  return { bookings, messages, notifications: notificationDocs };
 }
 
 // ── Phase: wishlists ──────────────────────────────────────────────────────
@@ -402,6 +517,9 @@ async function printSummary(startedAt) {
     userCount,
     wishlistCollectionCount,
     wishlistItemCount,
+    bookingCount,
+    messageCount,
+    notificationCount,
   ] = await Promise.all([
     Listing.countDocuments(),
     Review.countDocuments(),
@@ -409,6 +527,9 @@ async function printSummary(startedAt) {
     User.countDocuments(),
     WishlistCollection.countDocuments(),
     Wishlist.countDocuments(),
+    Booking.countDocuments(),
+    Message.countDocuments(),
+    Notification.countDocuments(),
   ]);
 
   const byCountry = await Listing.aggregate([
@@ -424,6 +545,9 @@ async function printSummary(startedAt) {
   );
   console.log(
     `   📌 ${wishlistItemCount} saved listings across ${wishlistCollectionCount} wishlists`,
+  );
+  console.log(
+    `   💬 ${bookingCount} bookings · ${messageCount} messages · ${notificationCount} notifications`,
   );
   console.log(`   🔑 Host/traveler login password: ${SEED_PASSWORD}`);
   console.log(`\n   Listings by country:`);
@@ -451,7 +575,11 @@ async function run() {
     hostRecords,
     travelerRecords,
   );
-  await seedAvailability(insertedListings);
+  const { bookings } = await seedConversations(
+    insertedListings,
+    travelerRecords,
+  );
+  await seedAvailability(insertedListings, bookings);
   await seedWishlists(insertedListings, hostRecords, travelerRecords);
   await backfillHostCounters(insertedListings, insertedReviews);
   await printSummary(startedAt);
