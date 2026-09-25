@@ -22,12 +22,15 @@ function useStaticMapPreview(location, country) {
       return;
     }
     setStatus("loading");
+    let cancelled = false;
     const t = setTimeout(async () => {
       try {
         const res = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?limit=1&access_token=${token}`,
         );
+        if (cancelled) return;
         const json = await res.json();
+        if (cancelled) return;
         const feature = json.features?.[0];
         if (!feature) {
           setUrl(null);
@@ -40,10 +43,13 @@ function useStaticMapPreview(location, country) {
         );
         setStatus("found");
       } catch {
-        setStatus("notfound");
+        if (!cancelled) setStatus("notfound");
       }
     }, 600);
-    return () => clearTimeout(t);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [location, country]);
 
   return { url, status };
@@ -91,13 +97,16 @@ const StepLocation = forwardRef(function StepLocation(
           sx={{
             fontFamily: "'DM Serif Display', serif",
             fontSize: "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 0.5,
           }}
         >
           Where's your place located?
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           Your exact address is only shared with guests after they book.
         </Typography>
       </Box>
@@ -106,7 +115,9 @@ const StepLocation = forwardRef(function StepLocation(
         label="Location"
         placeholder="Neighbourhood, city — e.g. Vasant Kunj, New Delhi"
         error={errors.location?.message}
-        startAdornment={<MapPin size={16} style={{ color: neutral[400] }} />}
+        startAdornment={
+          <MapPin size={16} style={{ color: "var(--color-text-muted)" }} />
+        }
         {...register("location")}
       />
       <Input
@@ -120,9 +131,9 @@ const StepLocation = forwardRef(function StepLocation(
         sx={{
           borderRadius: radii.xl,
           overflow: "hidden",
-          border: `1px solid ${neutral[200]}`,
+          border: `1px solid var(--color-border)`,
           minHeight: 200,
-          bgcolor: neutral[50],
+          bgcolor: "var(--color-surface-2)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -135,7 +146,10 @@ const StepLocation = forwardRef(function StepLocation(
             style={{ width: "100%", display: "block" }}
           />
         ) : (
-          <Typography variant="caption" sx={{ color: neutral[400], py: 6 }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "var(--color-text-muted)", py: 6 }}
+          >
             {status === "loading"
               ? "Looking up this location…"
               : status === "notfound"

@@ -30,7 +30,7 @@ function AutosaveIndicator({ lastSavedAt }) {
         display: "flex",
         alignItems: "center",
         gap: 0.75,
-        color: neutral[400],
+        color: "var(--color-text-muted)",
       }}
     >
       <Cloud size={14} />
@@ -78,7 +78,7 @@ export default function WizardShell({
             display: "flex",
             alignItems: "center",
             gap: 0.75,
-            color: neutral[500],
+            color: "var(--color-text-secondary)",
             fontSize: "0.875rem",
             fontWeight: 600,
             textDecoration: "none",
@@ -98,8 +98,8 @@ export default function WizardShell({
       {/* Step content */}
       <Box
         sx={{
-          bgcolor: "#fff",
-          border: `1px solid ${neutral[200]}`,
+          bgcolor: "var(--color-surface)",
+          border: `1px solid var(--color-border)`,
           borderRadius: radii["2xl"],
           boxShadow: shadows.card,
           p: { xs: 2.5, md: 5 },
@@ -131,9 +131,9 @@ export default function WizardShell({
           bottom: 0,
           left: 0,
           right: 0,
-          bgcolor: { xs: "rgba(255,255,255,0.97)", md: "transparent" },
+          bgcolor: { xs: "var(--color-dropdown-bg)", md: "transparent" },
           backdropFilter: { xs: "blur(12px)", md: "none" },
-          borderTop: { xs: `1px solid ${neutral[200]}`, md: "none" },
+          borderTop: { xs: `1px solid var(--color-border)`, md: "none" },
           px: { xs: 2.5, md: 0 },
           py: { xs: 2, md: 0 },
           zIndex: 50,

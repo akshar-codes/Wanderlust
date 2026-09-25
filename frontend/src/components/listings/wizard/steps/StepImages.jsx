@@ -70,13 +70,16 @@ export default function StepImages({ images, setImages }) {
           sx={{
             fontFamily: "'DM Serif Display', serif",
             fontSize: "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 0.5,
           }}
         >
           Add some photos
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           The first photo becomes your cover image. Drag to reorder, or upload
           up to {MAX_IMAGES}.
         </Typography>
@@ -95,9 +98,9 @@ export default function StepImages({ images, setImages }) {
         }}
         onClick={() => inputRef.current?.click()}
         sx={{
-          border: `2px dashed ${dragOver ? brand[500] : neutral[300]}`,
+          border: `2px dashed ${dragOver ? brand[500] : "var(--color-border-strong)"}`,
           borderRadius: radii.xl,
-          bgcolor: dragOver ? brand[50] : neutral[50],
+          bgcolor: dragOver ? brand[50] : "var(--color-surface-2)",
           py: 6,
           px: 3,
           display: "flex",
@@ -108,11 +111,14 @@ export default function StepImages({ images, setImages }) {
           transition: "all 150ms",
         }}
       >
-        <UploadCloud size={28} color={dragOver ? brand[500] : neutral[400]} />
-        <Typography sx={{ fontWeight: 600, color: neutral[700] }}>
+        <UploadCloud
+          size={28}
+          color={dragOver ? brand[500] : "var(--color-text-muted)"}
+        />
+        <Typography sx={{ fontWeight: 600, color: "var(--color-text)" }}>
           Drag photos here, or click to browse
         </Typography>
-        <Typography variant="caption" sx={{ color: neutral[400] }}>
+        <Typography variant="caption" sx={{ color: "var(--color-text-muted)" }}>
           JPG, PNG, or WebP · up to 10MB each
         </Typography>
         <input
@@ -152,7 +158,7 @@ export default function StepImages({ images, setImages }) {
                 borderRadius: radii.lg,
                 overflow: "hidden",
                 aspectRatio: "4/3",
-                border: `1.5px solid ${i === 0 ? brand[500] : neutral[200]}`,
+                border: `1.5px solid ${i === 0 ? brand[500] : "var(--color-border)"}`,
               }}
             >
               <img

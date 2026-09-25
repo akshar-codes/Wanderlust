@@ -18,13 +18,16 @@ export default function StepAmenities({ selected, onChange }) {
           sx={{
             fontFamily: "'DM Serif Display', serif",
             fontSize: "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 0.5,
           }}
         >
           What does your place offer?
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           You can always add more amenities later.
         </Typography>
       </Box>
@@ -35,7 +38,7 @@ export default function StepAmenities({ selected, onChange }) {
             sx={{
               fontWeight: 700,
               fontSize: "0.8125rem",
-              color: neutral[600],
+              color: "var(--color-text-secondary)",
               mb: 1.25,
             }}
           >
@@ -62,8 +65,8 @@ export default function StepAmenities({ selected, onChange }) {
                     py: 1.25,
                     borderRadius: radii.lg,
                     cursor: "pointer",
-                    border: `1.5px solid ${active ? brand[500] : neutral[200]}`,
-                    bgcolor: active ? brand[50] : "#fff",
+                    border: `1.5px solid ${active ? brand[500] : "var(--color-border)"}`,
+                    bgcolor: active ? brand[50] : "var(--color-surface)",
                     transition: "all 120ms",
                   }}
                 >
@@ -72,7 +75,7 @@ export default function StepAmenities({ selected, onChange }) {
                     sx={{
                       fontSize: "0.8125rem",
                       fontWeight: 600,
-                      color: active ? brand[700] : neutral[700],
+                      color: active ? brand[700] : "var(--color-text)",
                       flex: 1,
                     }}
                   >

@@ -26,7 +26,6 @@ const StepPricing = forwardRef(function StepPricing(
     mode: "onChange",
   });
 
-  
   const price = Number(watch("price")) || 0;
   const cleaningFee = Number(watch("cleaningFee")) || 0;
   const serviceFee = Number(watch("serviceFee")) || 0;
@@ -56,13 +55,16 @@ const StepPricing = forwardRef(function StepPricing(
           sx={{
             fontFamily: "'DM Serif Display', serif",
             fontSize: "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 0.5,
           }}
         >
           Set your price
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           You can adjust pricing anytime after publishing.
         </Typography>
       </Box>
@@ -94,7 +96,7 @@ const StepPricing = forwardRef(function StepPricing(
 
       <Box
         sx={{
-          border: `1px solid ${neutral[200]}`,
+          border: `1px solid var(--color-border)`,
           borderRadius: "16px",
           px: 2,
         }}
@@ -123,8 +125,8 @@ const StepPricing = forwardRef(function StepPricing(
 
       <Box
         sx={{
-          bgcolor: neutral[50],
-          border: `1px solid ${neutral[200]}`,
+          bgcolor: "var(--color-surface-2)",
+          border: `1px solid var(--color-border)`,
           borderRadius: radii.xl,
           p: 2.5,
         }}
@@ -133,7 +135,7 @@ const StepPricing = forwardRef(function StepPricing(
           sx={{
             fontWeight: 700,
             fontSize: "0.875rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 1.5,
           }}
         >
@@ -149,17 +151,20 @@ const StepPricing = forwardRef(function StepPricing(
             key={label}
             sx={{ display: "flex", justifyContent: "space-between", py: 0.5 }}
           >
-            <Typography variant="body2" sx={{ color: neutral[500] }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "var(--color-text-secondary)" }}
+            >
               {label}
             </Typography>
-            <Typography variant="body2" sx={{ color: neutral[700] }}>
+            <Typography variant="body2" sx={{ color: "var(--color-text)" }}>
               {formatPrice(amount)}
             </Typography>
           </Box>
         ))}
-        <Box sx={{ height: 1, bgcolor: neutral[200], my: 1 }} />
+        <Box sx={{ height: 1, bgcolor: "var(--color-border)", my: 1 }} />
         <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography sx={{ fontWeight: 700, color: neutral[800] }}>
+          <Typography sx={{ fontWeight: 700, color: "var(--color-text)" }}>
             Guest pays
           </Typography>
           <Typography sx={{ fontWeight: 700, color: brand[600] }}>

@@ -23,12 +23,12 @@ function SummaryRow({ icon, label, value, onEdit }) {
           minWidth: 0,
         }}
       >
-        <Box sx={{ color: neutral[400], mt: 0.25 }}>{icon}</Box>
+        <Box sx={{ color: "var(--color-text-muted)", mt: 0.25 }}>{icon}</Box>
         <Box sx={{ minWidth: 0 }}>
           <Typography
             variant="caption"
             sx={{
-              color: neutral[500],
+              color: "var(--color-text-secondary)",
               fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.06em",
@@ -39,7 +39,7 @@ function SummaryRow({ icon, label, value, onEdit }) {
           <Typography
             sx={{
               fontSize: "0.9375rem",
-              color: neutral[800],
+              color: "var(--color-text)",
               wordBreak: "break-word",
             }}
           >
@@ -73,7 +73,6 @@ export default function StepPublish({
   onSubmit,
   submitting,
 }) {
-  
   const publishMutation = usePublishListing();
 
   return (
@@ -83,13 +82,16 @@ export default function StepPublish({
           sx={{
             fontFamily: "'DM Serif Display', serif",
             fontSize: "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 0.5,
           }}
         >
           Review & publish
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           Take one last look before it goes live.
         </Typography>
       </Box>
@@ -113,10 +115,10 @@ export default function StepPublish({
       {/* Preview Section */}
       <Box
         sx={{
-          bgcolor: neutral[50],
+          bgcolor: "var(--color-surface-2)",
           p: 3,
           borderRadius: radii["2xl"],
-          border: `1px solid ${neutral[200]}`,
+          border: `1px solid var(--color-border)`,
         }}
       >
         <Typography sx={{ fontWeight: 600, mb: 2 }}>Preview</Typography>
@@ -134,7 +136,7 @@ export default function StepPublish({
 
       <Box
         sx={{
-          border: `1px solid ${neutral[200]}`,
+          border: `1px solid var(--color-border)`,
           borderRadius: radii.xl,
           px: 2.5,
           divider: "1px",
@@ -146,21 +148,21 @@ export default function StepPublish({
           value={`${data.title || "Untitled"} · ${data.category} · ${data.maxGuests} guests, ${data.bedrooms} bed(s)`}
           onEdit={() => onEditStep(0)}
         />
-        <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+        <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
         <SummaryRow
           icon={<MapPin size={16} />}
           label="Location"
           value={`${data.location || "—"}, ${data.country || "—"}`}
           onEdit={() => onEditStep(1)}
         />
-        <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+        <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
         <SummaryRow
           icon={<ImageIcon size={16} />}
           label="Photos"
           value={`${images.length} photo${images.length === 1 ? "" : "s"} uploaded`}
           onEdit={() => onEditStep(2)}
         />
-        <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+        <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
         <SummaryRow
           icon={<Tag size={16} />}
           label="Pricing"

@@ -16,7 +16,7 @@ export default function WizardProgress({ step, maxReachedStep, onStepClick }) {
           sx={{
             fontWeight: 700,
             fontSize: "1.05rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 1,
           }}
         >
@@ -30,7 +30,7 @@ export default function WizardProgress({ step, maxReachedStep, onStepClick }) {
                 flex: 1,
                 height: 4,
                 borderRadius: 999,
-                bgcolor: i <= step ? brand[500] : neutral[200],
+                bgcolor: i <= step ? brand[500] : "var(--color-border)",
                 transition: "background-color 200ms",
               }}
             />
@@ -78,13 +78,13 @@ export default function WizardProgress({ step, maxReachedStep, onStepClick }) {
                     justifyContent: "center",
                     fontWeight: 700,
                     fontSize: "0.85rem",
-                    bgcolor: isDone ? brand[500] : "#fff",
+                    bgcolor: isDone ? brand[500] : "var(--color-surface)",
                     color: isDone
-                      ? "#fff"
+                      ? "var(--color-surface)"
                       : isActive
                         ? brand[500]
-                        : neutral[400],
-                    border: `2px solid ${isDone || isActive ? brand[500] : neutral[200]}`,
+                        : "var(--color-text-muted)",
+                    border: `2px solid ${isDone || isActive ? brand[500] : "var(--color-border)"}`,
                   }}
                 >
                   {isDone ? <Check size={16} /> : i + 1}
@@ -93,7 +93,9 @@ export default function WizardProgress({ step, maxReachedStep, onStepClick }) {
                   variant="caption"
                   sx={{
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive ? neutral[800] : neutral[500],
+                    color: isActive
+                      ? "var(--color-text)"
+                      : "var(--color-text-secondary)",
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -105,7 +107,7 @@ export default function WizardProgress({ step, maxReachedStep, onStepClick }) {
                   sx={{
                     flex: 1,
                     height: 2,
-                    bgcolor: isDone ? brand[500] : neutral[200],
+                    bgcolor: isDone ? brand[500] : "var(--color-border)",
                     mx: 1,
                     mt: -2.5,
                   }}

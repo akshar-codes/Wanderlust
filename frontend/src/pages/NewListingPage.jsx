@@ -170,13 +170,16 @@ export default function NewListingPage() {
           sx={{
             fontFamily: "'DM Serif Display', serif",
             fontSize: "1.75rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 1,
           }}
         >
           Continue your draft?
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500], mb: 4 }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)", mb: 4 }}
+        >
           You have an unfinished listing — "{data.title || "Untitled listing"}".
           Pick up where you left off, or start fresh.
         </Typography>

@@ -64,13 +64,16 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
           sx={{
             fontFamily: "'DM Serif Display', serif",
             fontSize: "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 0.5,
           }}
         >
           Let's start with the basics
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           A great title and description help guests picture themselves staying
           here.
         </Typography>
@@ -88,7 +91,7 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
           sx={{
             fontWeight: 600,
             fontSize: "0.875rem",
-            color: neutral[700],
+            color: "var(--color-text)",
             mb: 1,
           }}
         >
@@ -120,8 +123,8 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
                       p: 1.5,
                       borderRadius: "14px",
                       cursor: "pointer",
-                      border: `1.5px solid ${active ? brand[500] : neutral[200]}`,
-                      bgcolor: active ? brand[50] : "#fff",
+                      border: `1.5px solid ${active ? brand[500] : "var(--color-border)"}`,
+                      bgcolor: active ? brand[50] : "var(--color-surface)",
                       transition: "all 120ms",
                     }}
                   >
@@ -133,7 +136,9 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
                         fontSize: "0.7rem",
                         fontWeight: 600,
                         textAlign: "center",
-                        color: active ? brand[700] : neutral[600],
+                        color: active
+                          ? brand[700]
+                          : "var(--color-text-secondary)",
                       }}
                     >
                       {meta.label}
@@ -175,7 +180,7 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
 
       <Box
         sx={{
-          border: `1px solid ${neutral[200]}`,
+          border: `1px solid var(--color-border)`,
           borderRadius: "16px",
           px: 2,
         }}
@@ -192,7 +197,7 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
             />
           )}
         />
-        <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+        <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
         <Controller
           name="beds"
           control={control}
@@ -205,7 +210,7 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
             />
           )}
         />
-        <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+        <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
         <Controller
           name="bathrooms"
           control={control}
@@ -218,7 +223,7 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
             />
           )}
         />
-        <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+        <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
         <Controller
           name="maxGuests"
           control={control}
