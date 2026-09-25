@@ -39,7 +39,13 @@ const AMENITIES_OPTIONS = [
  * `filters` / `onApply={setFilters}` / `onReset={resetFilters}` straight
  * from the hook — no separate filter state model.
  */
-export default function MobileFiltersSheet({ open, onClose, filters, onApply, onReset }) {
+export default function MobileFiltersSheet({
+  open,
+  onClose,
+  filters,
+  onApply,
+  onReset,
+}) {
   const [local, setLocal] = useState(filters);
   const containerRef = useRef(null);
 
@@ -52,7 +58,8 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
     onEscape: onClose,
   });
 
-  const { data: histogram, isLoading: histLoading } = usePriceHistogram(filters);
+  const { data: histogram, isLoading: histLoading } =
+    usePriceHistogram(filters);
   const update = (k, v) => setLocal((f) => ({ ...f, [k]: v }));
 
   const activeCount =
@@ -78,7 +85,7 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
             position: "fixed",
             inset: 0,
             zIndex: 2000,
-            background: "#fff",
+            background: "var(--color-surface)",
             display: "flex",
             flexDirection: "column",
           }}
@@ -89,7 +96,7 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
               alignItems: "center",
               gap: 12,
               padding: "calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px",
-              borderBottom: `1px solid ${neutral[200]}`,
+              borderBottom: `1px solid var(--color-border)`,
               flexShrink: 0,
             }}
           >
@@ -101,21 +108,21 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
                 height: 36,
                 borderRadius: "50%",
                 border: "none",
-                background: neutral[100],
+                background: "var(--color-surface-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
               }}
             >
-              <ArrowLeft size={18} color={neutral[700]} />
+              <ArrowLeft size={18} color={"var(--color-text)"} />
             </button>
             <h2
               id="mobile-filters-title"
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
                 fontSize: "1.1rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 margin: 0,
               }}
             >
@@ -123,7 +130,9 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
             </h2>
           </div>
 
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 120px" }}>
+          <div
+            style={{ flex: 1, overflowY: "auto", padding: "20px 16px 120px" }}
+          >
             <FSection title="Price range" subtitle="Per night, before taxes">
               <PriceRangeSlider
                 min={histogram?.min ?? 0}
@@ -153,9 +162,15 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
                       gap: 4,
                       padding: "9px 14px",
                       borderRadius: 10,
-                      border: `1.5px solid ${(local.rating ?? 0) === r ? brand[500] : neutral[200]}`,
-                      background: (local.rating ?? 0) === r ? brand[50] : "#fff",
-                      color: (local.rating ?? 0) === r ? brand[600] : neutral[600],
+                      border: `1.5px solid ${(local.rating ?? 0) === r ? brand[500] : "var(--color-border)"}`,
+                      background:
+                        (local.rating ?? 0) === r
+                          ? brand[50]
+                          : "var(--color-surface)",
+                      color:
+                        (local.rating ?? 0) === r
+                          ? brand[600]
+                          : "var(--color-text-secondary)",
                       fontWeight: 600,
                       fontSize: "0.875rem",
                       cursor: "pointer",
@@ -176,13 +191,26 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
             <FDivider />
 
             <FSection title="Guests">
-              <Counter label="Guests" value={local.guests ?? 1} onChange={(v) => update("guests", v)} min={1} max={16} />
+              <Counter
+                label="Guests"
+                value={local.guests ?? 1}
+                onChange={(v) => update("guests", v)}
+                min={1}
+                max={16}
+              />
             </FSection>
 
             <FDivider />
 
             <FSection title="Amenities">
-              <div className="amenity-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div
+                className="amenity-grid"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 8,
+                }}
+              >
                 {AMENITIES_OPTIONS.map(({ key, label, icon }) => {
                   const selected = local.amenities?.includes(key);
                   return (
@@ -201,15 +229,27 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
                         gap: 8,
                         padding: "11px 12px",
                         borderRadius: 10,
-                        border: `1.5px solid ${selected ? brand[500] : neutral[200]}`,
-                        background: selected ? brand[50] : "#fff",
-                        color: selected ? brand[600] : neutral[600],
+                        border: `1.5px solid ${selected ? brand[500] : "var(--color-border)"}`,
+                        background: selected
+                          ? brand[50]
+                          : "var(--color-surface)",
+                        color: selected
+                          ? brand[600]
+                          : "var(--color-text-secondary)",
                         fontWeight: selected ? 600 : 500,
                         fontSize: "0.8125rem",
                         cursor: "pointer",
                       }}
                     >
-                      <span style={{ color: selected ? brand[500] : neutral[400] }}>{icon}</span>
+                      <span
+                        style={{
+                          color: selected
+                            ? brand[500]
+                            : "var(--color-text-muted)",
+                        }}
+                      >
+                        {icon}
+                      </span>
                       {label}
                     </button>
                   );
@@ -226,9 +266,10 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
               alignItems: "center",
               justifyContent: "space-between",
               gap: 10,
-              padding: "14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)",
-              borderTop: `1px solid ${neutral[200]}`,
-              background: "#fff",
+              padding:
+                "14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)",
+              borderTop: `1px solid var(--color-border)`,
+              background: "var(--color-surface)",
             }}
           >
             <button
@@ -241,7 +282,7 @@ export default function MobileFiltersSheet({ open, onClose, filters, onApply, on
                 background: "none",
                 fontWeight: 700,
                 fontSize: "0.875rem",
-                color: neutral[700],
+                color: "var(--color-text)",
                 textDecoration: "underline",
                 cursor: "pointer",
               }}
@@ -281,8 +322,27 @@ function FSection({ title, subtitle, children }) {
   return (
     <div style={{ marginBottom: 26 }}>
       <div style={{ marginBottom: 12 }}>
-        <h3 style={{ fontSize: "0.9375rem", fontWeight: 700, color: neutral[800], margin: 0 }}>{title}</h3>
-        {subtitle && <p style={{ fontSize: "0.75rem", color: neutral[500], margin: "3px 0 0" }}>{subtitle}</p>}
+        <h3
+          style={{
+            fontSize: "0.9375rem",
+            fontWeight: 700,
+            color: "var(--color-text)",
+            margin: 0,
+          }}
+        >
+          {title}
+        </h3>
+        {subtitle && (
+          <p
+            style={{
+              fontSize: "0.75rem",
+              color: "var(--color-text-secondary)",
+              margin: "3px 0 0",
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
       </div>
       {children}
     </div>
@@ -290,5 +350,13 @@ function FSection({ title, subtitle, children }) {
 }
 
 function FDivider() {
-  return <div style={{ height: 1, background: neutral[100], margin: "0 0 22px" }} />;
+  return (
+    <div
+      style={{
+        height: 1,
+        background: "var(--color-surface-2)",
+        margin: "0 0 22px",
+      }}
+    />
+  );
 }

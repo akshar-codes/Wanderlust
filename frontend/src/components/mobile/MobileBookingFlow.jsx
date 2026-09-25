@@ -51,17 +51,27 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
   const maximumStay = listing?.maximumStay ?? null;
 
   const blockedRanges = useMemo(
-    () => (listing?.availabilityCalendar ?? []).map((b) => ({ startDate: b.startDate, endDate: b.endDate })),
+    () =>
+      (listing?.availabilityCalendar ?? []).map((b) => ({
+        startDate: b.startDate,
+        endDate: b.endDate,
+      })),
     [listing?.availabilityCalendar],
   );
 
-  const nights = checkIn && checkOut ? Math.round((checkOut - checkIn) / DAY_MS) : 0;
+  const nights =
+    checkIn && checkOut ? Math.round((checkOut - checkIn) / DAY_MS) : 0;
   const subtotal = nights * nightlyPrice;
-  const taxes = nights > 0 ? Math.round((subtotal + cleaningFee + serviceFee) * GST_RATE) : 0;
+  const taxes =
+    nights > 0
+      ? Math.round((subtotal + cleaningFee + serviceFee) * GST_RATE)
+      : 0;
   const total = subtotal + (nights > 0 ? cleaningFee + serviceFee : 0) + taxes;
 
   const step = STEPS[stepIdx];
-  const canGoNextFromDates = Boolean(checkIn && checkOut && nights >= minimumStay);
+  const canGoNextFromDates = Boolean(
+    checkIn && checkOut && nights >= minimumStay,
+  );
 
   const reset = () => {
     setStepIdx(0);
@@ -115,7 +125,14 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ type: "spring", stiffness: 340, damping: 34 }}
-          style={{ position: "fixed", inset: 0, zIndex: 2100, background: "#fff", display: "flex", flexDirection: "column" }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 2100,
+            background: "var(--color-surface)",
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
           {/* Header */}
           <div
@@ -124,26 +141,28 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
               alignItems: "center",
               gap: 12,
               padding: "calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px",
-              borderBottom: `1px solid ${neutral[200]}`,
+              borderBottom: `1px solid var(--color-border)`,
               flexShrink: 0,
             }}
           >
             <button
-              onClick={() => (stepIdx === 0 ? handleClose() : setStepIdx((s) => s - 1))}
+              onClick={() =>
+                stepIdx === 0 ? handleClose() : setStepIdx((s) => s - 1)
+              }
               aria-label="Back"
               style={{
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
                 border: "none",
-                background: neutral[100],
+                background: "var(--color-surface-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
               }}
             >
-              <ArrowLeft size={18} color={neutral[700]} />
+              <ArrowLeft size={18} color={"var(--color-text)"} />
             </button>
             <div style={{ flex: 1 }}>
               <p
@@ -159,7 +178,15 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
               >
                 Step {stepIdx + 1} of {STEPS.length}
               </p>
-              <h2 id="mobile-booking-title" style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: "1.1rem", color: neutral[800], margin: 0 }}>
+              <h2
+                id="mobile-booking-title"
+                style={{
+                  fontFamily: "'DM Serif Display', Georgia, serif",
+                  fontSize: "1.1rem",
+                  color: "var(--color-text)",
+                  margin: 0,
+                }}
+              >
                 {step === "dates" && "Select dates"}
                 {step === "guests" && "Add guests"}
                 {step === "review" && "Review & pay"}
@@ -173,21 +200,29 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
                 height: 36,
                 borderRadius: "50%",
                 border: "none",
-                background: neutral[100],
+                background: "var(--color-surface-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
               }}
             >
-              <X size={17} color={neutral[700]} />
+              <X size={17} color={"var(--color-text)"} />
             </button>
           </div>
 
           {/* Body */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 24px" }}>
+          <div
+            style={{ flex: 1, overflowY: "auto", padding: "20px 16px 24px" }}
+          >
             {step === "dates" && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
@@ -195,15 +230,24 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
                     gap: 8,
                     marginBottom: 20,
                     padding: "10px 16px",
-                    background: neutral[50],
+                    background: "var(--color-surface-2)",
                     borderRadius: radii.lg,
-                    border: `1px solid ${neutral[200]}`,
+                    border: `1px solid var(--color-border)`,
                     width: "100%",
                     boxSizing: "border-box",
                   }}
                 >
-                  <CalendarIcon size={15} color={neutral[500]} />
-                  <span style={{ fontSize: "0.875rem", fontWeight: 600, color: neutral[800] }}>
+                  <CalendarIcon
+                    size={15}
+                    color={"var(--color-text-secondary)"}
+                  />
+                  <span
+                    style={{
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      color: "var(--color-text)",
+                    }}
+                  >
                     {checkIn && checkOut
                       ? `${formatDate(checkIn)} – ${formatDate(checkOut)} · ${nights} night${nights > 1 ? "s" : ""}`
                       : "Choose your check-in and check-out dates"}
@@ -225,8 +269,21 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
 
             {step === "guests" && (
               <div>
-                <div style={{ border: `1px solid ${neutral[200]}`, borderRadius: radii.lg, padding: "0 16px" }}>
-                  <Counter label="Guests" hint={`Maximum ${maxGuests} guests`} value={guests} onChange={setGuests} min={1} max={maxGuests} />
+                <div
+                  style={{
+                    border: `1px solid var(--color-border)`,
+                    borderRadius: radii.lg,
+                    padding: "0 16px",
+                  }}
+                >
+                  <Counter
+                    label="Guests"
+                    hint={`Maximum ${maxGuests} guests`}
+                    value={guests}
+                    onChange={setGuests}
+                    min={1}
+                    max={maxGuests}
+                  />
                 </div>
                 <div style={{ marginTop: 20 }}>
                   <Textarea
@@ -243,18 +300,32 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
 
             {step === "review" && (
               <div>
-                <div style={{ display: "flex", gap: 12, marginBottom: 20, paddingBottom: 20, borderBottom: `1px solid ${neutral[200]}` }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginBottom: 20,
+                    paddingBottom: 20,
+                    borderBottom: `1px solid var(--color-border)`,
+                  }}
+                >
                   <img
                     src={listing?.image?.url}
                     alt=""
-                    style={{ width: 72, height: 72, borderRadius: radii.md, objectFit: "cover", flexShrink: 0 }}
+                    style={{
+                      width: 72,
+                      height: 72,
+                      borderRadius: radii.md,
+                      objectFit: "cover",
+                      flexShrink: 0,
+                    }}
                   />
                   <div style={{ minWidth: 0 }}>
                     <p
                       style={{
                         fontWeight: 700,
                         fontSize: "0.9375rem",
-                        color: neutral[800],
+                        color: "var(--color-text)",
                         margin: "0 0 4px",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -263,33 +334,97 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
                     >
                       {listing?.title}
                     </p>
-                    <p style={{ fontSize: "0.8125rem", color: neutral[500], margin: 0 }}>
-                      {formatDate(checkIn)} – {formatDate(checkOut)} · {nights} night{nights > 1 ? "s" : ""}
+                    <p
+                      style={{
+                        fontSize: "0.8125rem",
+                        color: "var(--color-text-secondary)",
+                        margin: 0,
+                      }}
+                    >
+                      {formatDate(checkIn)} – {formatDate(checkOut)} · {nights}{" "}
+                      night{nights > 1 ? "s" : ""}
                     </p>
-                    <p style={{ fontSize: "0.8125rem", color: neutral[500], margin: "2px 0 0" }}>
+                    <p
+                      style={{
+                        fontSize: "0.8125rem",
+                        color: "var(--color-text-secondary)",
+                        margin: "2px 0 0",
+                      }}
+                    >
                       {guests} guest{guests > 1 ? "s" : ""}
                     </p>
                   </div>
                 </div>
 
-                <p style={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800], marginBottom: 12 }}>Price breakdown</p>
+                <p
+                  style={{
+                    fontWeight: 700,
+                    fontSize: "0.9375rem",
+                    color: "var(--color-text)",
+                    marginBottom: 12,
+                  }}
+                >
+                  Price breakdown
+                </p>
                 {[
-                  [`${formatPrice(nightlyPrice)} × ${nights} night${nights > 1 ? "s" : ""}`, subtotal],
+                  [
+                    `${formatPrice(nightlyPrice)} × ${nights} night${nights > 1 ? "s" : ""}`,
+                    subtotal,
+                  ],
                   ...(cleaningFee ? [["Cleaning fee", cleaningFee]] : []),
                   ...(serviceFee ? [["Service fee", serviceFee]] : []),
                   ["Taxes (GST 18%)", taxes],
                 ].map(([label, amount]) => (
-                  <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
-                    <span style={{ fontSize: "0.875rem", color: neutral[500] }}>{label}</span>
-                    <span style={{ fontSize: "0.875rem", color: neutral[700] }}>{formatPrice(amount)}</span>
+                  <div
+                    key={label}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "6px 0",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "var(--color-text-secondary)",
+                      }}
+                    >
+                      {label}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "var(--color-text)",
+                      }}
+                    >
+                      {formatPrice(amount)}
+                    </span>
                   </div>
                 ))}
-                <div style={{ height: 1, background: neutral[200], margin: "10px 0" }} />
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontWeight: 700, color: neutral[800] }}>Total</span>
-                  <span style={{ fontWeight: 700, color: brand[600] }}>{formatPrice(total)}</span>
+                <div
+                  style={{
+                    height: 1,
+                    background: "var(--color-surface-3)",
+                    margin: "10px 0",
+                  }}
+                />
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <span style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                    Total
+                  </span>
+                  <span style={{ fontWeight: 700, color: brand[600] }}>
+                    {formatPrice(total)}
+                  </span>
                 </div>
-                <p style={{ fontSize: "0.75rem", color: neutral[400], marginTop: 16 }}>
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "var(--color-text-muted)",
+                    marginTop: 16,
+                  }}
+                >
                   You won't be charged until the host confirms your request.
                 </p>
               </div>
@@ -305,16 +440,31 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
               alignItems: "center",
               justifyContent: "space-between",
               gap: 12,
-              padding: "14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)",
-              borderTop: `1px solid ${neutral[200]}`,
-              background: "#fff",
+              padding:
+                "14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)",
+              borderTop: `1px solid var(--color-border)`,
+              background: "var(--color-surface)",
             }}
           >
             <div>
               {nights > 0 && (
                 <>
-                  <span style={{ fontWeight: 700, fontSize: "1rem", color: neutral[800] }}>{formatPrice(total)}</span>
-                  <span style={{ fontSize: "0.75rem", color: neutral[500], display: "block" }}>
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "1rem",
+                      color: "var(--color-text)",
+                    }}
+                  >
+                    {formatPrice(total)}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "var(--color-text-secondary)",
+                      display: "block",
+                    }}
+                  >
                     {nights} night{nights > 1 ? "s" : ""} total
                   </span>
                 </>
@@ -329,14 +479,20 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
                   padding: "13px 32px",
                   background:
                     step === "dates" && !canGoNextFromDates
-                      ? neutral[200]
+                      ? "var(--color-border)"
                       : `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
                   border: "none",
                   borderRadius: 999,
-                  color: step === "dates" && !canGoNextFromDates ? neutral[400] : "#fff",
+                  color:
+                    step === "dates" && !canGoNextFromDates
+                      ? "var(--color-text-muted)"
+                      : "var(--color-surface)",
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  cursor: step === "dates" && !canGoNextFromDates ? "not-allowed" : "pointer",
+                  cursor:
+                    step === "dates" && !canGoNextFromDates
+                      ? "not-allowed"
+                      : "pointer",
                 }}
               >
                 Next
@@ -358,7 +514,11 @@ export default function MobileBookingFlow({ open, onClose, listing }) {
                   opacity: isPending ? 0.7 : 1,
                 }}
               >
-                {isPending ? "Booking…" : isAuthenticated ? "Request to book" : "Log in to reserve"}
+                {isPending
+                  ? "Booking…"
+                  : isAuthenticated
+                    ? "Request to book"
+                    : "Log in to reserve"}
               </motion.button>
             )}
           </div>

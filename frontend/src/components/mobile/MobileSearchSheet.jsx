@@ -24,7 +24,11 @@ const CATEGORIES = [
  * SearchBar + CategoryBar produce, so results stay consistent across
  * breakpoints.
  */
-export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) {
+export default function MobileSearchSheet({
+  open,
+  onClose,
+  initialQuery = "",
+}) {
   const navigate = useNavigate();
   const [step, setStep] = useState("where"); // "where" | "who"
   const [query, setQuery] = useState(initialQuery);
@@ -76,7 +80,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
             position: "fixed",
             inset: 0,
             zIndex: 2000,
-            background: "#fff",
+            background: "var(--color-surface)",
             display: "flex",
             flexDirection: "column",
           }}
@@ -88,7 +92,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
               alignItems: "center",
               gap: 12,
               padding: "calc(env(safe-area-inset-top, 0px) + 14px) 16px 12px",
-              borderBottom: `1px solid ${neutral[200]}`,
+              borderBottom: `1px solid var(--color-border)`,
               flexShrink: 0,
             }}
           >
@@ -100,7 +104,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                 height: 36,
                 borderRadius: "50%",
                 border: "none",
-                background: neutral[100],
+                background: "var(--color-surface-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -108,7 +112,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                 flexShrink: 0,
               }}
             >
-              <ArrowLeft size={18} color={neutral[700]} />
+              <ArrowLeft size={18} color={"var(--color-text)"} />
             </button>
             <div
               style={{
@@ -116,12 +120,12 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                background: neutral[100],
+                background: "var(--color-surface-2)",
                 borderRadius: 999,
                 padding: "10px 14px",
               }}
             >
-              <SearchIcon size={16} color={neutral[400]} />
+              <SearchIcon size={16} color={"var(--color-text-muted)"} />
               <input
                 ref={inputRef}
                 aria-label="Search destinations"
@@ -136,7 +140,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                   background: "transparent",
                   fontSize: "0.9375rem",
                   fontFamily: "inherit",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                 }}
               />
               {query && (
@@ -148,7 +152,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                     background: "none",
                     cursor: "pointer",
                     display: "flex",
-                    color: neutral[400],
+                    color: "var(--color-text-muted)",
                   }}
                 >
                   <X size={15} />
@@ -158,7 +162,9 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
           </div>
 
           {/* Body */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}>
+          <div
+            style={{ flex: 1, overflowY: "auto", padding: "20px 16px 100px" }}
+          >
             {step === "where" && (
               <>
                 {query.trim().length >= 1 ? (
@@ -167,7 +173,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                       style={{
                         fontSize: "0.75rem",
                         fontWeight: 700,
-                        color: neutral[400],
+                        color: "var(--color-text-muted)",
                         textTransform: "uppercase",
                         letterSpacing: "0.06em",
                         marginBottom: 10,
@@ -192,7 +198,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                           background: "none",
                           textAlign: "left",
                           cursor: "pointer",
-                          borderBottom: `1px solid ${neutral[100]}`,
+                          borderBottom: `1px solid ${"var(--color-surface-2)"}`,
                         }}
                       >
                         <span
@@ -200,7 +206,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                             width: 40,
                             height: 40,
                             borderRadius: radii.md,
-                            background: neutral[100],
+                            background: "var(--color-surface-2)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -216,13 +222,18 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                               display: "block",
                               fontWeight: 600,
                               fontSize: "0.9375rem",
-                              color: neutral[800],
+                              color: "var(--color-text)",
                             }}
                           >
                             {item.label}
                           </span>
                           {item.sublabel && (
-                            <span style={{ fontSize: "0.8125rem", color: neutral[500] }}>
+                            <span
+                              style={{
+                                fontSize: "0.8125rem",
+                                color: "var(--color-text-secondary)",
+                              }}
+                            >
                               {item.sublabel}
                             </span>
                           )}
@@ -230,7 +241,13 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                       </button>
                     ))}
                     {!isFetching && suggestions.length === 0 && (
-                      <p style={{ color: neutral[400], fontSize: "0.875rem", padding: "12px 4px" }}>
+                      <p
+                        style={{
+                          color: "var(--color-text-muted)",
+                          fontSize: "0.875rem",
+                          padding: "12px 4px",
+                        }}
+                      >
                         No matches — press search to browse "{query}" anyway.
                       </p>
                     )}
@@ -241,7 +258,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                       style={{
                         fontSize: "0.75rem",
                         fontWeight: 700,
-                        color: neutral[400],
+                        color: "var(--color-text-muted)",
                         textTransform: "uppercase",
                         letterSpacing: "0.06em",
                         marginBottom: 12,
@@ -249,7 +266,13 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                     >
                       Browse by category
                     </p>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(3, 1fr)",
+                        gap: 10,
+                      }}
+                    >
                       {CATEGORIES.map((c) => (
                         <button
                           key={c.label}
@@ -265,13 +288,22 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                             gap: 6,
                             padding: "16px 8px",
                             borderRadius: radii.lg,
-                            border: `1.5px solid ${category === c.key ? brand[500] : neutral[200]}`,
-                            background: category === c.key ? brand[50] : "#fff",
+                            border: `1.5px solid ${category === c.key ? brand[500] : "var(--color-border)"}`,
+                            background:
+                              category === c.key
+                                ? brand[50]
+                                : "var(--color-surface)",
                             cursor: "pointer",
                           }}
                         >
                           <span style={{ fontSize: "1.5rem" }}>{c.icon}</span>
-                          <span style={{ fontSize: "0.75rem", fontWeight: 600, color: neutral[700] }}>
+                          <span
+                            style={{
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              color: "var(--color-text)",
+                            }}
+                          >
                             {c.label}
                           </span>
                         </button>
@@ -288,7 +320,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                   style={{
                     fontSize: "0.75rem",
                     fontWeight: 700,
-                    color: neutral[400],
+                    color: "var(--color-text-muted)",
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
                     marginBottom: 4,
@@ -298,7 +330,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                 </p>
                 <div
                   style={{
-                    border: `1px solid ${neutral[200]}`,
+                    border: `1px solid var(--color-border)`,
                     borderRadius: radii.lg,
                     padding: "0 16px",
                     marginTop: 12,
@@ -326,9 +358,10 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
               alignItems: "center",
               justifyContent: "space-between",
               gap: 12,
-              padding: "14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)",
-              borderTop: `1px solid ${neutral[200]}`,
-              background: "#fff",
+              padding:
+                "14px 16px calc(env(safe-area-inset-bottom, 0px) + 14px)",
+              borderTop: `1px solid var(--color-border)`,
+              background: "var(--color-surface)",
             }}
           >
             <button
@@ -342,7 +375,7 @@ export default function MobileSearchSheet({ open, onClose, initialQuery = "" }) 
                 background: "none",
                 fontWeight: 700,
                 fontSize: "0.875rem",
-                color: neutral[700],
+                color: "var(--color-text)",
                 textDecoration: "underline",
                 cursor: "pointer",
               }}

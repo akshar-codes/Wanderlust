@@ -5,10 +5,34 @@ import { useAuthStore } from "../../store/auth.store";
 import { brand, neutral } from "../../theme/tokens";
 
 const TABS = [
-  { key: "explore", label: "Explore", icon: Compass, to: "/listings", requiresAuth: false },
-  { key: "wishlist", label: "Wishlists", icon: Heart, to: "/wishlist", requiresAuth: true },
-  { key: "trips", label: "Trips", icon: CalendarCheck, to: "/dashboard/bookings", requiresAuth: true },
-  { key: "profile", label: "Profile", icon: User, to: "/account", requiresAuth: true },
+  {
+    key: "explore",
+    label: "Explore",
+    icon: Compass,
+    to: "/listings",
+    requiresAuth: false,
+  },
+  {
+    key: "wishlist",
+    label: "Wishlists",
+    icon: Heart,
+    to: "/wishlist",
+    requiresAuth: true,
+  },
+  {
+    key: "trips",
+    label: "Trips",
+    icon: CalendarCheck,
+    to: "/dashboard/bookings",
+    requiresAuth: true,
+  },
+  {
+    key: "profile",
+    label: "Profile",
+    icon: User,
+    to: "/account",
+    requiresAuth: true,
+  },
 ];
 
 /**
@@ -24,7 +48,9 @@ export default function BottomNav() {
 
   const isActive = (tab) => {
     if (tab.to === "/listings") {
-      return location.pathname === "/" || location.pathname.startsWith("/listings");
+      return (
+        location.pathname === "/" || location.pathname.startsWith("/listings")
+      );
     }
     return location.pathname.startsWith(tab.to);
   };
@@ -46,10 +72,10 @@ export default function BottomNav() {
         right: 0,
         zIndex: 900,
         display: "flex",
-        background: "rgba(253,252,251,0.96)",
+        background: "var(--color-surface)",
         backdropFilter: "blur(20px) saturate(1.8)",
         WebkitBackdropFilter: "blur(20px) saturate(1.8)",
-        borderTop: `1px solid ${neutral[200]}`,
+        borderTop: `1px solid var(--color-border)`,
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
@@ -71,7 +97,7 @@ export default function BottomNav() {
               gap: 3,
               padding: "8px 4px 6px",
               textDecoration: "none",
-              color: active ? brand[600] : neutral[500],
+              color: active ? brand[600] : "var(--color-text-secondary)",
               position: "relative",
               WebkitTapHighlightColor: "transparent",
             }}
@@ -87,7 +113,9 @@ export default function BottomNav() {
                 fill={active && tab.key === "wishlist" ? brand[100] : "none"}
               />
             </motion.div>
-            <span style={{ fontSize: "0.6875rem", fontWeight: active ? 700 : 500 }}>
+            <span
+              style={{ fontSize: "0.6875rem", fontWeight: active ? 700 : 500 }}
+            >
               {tab.label}
             </span>
             {active && (
