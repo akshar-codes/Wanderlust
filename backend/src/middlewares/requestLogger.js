@@ -7,11 +7,12 @@ const stream = {
 };
 
 morgan.token("body-size", (req, res) => res.getHeader("content-length") ?? "-");
+morgan.token("safe-url", (req) => req.originalUrl.split("?")[0]);
 
 const REDACT = new Set([
   "password",
-  "newPassword",
-  "confirmPassword",
+  "newpassword",
+  "confirmpassword",
   "token",
   "secret",
   "authorization",
@@ -29,11 +30,11 @@ morgan.token("req-body", (req) => {
 });
 
 const DEV_FORMAT =
-  ":method :url :status :response-time ms — :res[content-length]";
+  ":method :safe-url :status :response-time ms — :res[content-length]";
 
 const PROD_FORMAT = JSON.stringify({
   method: ":method",
-  url: ":url",
+  url: ":safe-url",
   status: ":status",
   responseTime: ":response-time ms",
   contentLength: ":body-size",

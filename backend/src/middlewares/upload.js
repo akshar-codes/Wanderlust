@@ -1,9 +1,15 @@
 import multer from "multer";
-import { cloudinary, storage, ALLOWED_MIME_TYPES } from "../config/cloudConfig.js";
+import {
+  cloudinary,
+  storage,
+  ALLOWED_MIME_TYPES,
+} from "../config/cloudConfig.js";
 import AppError from "../utils/AppError.js";
 import { fileTypeFromStream } from "file-type";
 import https from "https";
+import { Readable } from "node:stream";
 import fs from "fs";
+import logger from "../utils/logger.js";
 
 const fileFilter = (_req, file, cb) => {
   if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
@@ -43,24 +49,29 @@ export async function readMagicBytes(filePath) {
           request.destroy();
           return reject(new Error("Failed to fetch file"));
         }
-        fileTypeFromStream(response)
-          .then((type) => {
-            request.destroy();
-            resolve(type);
-          })
-          .catch((err) => {
-            request.destroy();
-            reject(err);
-          });
+        try {
+          fileTypeFromStream(Readable.toWeb(response))
+            .then((type) => {
+              request.destroy();
+              resolve(type);
+            })
+            .catch((err) => {
+              request.destroy();
+              reject(err);
+            });
+        } catch (err) {
+          request.destroy();
+          reject(err);
+        }
       });
       request.on("error", reject);
     } else {
       // Local fallback for tests
-      import("file-type").then(({ fileTypeFromFile }) => {
-        fileTypeFromFile(filePath)
-          .then(resolve)
-          .catch(reject);
-      }).catch(reject);
+      import("file-type")
+        .then(({ fileTypeFromFile }) => {
+          fileTypeFromFile(filePath).then(resolve).catch(reject);
+        })
+        .catch(reject);
     }
   });
 }
@@ -100,7 +111,7 @@ export const validateFileType = async (req, res, next) => {
       if (!file.path) continue;
 
       const actualType = await readMagicBytes(file.path);
-      
+
       if (!actualType) {
         await cleanup();
         return next(
@@ -113,9 +124,10 @@ export const validateFileType = async (req, res, next) => {
           ),
         );
       }
-      
+
       // Normalize image/jpg to image/jpeg for validation
-      const normalizedMime = actualType.mime === "image/jpg" ? "image/jpeg" : actualType.mime;
+      const normalizedMime =
+        actualType.mime === "image/jpg" ? "image/jpeg" : actualType.mime;
 
       if (!ALLOWED_MIME_TYPES.includes(normalizedMime)) {
         await cleanup();
@@ -132,7 +144,10 @@ export const validateFileType = async (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.error("VALIDATE ERR:", err);
+    logger.error("File type validation failed", {
+      error: err.message,
+      stack: err.stack,
+    });
     await cleanup();
     return next(
       new AppError(500, "Failed to validate uploaded file type.", {

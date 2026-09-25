@@ -12,7 +12,7 @@ function logError(err, req, level = "error") {
     statusCode: err.statusCode ?? 500,
     code: err.code,
     method: req.method,
-    url: req.originalUrl,
+    url: req.originalUrl.split("?")[0],
     ip: req.ip,
     userId: req.user?._id,
     stack: IS_PROD ? undefined : err.stack,
