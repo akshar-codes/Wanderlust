@@ -29,24 +29,24 @@ export default function GuestSelector({ value, onChange, maxGuests = 16 }) {
           gap: 1,
           px: 2,
           py: 1.5,
-          border: `1.5px solid ${open ? brand[500] : neutral[300]}`,
+          border: `1.5px solid ${open ? brand[500] : "var(--color-border-strong)"}`,
           borderRadius: `0 0 ${radii.lg} ${radii.lg}`,
           borderTop: "none",
-          background: "#fff",
+          background: "var(--color-surface)",
           cursor: "pointer",
           textAlign: "left",
           fontFamily: "inherit",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Users size={15} color={neutral[500]} />
+          <Users size={15} color={"var(--color-text-secondary)"} />
           <Box>
             <Typography
               variant="caption"
               sx={{
                 display: "block",
                 fontWeight: 700,
-                color: neutral[500],
+                color: "var(--color-text-secondary)",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
                 fontSize: "0.65rem",
@@ -57,7 +57,7 @@ export default function GuestSelector({ value, onChange, maxGuests = 16 }) {
             <Typography
               sx={{
                 fontSize: "0.875rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 fontWeight: 600,
               }}
             >
@@ -65,7 +65,7 @@ export default function GuestSelector({ value, onChange, maxGuests = 16 }) {
             </Typography>
           </Box>
         </Box>
-        <ChevronDown size={15} color={neutral[400]} />
+        <ChevronDown size={15} color={"var(--color-text-muted)"} />
       </Box>
 
       <Popover

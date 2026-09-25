@@ -143,8 +143,8 @@ export default function AvailabilityCalendar({
             width: 32,
             height: 32,
             borderRadius: "50%",
-            border: `1px solid ${neutral[300]}`,
-            background: "#fff",
+            border: `1px solid var(--color-border-strong)`,
+            background: "var(--color-surface)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -152,10 +152,14 @@ export default function AvailabilityCalendar({
             "&:disabled": { opacity: 0.3, cursor: "not-allowed" },
           }}
         >
-          <ChevronLeft size={15} color={neutral[600]} />
+          <ChevronLeft size={15} color={"var(--color-text-secondary)"} />
         </Box>
         <Typography
-          sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800] }}
+          sx={{
+            fontWeight: 700,
+            fontSize: "0.9375rem",
+            color: "var(--color-text)",
+          }}
         >
           {viewMonth.toLocaleDateString("en-US", {
             month: "long",
@@ -171,15 +175,15 @@ export default function AvailabilityCalendar({
             width: 32,
             height: 32,
             borderRadius: "50%",
-            border: `1px solid ${neutral[300]}`,
-            background: "#fff",
+            border: `1px solid var(--color-border-strong)`,
+            background: "var(--color-surface)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             cursor: "pointer",
           }}
         >
-          <ChevronRight size={15} color={neutral[600]} />
+          <ChevronRight size={15} color={"var(--color-text-secondary)"} />
         </Box>
       </Box>
 
@@ -195,7 +199,11 @@ export default function AvailabilityCalendar({
           <Typography
             key={`${d}-${i}`}
             variant="caption"
-            sx={{ textAlign: "center", color: neutral[400], fontWeight: 700 }}
+            sx={{
+              textAlign: "center",
+              color: "var(--color-text-muted)",
+              fontWeight: 700,
+            }}
           >
             {d}
           </Typography>
@@ -238,10 +246,10 @@ export default function AvailabilityCalendar({
                 fontFamily: "inherit",
                 cursor: disabled ? "not-allowed" : "pointer",
                 color: disabled
-                  ? neutral[300]
+                  ? "var(--color-border-strong)"
                   : isEndpoint
-                    ? "#fff"
-                    : neutral[700],
+                    ? "var(--color-surface)"
+                    : "var(--color-text)",
                 background: isEndpoint
                   ? brand[500]
                   : inRange
@@ -251,7 +259,7 @@ export default function AvailabilityCalendar({
                 transition: "background 100ms",
                 "&:hover":
                   !disabled && !isEndpoint
-                    ? { background: neutral[100] }
+                    ? { background: "var(--color-surface-2)" }
                     : undefined,
               }}
             >
@@ -263,7 +271,7 @@ export default function AvailabilityCalendar({
 
       <Typography
         variant="caption"
-        sx={{ color: neutral[400], mt: 1.5, display: "block" }}
+        sx={{ color: "var(--color-text-muted)", mt: 1.5, display: "block" }}
       >
         {minimumStay > 1
           ? `${minimumStay} night minimum`

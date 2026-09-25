@@ -33,7 +33,6 @@ export default function BookingWidget({ listing }) {
   const { isAuthenticated } = useAuthStore();
   const isOwner = useIsOwner(listing?.owner?._id ?? listing?.owner);
   const { mutate: createBooking, isPending } = useCreateBooking();
-  
 
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
@@ -102,22 +101,28 @@ export default function BookingWidget({ listing }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
         boxShadow: shadows.lg,
         p: 3,
         position: "sticky",
         top: 96,
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5, mb: 2.5 }}>
         <Typography
-          sx={{ fontSize: "1.375rem", fontWeight: 700, color: neutral[800] }}
+          sx={{
+            fontSize: "1.375rem",
+            fontWeight: 700,
+            color: "var(--color-text)",
+          }}
         >
           {formatPrice(nightlyPrice)}
         </Typography>
-        <Typography sx={{ color: neutral[500], fontSize: "0.9375rem" }}>
+        <Typography
+          sx={{ color: "var(--color-text-secondary)", fontSize: "0.9375rem" }}
+        >
           / night
         </Typography>
       </Box>
@@ -135,23 +140,23 @@ export default function BookingWidget({ listing }) {
           gap: 1,
           px: 2,
           py: 1.5,
-          border: `1.5px solid ${calendarAnchor ? brand[500] : neutral[300]}`,
+          border: `1.5px solid ${calendarAnchor ? brand[500] : "var(--color-border-strong)"}`,
           borderRadius: `${radii.lg} ${radii.lg} 0 0`,
-          background: "#fff",
+          background: "var(--color-surface)",
           cursor: "pointer",
           textAlign: "left",
           fontFamily: "inherit",
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <CalendarIcon size={15} color={neutral[500]} />
+          <CalendarIcon size={15} color={"var(--color-text-secondary)"} />
           <Box>
             <Typography
               variant="caption"
               sx={{
                 display: "block",
                 fontWeight: 700,
-                color: neutral[500],
+                color: "var(--color-text-secondary)",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
                 fontSize: "0.65rem",
@@ -162,7 +167,7 @@ export default function BookingWidget({ listing }) {
             <Typography
               sx={{
                 fontSize: "0.875rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 fontWeight: 600,
               }}
             >
@@ -218,7 +223,12 @@ export default function BookingWidget({ listing }) {
       {isOwner && (
         <Typography
           variant="caption"
-          sx={{ color: neutral[400], display: "block", mt: 2, mb: 0.5 }}
+          sx={{
+            color: "var(--color-text-muted)",
+            display: "block",
+            mt: 2,
+            mb: 0.5,
+          }}
         >
           You can't book your own listing.
         </Typography>
@@ -240,7 +250,7 @@ export default function BookingWidget({ listing }) {
         <Box sx={{ mt: 2.5 }}>
           <Typography
             variant="caption"
-            sx={{ color: neutral[400], display: "block", mb: 1 }}
+            sx={{ color: "var(--color-text-muted)", display: "block", mb: 1 }}
           >
             You won't be charged until the host confirms
           </Typography>
@@ -258,17 +268,20 @@ export default function BookingWidget({ listing }) {
               key={label}
               sx={{ display: "flex", justifyContent: "space-between", py: 0.5 }}
             >
-              <Typography variant="body2" sx={{ color: neutral[500] }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--color-text-secondary)" }}
+              >
                 {label}
               </Typography>
-              <Typography variant="body2" sx={{ color: neutral[700] }}>
+              <Typography variant="body2" sx={{ color: "var(--color-text)" }}>
                 {formatPrice(amount)}
               </Typography>
             </Box>
           ))}
           <Divider sx={{ my: 1.5 }} />
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography sx={{ fontWeight: 700, color: neutral[800] }}>
+            <Typography sx={{ fontWeight: 700, color: "var(--color-text)" }}>
               Total
             </Typography>
             <Typography sx={{ fontWeight: 700, color: brand[600] }}>
