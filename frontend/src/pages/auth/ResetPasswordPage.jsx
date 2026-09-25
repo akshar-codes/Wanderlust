@@ -61,7 +61,7 @@ function MissingTokenState() {
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "1.6rem",
-            color: "#261f1a",
+            color: "var(--color-text)",
             marginBottom: 8,
           }}
         >
@@ -70,7 +70,7 @@ function MissingTokenState() {
         <p
           style={{
             fontSize: "0.875rem",
-            color: "#8a8179",
+            color: "var(--color-text-secondary)",
             lineHeight: 1.65,
             maxWidth: 300,
           }}
@@ -149,14 +149,20 @@ export default function ResetPasswordPage() {
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "clamp(1.5rem, 3vw, 1.85rem)",
-            color: "#261f1a",
+            color: "var(--color-text)",
             lineHeight: 1.15,
             marginBottom: 6,
           }}
         >
           Set a new password
         </h1>
-        <p style={{ fontSize: "0.875rem", color: "#8a8179", lineHeight: 1.6 }}>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--color-text-secondary)",
+            lineHeight: 1.6,
+          }}
+        >
           Choose something strong that you haven't used before.
         </p>
       </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,7 +23,7 @@ const schema = z.object({
 function ConfirmationScreen({ email, onResend, isResending }) {
   const [countdown, setCountdown] = useState(60);
 
-  useState(() => {
+  useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((c) => {
         if (c <= 1) {
@@ -34,7 +34,7 @@ function ConfirmationScreen({ email, onResend, isResending }) {
       });
     }, 1000);
     return () => clearInterval(timer);
-  });
+  }, []);
 
   return (
     <motion.div
@@ -70,7 +70,7 @@ function ConfirmationScreen({ email, onResend, isResending }) {
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "1.7rem",
-            color: "#261f1a",
+            color: "var(--color-text)",
             marginBottom: 10,
           }}
         >
@@ -79,25 +79,25 @@ function ConfirmationScreen({ email, onResend, isResending }) {
         <p
           style={{
             fontSize: "0.9rem",
-            color: "#8a8179",
+            color: "var(--color-text-secondary)",
             lineHeight: 1.65,
             maxWidth: 320,
           }}
         >
           We sent a reset link to{" "}
-          <strong style={{ color: "#3d3630" }}>{email}</strong>. It expires in 1
-          hour.
+          <strong style={{ color: "var(--color-text)" }}>{email}</strong>. It
+          expires in 1 hour.
         </p>
       </div>
 
       <div
         style={{
-          background: "#faf8f6",
-          border: "1px solid #ebe7e3",
+          background: "var(--color-surface-2)",
+          border: "1px solid var(--color-border)",
           borderRadius: 14,
           padding: "14px 20px",
           fontSize: "0.8125rem",
-          color: "#8a8179",
+          color: "var(--color-text-secondary)",
           lineHeight: 1.5,
           width: "100%",
         }}
@@ -113,7 +113,7 @@ function ConfirmationScreen({ email, onResend, isResending }) {
             padding: 0,
             fontFamily: "inherit",
             fontSize: "inherit",
-            color: countdown === 0 ? "#ff5a5f" : "#b8b0a8",
+            color: countdown === 0 ? "#ff5a5f" : "var(--color-text-muted)",
             fontWeight: 600,
             cursor: countdown === 0 ? "pointer" : "default",
             textDecoration: countdown === 0 ? "underline" : "none",
@@ -134,7 +134,7 @@ function ConfirmationScreen({ email, onResend, isResending }) {
           alignItems: "center",
           gap: 6,
           fontSize: "0.875rem",
-          color: "#5c544c",
+          color: "var(--color-text-secondary)",
           fontWeight: 600,
           textDecoration: "none",
         }}
@@ -212,7 +212,7 @@ export default function ForgotPasswordPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "clamp(1.5rem, 3vw, 1.85rem)",
-                  color: "#261f1a",
+                  color: "var(--color-text)",
                   lineHeight: 1.15,
                   marginBottom: 6,
                 }}
@@ -222,7 +222,7 @@ export default function ForgotPasswordPage() {
               <p
                 style={{
                   fontSize: "0.875rem",
-                  color: "#8a8179",
+                  color: "var(--color-text-secondary)",
                   lineHeight: 1.6,
                 }}
               >

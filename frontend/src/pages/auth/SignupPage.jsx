@@ -74,7 +74,7 @@ function SignupForm() {
       <p
         style={{
           fontSize: "0.75rem",
-          color: "#b8b0a8",
+          color: "var(--color-text-muted)",
           lineHeight: 1.55,
         }}
       >
@@ -125,14 +125,20 @@ export default function SignupPage() {
         style={{
           fontFamily: "'DM Serif Display', Georgia, serif",
           fontSize: "clamp(1.6rem, 3vw, 1.9rem)",
-          color: "#261f1a",
+          color: "var(--color-text)",
           lineHeight: 1.15,
           marginBottom: 2,
         }}
       >
         Create your account
       </h1>
-      <p style={{ fontSize: "0.9rem", color: "#8a8179", marginBottom: 16 }}>
+      <p
+        style={{
+          fontSize: "0.9rem",
+          color: "var(--color-text-secondary)",
+          marginBottom: 16,
+        }}
+      >
         Start your journey with Wanderlust today.
       </p>
 
