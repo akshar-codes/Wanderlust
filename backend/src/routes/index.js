@@ -14,6 +14,7 @@ import userRoutes from "./user.routes.js";
 import wishlistRoutes from "./wishlist.routes.js";
 import wishlistCollectionRoutes from "./wishlistCollection.routes.js";
 import notificationRoutes from "./notification.routes.js";
+import messageRoutes from "./message.routes.js";
 
 const router = express.Router();
 
@@ -61,6 +62,7 @@ router.use("/users", userRoutes);
 router.use("/wishlist", wishlistRoutes);
 router.use("/wishlists", wishlistCollectionRoutes);
 router.use("/notifications", notificationRoutes);
+router.use("/messages", messageRoutes);
 
 router.use((_req, res) =>
   res.status(404).json({
