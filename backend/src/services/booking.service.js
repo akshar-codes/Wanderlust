@@ -85,7 +85,7 @@ export const createBooking = async (guestId, payload) => {
     checkInDate,
     checkOutDate,
   );
-  
+
   if (overlapping.length > 0) {
     throw AppError.conflict("These dates are no longer available");
   }
@@ -98,41 +98,73 @@ export const createBooking = async (guestId, payload) => {
     throw AppError.conflict("These dates are blocked by the host");
   }
 
-  const updatedListing = await listingRepo.addBlockedDateAtomic(
-    listing._id,
-    checkInDate,
-    checkOutDate,
-    {
-      _id: blockedDateId,
-      startDate: checkInDate,
-      endDate: checkOutDate,
-      reason: "booked",
+  // ── Transaction: atomic multi-document write ──────────────────────────────
+  const session = await mongoose.startSession();
+  let booking;
+  try {
+    session.startTransaction();
+
+    const updatedListing = await listingRepo.addBlockedDateAtomic(
+      listing._id,
+      checkInDate,
+      checkOutDate,
+      {
+        _id: blockedDateId,
+        startDate: checkInDate,
+        endDate: checkOutDate,
+        reason: "booked",
+      },
+      session,
+    );
+
+    if (!updatedListing) {
+      await session.abortTransaction();
+      throw AppError.conflict("These dates are no longer available");
     }
-  );
 
-  if (!updatedListing) {
-    throw AppError.conflict("These dates are no longer available");
+    booking = await bookingRepo.createWithSession(
+      {
+        listing: listing._id,
+        guest: guestId,
+        host: listing.owner,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        nights,
+        guestsCount,
+        pricing: {
+          nightlyPrice,
+          cleaningFee,
+          serviceFee,
+          taxes,
+          subtotal,
+          total,
+        },
+        status: "pending",
+        guestNote: guestNote?.trim() || null,
+        blockedDateId,
+      },
+      session,
+    );
+
+    await listingRepo.incrementCounter(listing._id, "bookingCount", 1, session);
+
+    await session.commitTransaction();
+  } catch (err) {
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+    throw err;
+  } finally {
+    await session.endSession();
   }
-
-  const booking = await bookingRepo.create({
-    listing: listing._id,
-    guest: guestId,
-    host: listing.owner,
-    checkIn: checkInDate,
-    checkOut: checkOutDate,
-    nights,
-    guestsCount,
-    pricing: { nightlyPrice, cleaningFee, serviceFee, taxes, subtotal, total },
-    status: "pending",
-    guestNote: guestNote?.trim() || null,
-    blockedDateId,
-  });
-
-  await listingRepo.incrementCounter(listing._id, "bookingCount", 1);
 
   const populatedBooking = await bookingRepo.findById(booking._id);
   const actor = await userRepo.findById(guestId);
-  await notificationService.createBookingNotification("booking_created", populatedBooking, actor);
+  await notificationService.createBookingNotification(
+    "booking_created",
+    populatedBooking,
+    actor,
+  );
 
   return populatedBooking;
 };
@@ -172,15 +204,23 @@ export const cancelBooking = async (bookingId, userId, reason) => {
     );
   }
 
-  const updatedBooking = await bookingRepo.updateStatus(bookingId, "cancelled", {
-    cancelledAt: new Date(),
-    cancelledBy: userId,
-    cancellationReason: reason?.trim() || null,
-  });
-  
+  const updatedBooking = await bookingRepo.updateStatus(
+    bookingId,
+    "cancelled",
+    {
+      cancelledAt: new Date(),
+      cancelledBy: userId,
+      cancellationReason: reason?.trim() || null,
+    },
+  );
+
   const actor = await userRepo.findById(userId);
-  await notificationService.createBookingNotification("booking_cancelled", updatedBooking, actor);
-  
+  await notificationService.createBookingNotification(
+    "booking_cancelled",
+    updatedBooking,
+    actor,
+  );
+
   return updatedBooking;
 };
 
@@ -204,10 +244,14 @@ export const confirmBooking = async (bookingId, hostId) => {
 
   logger.info("Booking confirmed by host", { bookingId, hostId });
   const updatedBooking = await bookingRepo.updateStatus(bookingId, "confirmed");
-  
+
   const actor = await userRepo.findById(hostId);
-  await notificationService.createBookingNotification("booking_confirmed", updatedBooking, actor);
-  
+  await notificationService.createBookingNotification(
+    "booking_confirmed",
+    updatedBooking,
+    actor,
+  );
+
   return updatedBooking;
 };
 
@@ -236,15 +280,23 @@ export const declineBooking = async (bookingId, hostId, reason) => {
 
   logger.info("Booking declined by host", { bookingId, hostId, reason });
 
-  const updatedBooking = await bookingRepo.updateStatus(bookingId, "cancelled", {
-    cancelledAt: new Date(),
-    cancelledBy: hostId,
-    cancellationReason: reason?.trim() || "Declined by host",
-  });
-  
+  const updatedBooking = await bookingRepo.updateStatus(
+    bookingId,
+    "cancelled",
+    {
+      cancelledAt: new Date(),
+      cancelledBy: hostId,
+      cancellationReason: reason?.trim() || "Declined by host",
+    },
+  );
+
   const actor = await userRepo.findById(hostId);
-  await notificationService.createBookingNotification("booking_declined", updatedBooking, actor);
-  
+  await notificationService.createBookingNotification(
+    "booking_declined",
+    updatedBooking,
+    actor,
+  );
+
   return updatedBooking;
 };
 
@@ -270,10 +322,14 @@ export const completeBooking = async (bookingId, hostId) => {
   }
 
   const updatedBooking = await bookingRepo.updateStatus(bookingId, "completed");
-  
+
   const actor = await userRepo.findById(hostId);
-  await notificationService.createBookingNotification("booking_completed", updatedBooking, actor);
-  
+  await notificationService.createBookingNotification(
+    "booking_completed",
+    updatedBooking,
+    actor,
+  );
+
   return updatedBooking;
 };
 

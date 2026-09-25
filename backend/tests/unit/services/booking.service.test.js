@@ -14,6 +14,13 @@ vi.mock("../../../src/services/notification.service.js");
 describe("Booking Service (Unit)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(mongoose, "startSession").mockResolvedValue({
+      startTransaction: vi.fn(),
+      commitTransaction: vi.fn(),
+      abortTransaction: vi.fn(),
+      endSession: vi.fn(),
+      inTransaction: vi.fn().mockReturnValue(true),
+    });
   });
 
   const guestId = new mongoose.Types.ObjectId().toString();
@@ -144,7 +151,7 @@ describe("Booking Service (Unit)", () => {
       listingRepo.findById.mockResolvedValue(mockListing);
       bookingRepo.findOverlapping.mockResolvedValue([]);
       listingRepo.addBlockedDateAtomic.mockResolvedValue(mockListing);
-      bookingRepo.create.mockResolvedValue({ _id: bookingId });
+      bookingRepo.createWithSession.mockResolvedValue({ _id: bookingId });
       bookingRepo.findById.mockResolvedValue({
         _id: bookingId,
         guest: guestId,
@@ -157,7 +164,7 @@ describe("Booking Service (Unit)", () => {
       // Calculate expected totals: 5 nights * 100 = 500 subtotal
       // taxes = round((500+20+10)*0.18) = 95
       // total = 500+20+10+95 = 625
-      expect(bookingRepo.create).toHaveBeenCalledWith(
+      expect(bookingRepo.createWithSession).toHaveBeenCalledWith(
         expect.objectContaining({
           nights: 5,
           pricing: {
@@ -169,6 +176,7 @@ describe("Booking Service (Unit)", () => {
             total: 625,
           },
         }),
+        expect.anything(),
       );
       expect(
         notificationService.createBookingNotification,
