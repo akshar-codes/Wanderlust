@@ -19,8 +19,11 @@
     "migrate:006": "node migrations/006_review_upgrade.js",
     "migrate:007": "node migrations/007_wishlist_collections.js",
     "migrate:008": "node migrations/008_reports.js",
+    "migrate:010": "node migrations/010_wishlist_share_token_index.js",
     "test:unit": "vitest run tests/unit",
+    "test:seed": "vitest run tests/unit/seeder",
     "test:integration": "vitest run tests/integration",
+    "test:messages": "vitest run tests/unit/services/message.service.test.js tests/unit/realtime/messageEventHub.test.js tests/unit/validators/message.schemas.test.js tests/integration/messages.test.js",
     "test:security": "vitest run tests/security",
     "test:all": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -29,7 +32,6 @@
   "author": "Akshar Gupta",
   "license": "ISC",
   "dependencies": {
-    "@fluidjs/multer-cloudinary": "^1.0.4",
     "@mapbox/mapbox-sdk": "^0.16.2",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
@@ -47,7 +49,7 @@
     "js-yaml": "^4.2.0",
     "method-override": "^3.0.0",
     "mongoose": "^7.6.3",
-    "multer": "^2.0.2",
+    "multer": "2.4.0",
     "nodemailer": "^9.0.1",
     "otplib": "^13.5.0",
     "passport": "^0.7.0",
@@ -62,14 +64,18 @@
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
-    "@vitest/coverage-v8": "^2.1.9",
+    "@vitest/coverage-v8": "5.0.2",
     "morgan": "^1.12.1",
     "nodemon": "^3.0.0",
     "supertest": "^7.2.2",
-    "vitest": "^2.1.1"
+    "vite": "7.3.6",
+    "vitest": "5.0.2"
   },
   "allowScripts": {
     "@scarf/scarf@1.4.0": true,
     "core-js@3.49.0": true
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
   }
 }
