@@ -67,7 +67,7 @@ process.on("uncaughtException", (err) => {
 
     configurePassport();
 
-    const httpServer = app.listen(PORT, "127.0.0.1", () =>
+    const httpServer = app.listen(PORT, process.env.HOST ?? "127.0.0.1", () =>
       logger.info("Server running", {
         port: PORT,
         env: process.env.NODE_ENV ?? "development",

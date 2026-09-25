@@ -26,6 +26,10 @@ const __dirname = path.dirname(__filename);
 
 export default function createApp(sessionMiddleware) {
   const app = express();
+  const trustedProxyHops = Number(process.env.TRUST_PROXY_HOPS ?? 0);
+  if (Number.isInteger(trustedProxyHops) && trustedProxyHops > 0) {
+    app.set("trust proxy", trustedProxyHops);
+  }
 
   // 1. Compression
   app.use(compressionMiddleware);
