@@ -87,12 +87,19 @@ function Row({ label, hint, checked, onChange }) {
     >
       <Box>
         <Typography
-          sx={{ fontSize: "0.875rem", fontWeight: 600, color: neutral[700] }}
+          sx={{
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            color: "var(--color-text)",
+          }}
         >
           {label}
         </Typography>
         {hint && (
-          <Typography variant="caption" sx={{ color: neutral[500] }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "var(--color-text-secondary)" }}
+          >
             {hint}
           </Typography>
         )}
@@ -148,7 +155,11 @@ export default function NotificationsSection() {
             >
               <group.icon size={18} color={brand[500]} />
               <Typography
-                sx={{ fontWeight: 700, fontSize: "1rem", color: neutral[800] }}
+                sx={{
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  color: "var(--color-text)",
+                }}
               >
                 {group.label}
               </Typography>

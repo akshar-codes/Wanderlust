@@ -56,7 +56,7 @@ export default function PrivacySection() {
               sx={{
                 fontWeight: 700,
                 fontSize: "1.0625rem",
-                color: neutral[800],
+                color: "var(--color-text)",
               }}
             >
               Profile visibility

@@ -75,7 +75,7 @@ export default function AccountSection() {
             sx={{
               fontWeight: 700,
               fontSize: "1.0625rem",
-              color: neutral[800],
+              color: "var(--color-text)",
               mb: 2,
             }}
           >
@@ -136,7 +136,11 @@ export default function AccountSection() {
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, fontSize: "1.0625rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "1.0625rem",
+              color: "var(--color-text)",
+            }}
           >
             Profile
           </Typography>
@@ -154,7 +158,7 @@ export default function AccountSection() {
             </Typography>
           )}
 
-          <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+          <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
 
           <Box
             sx={{
@@ -219,7 +223,10 @@ export default function AccountSection() {
               Danger zone
             </Typography>
           </Stack>
-          <Typography variant="body2" sx={{ color: neutral[500], mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "var(--color-text-secondary)", mb: 2 }}
+          >
             Deleting your account permanently removes your profile, listings,
             reviews, and bookings. This action cannot be undone.
           </Typography>

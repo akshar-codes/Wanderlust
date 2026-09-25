@@ -75,7 +75,7 @@ export default function SettingsPage() {
   const goTo = (key) => navigate(`/settings/${key}`, { replace: true });
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8 }}>
+    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 4 }, pb: 8 }}>
       <PageHeader
         eyebrow="Account"
         title="Settings"
@@ -83,8 +83,13 @@ export default function SettingsPage() {
       />
 
       <Box
-        className="flex flex-col gap-6 md:flex-row md:items-start"
-        sx={{ mt: 1 }}
+        sx={{
+          mt: { xs: 2, md: 4 },
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: { xs: "stretch", md: "flex-start" },
+          gap: { xs: 4, md: 6 },
+        }}
       >
         {/* ── Navigation ─────────────────────────────────────────────── */}
         {isDesktop ? (
@@ -123,12 +128,14 @@ export default function SettingsPage() {
                     fontFamily: "inherit",
                     fontSize: "0.9375rem",
                     fontWeight: active ? 700 : 500,
-                    color: active ? brand[600] : neutral[600],
-                    bgcolor: active ? brand[50] : "transparent",
+                    color: active ? brand[500] : "var(--color-text-secondary)",
+                    bgcolor: active ? "rgba(255, 90, 95, 0.08)" : "transparent",
                     transition: "background-color 120ms, color 120ms",
                     "&:hover": {
-                      bgcolor: active ? brand[50] : neutral[100],
-                      color: active ? brand[600] : neutral[800],
+                      bgcolor: active
+                        ? "rgba(255, 90, 95, 0.12)"
+                        : "var(--color-surface-2)",
+                      color: active ? brand[500] : "var(--color-text)",
                     },
                   }}
                 >
@@ -144,8 +151,8 @@ export default function SettingsPage() {
               position: "sticky",
               top: 56,
               zIndex: 10,
-              bgcolor: "#faf8f6",
-              borderBottom: `1px solid ${neutral[200]}`,
+              bgcolor: "var(--color-surface-2)",
+              borderBottom: `1px solid var(--color-border)`,
               mb: 1,
             }}
           >

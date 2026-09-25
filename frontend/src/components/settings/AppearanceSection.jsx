@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Stack } from "@mui/material";
-import { Tooltip } from "@mui/material";
 import { Sun, Moon, Monitor, Globe2 } from "lucide-react";
 
 import { Card } from "../ui/Card";
@@ -46,16 +45,19 @@ export default function AppearanceSection() {
   const user = useCurrentUser();
   const username = user?.username;
   const { mutate: updateSettings, isPending: saving } = useUpdateSettings();
-  const { setMode } = useColorModeContext();
+  const { mode, setMode } = useColorModeContext();
 
-  const [theme, setTheme] = useState("system");
+  const [theme, setTheme] = useState(mode);
   const [language, setLanguage] = useState("en");
   const [currency, setCurrency] = useState("INR");
   const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     if (user?.settings) {
-      setTheme(user.settings.theme ?? "system");
+      if (user.settings.theme) {
+        setTheme(user.settings.theme);
+        setMode(user.settings.theme);
+      }
       setLanguage(user.settings.language ?? "en");
       setCurrency(user.settings.currency ?? "INR");
       setDirty(false);
@@ -108,17 +110,24 @@ export default function AppearanceSection() {
                     py: 2.5,
                     borderRadius: radii.lg,
                     cursor: "pointer",
-                    border: `1.5px solid ${active ? brand[500] : neutral[200]}`,
-                    bgcolor: active ? brand[50] : "#fff",
+                    border: `1.5px solid ${active ? brand[500] : "var(--color-border)"}`,
+                    bgcolor: active
+                      ? "var(--color-primary-50)"
+                      : "var(--color-surface)",
                     transition: "all 120ms",
                   }}
                 >
-                  <Icon size={20} color={active ? brand[600] : neutral[500]} />
+                  <Icon
+                    size={20}
+                    color={active ? brand[600] : "var(--color-text-secondary)"}
+                  />
                   <Typography
                     sx={{
                       fontSize: "0.8125rem",
                       fontWeight: 600,
-                      color: active ? brand[700] : neutral[600],
+                      color: active
+                        ? brand[700]
+                        : "var(--color-text-secondary)",
                     }}
                   >
                     {label}
@@ -129,7 +138,7 @@ export default function AppearanceSection() {
           </Box>
           <Typography
             variant="caption"
-            sx={{ color: neutral[400], mt: 1.5, display: "block" }}
+            sx={{ color: "var(--color-text-muted)", mt: 1.5, display: "block" }}
           >
             "System" follows your device's appearance setting.
           </Typography>
@@ -149,7 +158,7 @@ export default function AppearanceSection() {
               sx={{
                 fontWeight: 700,
                 fontSize: "1.0625rem",
-                color: neutral[800],
+                color: "var(--color-text)",
               }}
             >
               Regional preferences
@@ -162,20 +171,15 @@ export default function AppearanceSection() {
               gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
             }}
           >
-            <Tooltip title="Multi-language support coming soon">
-              <span>
-                <Select
-                  label="Language"
-                  options={LANGUAGE_OPTIONS}
-                  value={language}
-                  onChange={(e) => {
-                    setLanguage(e.target.value);
-                    setDirty(true);
-                  }}
-                  disabled
-                />
-              </span>
-            </Tooltip>
+            <Select
+              label="Language preference"
+              options={LANGUAGE_OPTIONS}
+              value={language}
+              onChange={(e) => {
+                setLanguage(e.target.value);
+                setDirty(true);
+              }}
+            />
             <Select
               label="Currency"
               options={CURRENCY_OPTIONS}

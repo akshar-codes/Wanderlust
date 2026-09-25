@@ -76,13 +76,16 @@ export default function ConnectedAccountsSection() {
             sx={{
               fontWeight: 700,
               fontSize: "1.0625rem",
-              color: neutral[800],
+              color: "var(--color-text)",
               mb: 0.5,
             }}
           >
             Connected accounts
           </Typography>
-          <Typography variant="body2" sx={{ color: neutral[500], mb: 2.5 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "var(--color-text-secondary)", mb: 2.5 }}
+          >
             Link a social account for faster sign-in, or disconnect one you no
             longer use.
           </Typography>
@@ -101,7 +104,7 @@ export default function ConnectedAccountsSection() {
                     justifyContent: "space-between",
                     gap: 2,
                     p: 2,
-                    border: `1px solid ${neutral[200]}`,
+                    border: `1px solid var(--color-border)`,
                     borderRadius: radii.lg,
                     flexWrap: "wrap",
                   }}
@@ -113,7 +116,7 @@ export default function ConnectedAccountsSection() {
                         sx={{
                           fontWeight: 700,
                           fontSize: "0.9375rem",
-                          color: neutral[800],
+                          color: "var(--color-text)",
                         }}
                       >
                         {label}
@@ -138,7 +141,7 @@ export default function ConnectedAccountsSection() {
                       ) : (
                         <Typography
                           variant="caption"
-                          sx={{ color: neutral[400] }}
+                          sx={{ color: "var(--color-text-muted)" }}
                         >
                           Not connected
                         </Typography>
@@ -179,9 +182,9 @@ export default function ConnectedAccountsSection() {
               justifyContent: "space-between",
               gap: 2,
               p: 2,
-              border: `1px solid ${neutral[200]}`,
+              border: `1px solid var(--color-border)`,
               borderRadius: radii.lg,
-              bgcolor: neutral[50],
+              bgcolor: "var(--color-surface-2)",
               flexWrap: "wrap",
             }}
           >
@@ -190,12 +193,15 @@ export default function ConnectedAccountsSection() {
                 sx={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                 }}
               >
                 Email &amp; password
               </Typography>
-              <Typography variant="caption" sx={{ color: neutral[500] }}>
+              <Typography
+                variant="caption"
+                sx={{ color: "var(--color-text-secondary)" }}
+              >
                 {linked.local
                   ? "Password login is set up for this account."
                   : "No password set — you sign in via a connected account."}
