@@ -45,7 +45,7 @@ describe("Auth Integration Tests", () => {
   it("should register successfully", async () => {
     const { agent, token } = await getAgent();
     const res = await agent
-      .post("/api/auth/register")
+      .post("/api/auth/signup")
       .set("X-CSRF-Token", token)
       .send({
         email: "test@test.com",
@@ -61,7 +61,7 @@ describe("Auth Integration Tests", () => {
     await makeUser({ email: "test@test.com", username: "testuser" });
     const { agent, token } = await getAgent();
     const res = await agent
-      .post("/api/auth/register")
+      .post("/api/auth/signup")
       .set("X-CSRF-Token", token)
       .send({
         email: "test@test.com",
@@ -108,6 +108,6 @@ describe("Auth Integration Tests", () => {
 
     const res = await agent.get("/api/auth/me");
     expect(res.status).toBe(200);
-    expect(res.body.user.username).toBe("testuser");
+    expect(res.body.data.user.username).toBe("testuser");
   });
 });

@@ -62,20 +62,24 @@ describe("Listings Integration Tests", () => {
     expect(res.status).toBe(200);
   });
 
-  it("should POST a new listing if auth", async () => {
-    const user = await makeUser({}, "Password123!");
+  it("should reject creating a listing without an image", async () => {
+    const user = await makeUser({ role: "host" }, "Password123!");
     const { agent, token } = await getAgent(user);
     const res = await agent
       .post("/api/listings")
       .set("X-CSRF-Token", token)
       .send({
-        title: "Test Listing",
-        description: "Test",
-        price: 100,
-        location: "Test",
-        country: "Test",
+        listing: {
+          title: "Test Listing",
+          description: "Test",
+          category: "rooms",
+          price: 100,
+          location: "Test",
+          country: "Test",
+        },
       });
-    expect([200, 201]).toContain(res.status); // depends on implementation
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("At least one image is required");
   });
 
   it("should forbid PUT if non-owner", async () => {
