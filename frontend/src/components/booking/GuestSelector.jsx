@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Popover, Box, Typography } from "@mui/material";
 import { Users, ChevronDown } from "lucide-react";
 import { Counter } from "../ui/Counter";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 
 /**
  * GuestSelector — pill trigger + popover housing the shared Counter

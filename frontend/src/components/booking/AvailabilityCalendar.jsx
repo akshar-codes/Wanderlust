@@ -1,7 +1,7 @@
 import { useMemo, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEKDAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];

@@ -13,7 +13,7 @@ import { useAuthStore } from "../../store/auth.store";
 import { useIsOwner } from "../../hooks/useCurrentUser";
 import { useCreateBooking } from "../../hooks/useBookings";
 import { formatPrice } from "../../utils/currency";
-import { neutral, brand, radii, shadows } from "../../theme/tokens";
+import { brand, radii, shadows } from "../../theme/tokens";
 
 // Mirrors backend/src/services/booking.service.js GST_RATE — keep in sync.
 const GST_RATE = 0.18;
