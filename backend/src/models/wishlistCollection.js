@@ -68,7 +68,10 @@ wishlistCollectionSchema.index({ owner: 1, isDefault: 1 });
 wishlistCollectionSchema.index({ owner: 1, createdAt: -1 });
 wishlistCollectionSchema.index(
   { shareToken: 1 },
-  { unique: true, sparse: true },
+  {
+    unique: true,
+    partialFilterExpression: { shareToken: { $type: "string" } },
+  },
 );
 
 const WishlistCollection = mongoose.model(
