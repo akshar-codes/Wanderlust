@@ -90,7 +90,6 @@ const AMENITY_ICONS = {
   lake_access: { icon: <Waves size={18} />, label: "Lake access" },
 };
 
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function idEquals(a, b) {
   if (!a || !b) return false;
@@ -211,7 +210,7 @@ function Lightbox({ images, startIndex, onClose }) {
           zIndex: 1,
         }}
       >
-        <X size={20} color={neutral[0]} />
+        <X size={20} color={"#fff"} />
       </motion.button>
 
       {/* Counter */}
@@ -284,7 +283,7 @@ function Lightbox({ images, startIndex, onClose }) {
               cursor: "pointer",
             }}
           >
-            <ChevronLeft size={22} color={neutral[0]} />
+            <ChevronLeft size={22} color={"#fff"} />
           </motion.button>
           <motion.button
             aria-label="Next image"
@@ -310,7 +309,7 @@ function Lightbox({ images, startIndex, onClose }) {
               cursor: "pointer",
             }}
           >
-            <ChevronRight size={22} color={neutral[0]} />
+            <ChevronRight size={22} color={"#fff"} />
           </motion.button>
         </>
       )}
@@ -429,7 +428,7 @@ function ShareSheet({ open, onClose, listing }) {
             style={{
               width: "100%",
               maxWidth: 480,
-              background: neutral[0],
+              background: "var(--color-surface)",
               borderRadius: "24px 24px 0 0",
               padding: "28px 28px 36px",
             }}
@@ -447,7 +446,7 @@ function ShareSheet({ open, onClose, listing }) {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.3rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   margin: 0,
                 }}
               >
@@ -457,7 +456,7 @@ function ShareSheet({ open, onClose, listing }) {
                 aria-label="Close share sheet"
                 onClick={onClose}
                 style={{
-                  background: neutral[100],
+                  background: "var(--color-surface-2)",
                   border: "none",
                   width: 44,
                   height: 44,
@@ -468,7 +467,7 @@ function ShareSheet({ open, onClose, listing }) {
                   cursor: "pointer",
                 }}
               >
-                <X size={15} color={neutral[600]} />
+                <X size={15} color={"var(--color-text-secondary)"} />
               </button>
             </div>
 
@@ -478,10 +477,10 @@ function ShareSheet({ open, onClose, listing }) {
                 display: "flex",
                 gap: 12,
                 padding: "12px",
-                background: neutral[50],
+                background: "var(--color-surface-2)",
                 borderRadius: 12,
                 marginBottom: 20,
-                border: "1px solid #ebe7e3",
+                border: "1px solid var(--color-border)",
               }}
             >
               <img
@@ -500,7 +499,7 @@ function ShareSheet({ open, onClose, listing }) {
                   style={{
                     fontSize: "0.875rem",
                     fontWeight: 700,
-                    color: neutral[800],
+                    color: "var(--color-text)",
                     margin: 0,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -512,7 +511,7 @@ function ShareSheet({ open, onClose, listing }) {
                 <p
                   style={{
                     fontSize: "0.75rem",
-                    color: neutral[500],
+                    color: "var(--color-text-secondary)",
                     margin: "3px 0 0",
                   }}
                 >
@@ -539,7 +538,7 @@ function ShareSheet({ open, onClose, listing }) {
                     borderRadius: 10,
                     textDecoration: "none",
                     background: s.bg,
-                    color: neutral[0],
+                    color: "#fff",
                     fontSize: "0.8125rem",
                     fontWeight: 600,
                   }}
@@ -554,12 +553,12 @@ function ShareSheet({ open, onClose, listing }) {
               <div
                 style={{
                   flex: 1,
-                  background: neutral[100],
-                  border: "1.5px solid #ebe7e3",
+                  background: "var(--color-surface-2)",
+                  border: "1.5px solid var(--color-border)",
                   borderRadius: 10,
                   padding: "10px 14px",
                   fontSize: "0.8125rem",
-                  color: neutral[500],
+                  color: "var(--color-text-secondary)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -576,9 +575,11 @@ function ShareSheet({ open, onClose, listing }) {
                   gap: 6,
                   padding: "10px 16px",
                   borderRadius: 10,
-                  background: copied ? semantic.success.base : neutral[800],
+                  background: copied
+                    ? semantic.success.base
+                    : "var(--color-text)",
                   border: "none",
-                  color: neutral[0],
+                  color: "#fff",
                   fontSize: "0.8125rem",
                   fontWeight: 700,
                   cursor: "pointer",
@@ -601,7 +602,11 @@ function ShareSheet({ open, onClose, listing }) {
 // ─── Star Picker (inline) ─────────────────────────────────────────────────────
 function StarPicker({ value, onChange }) {
   return (
-    <div style={{ display: "flex", gap: 4 }} role="group" aria-label="Rate this listing">
+    <div
+      style={{ display: "flex", gap: 4 }}
+      role="group"
+      aria-label="Rate this listing"
+    >
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
@@ -671,7 +676,7 @@ function ReviewForm({ listingId }) {
             display: "block",
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: neutral[800],
+            color: "var(--color-text)",
             marginBottom: 8,
           }}
         >
@@ -703,7 +708,7 @@ function ReviewForm({ listingId }) {
             display: "block",
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: neutral[800],
+            color: "var(--color-text)",
             marginBottom: 8,
           }}
         >
@@ -717,12 +722,12 @@ function ReviewForm({ listingId }) {
             width: "100%",
             padding: "12px 14px",
             boxSizing: "border-box",
-            border: `1.5px solid ${errors.comment ? semantic.error.base : neutral[300]}`,
+            border: `1.5px solid ${errors.comment ? semantic.error.base : "var(--color-border-strong)"}`,
             borderRadius: 12,
             fontSize: "0.9375rem",
             fontFamily: "inherit",
-            color: neutral[800],
-            background: neutral[0],
+            color: "var(--color-text)",
+            background: "var(--color-surface)",
             outline: "none",
             resize: "vertical",
             transition: "border-color 0.15s",
@@ -754,7 +759,7 @@ function ReviewForm({ listingId }) {
           background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
           border: "none",
           borderRadius: 999,
-          color: neutral[0],
+          color: "#fff",
           fontSize: "0.9rem",
           fontWeight: 700,
           cursor: isPending ? "not-allowed" : "pointer",
@@ -785,8 +790,8 @@ function ReviewCard({ review, listingId }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       style={{
-        background: neutral[0],
-        border: "1px solid #ebe7e3",
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
         borderRadius: 16,
         padding: "20px 22px",
       }}
@@ -822,7 +827,7 @@ function ReviewCard({ review, listingId }) {
               style={{
                 fontWeight: 700,
                 fontSize: "0.875rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 margin: 0,
               }}
             >
@@ -836,7 +841,9 @@ function ReviewCard({ review, listingId }) {
                   height={13}
                   viewBox="0 0 24 24"
                   fill={s <= review.rating ? semantic.warning.base : "none"}
-                  stroke={s <= review.rating ? semantic.warning.base : "#d1d5db"}
+                  stroke={
+                    s <= review.rating ? semantic.warning.base : "#d1d5db"
+                  }
                   strokeWidth="1.5"
                 >
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -847,7 +854,9 @@ function ReviewCard({ review, listingId }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {review.createdAt && (
-            <time style={{ fontSize: "0.75rem", color: neutral[400] }}>
+            <time
+              style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}
+            >
               {formatDate(review.createdAt)}
             </time>
           )}
@@ -863,7 +872,7 @@ function ReviewCard({ review, listingId }) {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: neutral[400],
+                color: "var(--color-text-muted)",
                 padding: 4,
                 borderRadius: 6,
                 display: "flex",
@@ -880,7 +889,7 @@ function ReviewCard({ review, listingId }) {
         style={{
           fontSize: "0.9375rem",
           lineHeight: 1.65,
-          color: neutral[700],
+          color: "var(--color-text)",
           margin: 0,
         }}
       >
@@ -964,7 +973,7 @@ export default function ListingShowPage() {
         <h2
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
-            color: neutral[800],
+            color: "var(--color-text)",
           }}
         >
           Listing not found
@@ -976,7 +985,7 @@ export default function ListingShowPage() {
             background: brand[500],
             border: "none",
             borderRadius: 999,
-            color: neutral[0],
+            color: "#fff",
             fontWeight: 700,
             cursor: "pointer",
             fontFamily: "inherit",
@@ -1056,7 +1065,7 @@ export default function ListingShowPage() {
               cursor: "pointer",
               fontSize: "0.875rem",
               fontWeight: 600,
-              color: neutral[600],
+              color: "var(--color-text-secondary)",
               fontFamily: "inherit",
               padding: 0,
             }}
@@ -1103,7 +1112,7 @@ export default function ListingShowPage() {
                   <span
                     style={{
                       background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
-                      color: neutral[0],
+                      color: "#fff",
                       borderRadius: 999,
                       padding: "3px 10px",
                       fontSize: "0.72rem",
@@ -1124,7 +1133,7 @@ export default function ListingShowPage() {
                   fontWeight: 400,
                   lineHeight: 1.1,
                   letterSpacing: "-0.02em",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   margin: 0,
                   maxWidth: 700,
                 }}
@@ -1144,27 +1153,36 @@ export default function ListingShowPage() {
                   <div
                     style={{ display: "flex", alignItems: "center", gap: 4 }}
                   >
-                    <Star size={14} fill={semantic.warning.base} stroke="none" />
+                    <Star
+                      size={14}
+                      fill={semantic.warning.base}
+                      stroke="none"
+                    />
                     <span
                       style={{
                         fontSize: "0.875rem",
                         fontWeight: 700,
-                        color: neutral[800],
+                        color: "var(--color-text)",
                       }}
                     >
                       {Number(avgRating).toFixed(1)}
                     </span>
-                    <span style={{ fontSize: "0.875rem", color: neutral[500] }}>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "var(--color-text-secondary)",
+                      }}
+                    >
                       · {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
                     </span>
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <MapPin size={13} color={neutral[400]} />
+                  <MapPin size={13} color={"var(--color-text-muted)"} />
                   <span
                     style={{
                       fontSize: "0.875rem",
-                      color: neutral[600],
+                      color: "var(--color-text-secondary)",
                       fontWeight: 500,
                     }}
                   >
@@ -1188,22 +1206,22 @@ export default function ListingShowPage() {
                     padding: "8px 16px",
                     border: "1.5px solid #d6d0ca",
                     borderRadius: 999,
-                    background: neutral[0],
+                    background: "var(--color-surface)",
                     cursor: "pointer",
                     fontSize: "0.8125rem",
                     fontWeight: 600,
-                    color: neutral[700],
+                    color: "var(--color-text)",
                     fontFamily: "inherit",
                   }}
                 >
                   <Share2 size={15} /> Share
                 </motion.button>
               </Tooltip>
-                <WishlistHeartButton 
-                  listingId={listing._id} 
-                  variant="pill"
-                  iconSize={15}
-                />
+              <WishlistHeartButton
+                listingId={listing._id}
+                variant="pill"
+                iconSize={15}
+              />
             </div>
           </div>
         </div>
@@ -1216,11 +1234,11 @@ export default function ListingShowPage() {
                 width: "100%",
                 height: 420,
                 borderRadius: 20,
-                background: "linear-gradient(135deg, #f4f1ee, #ebe7e3)",
+                background: "var(--color-surface-2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: neutral[400],
+                color: "var(--color-text-muted)",
                 fontSize: "3rem",
               }}
             >
@@ -1338,7 +1356,7 @@ export default function ListingShowPage() {
                       >
                         <span
                           style={{
-                            color: neutral[0],
+                            color: "#fff",
                             fontWeight: 700,
                             fontSize: "1.125rem",
                           }}
@@ -1370,13 +1388,13 @@ export default function ListingShowPage() {
                 alignItems: "center",
                 gap: 6,
                 padding: "8px 16px",
-                background: "rgba(255,255,255,0.95)",
+                background: "var(--color-dropdown-bg)",
                 backdropFilter: "blur(8px)",
-                border: "1.5px solid rgba(230,224,218,0.8)",
+                border: "1.5px solid var(--color-nav-border)",
                 borderRadius: 999,
                 fontSize: "0.8125rem",
                 fontWeight: 700,
-                color: neutral[800],
+                color: "var(--color-text)",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
@@ -1406,7 +1424,7 @@ export default function ListingShowPage() {
                 flexWrap: "wrap",
                 gap: 10,
                 padding: "20px 0",
-                borderBottom: "1px solid #ebe7e3",
+                borderBottom: "1px solid var(--color-border)",
                 marginBottom: 32,
               }}
             >
@@ -1441,12 +1459,12 @@ export default function ListingShowPage() {
                       alignItems: "center",
                       gap: 7,
                       padding: "8px 14px",
-                      background: neutral[50],
-                      border: "1px solid #ebe7e3",
+                      background: "var(--color-surface-2)",
+                      border: "1px solid var(--color-border)",
                       borderRadius: 10,
                       fontSize: "0.875rem",
                       fontWeight: 600,
-                      color: neutral[700],
+                      color: "var(--color-text)",
                     }}
                   >
                     <span style={{ color: brand[500] }}>{icon}</span>
@@ -1466,8 +1484,8 @@ export default function ListingShowPage() {
                   justifyContent: "space-between",
                   gap: 16,
                   padding: "22px 24px",
-                  background: "linear-gradient(135deg, #faf8f6, #fff)",
-                  border: "1px solid #ebe7e3",
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
                   borderRadius: 18,
                   marginBottom: 36,
                 }}
@@ -1502,7 +1520,7 @@ export default function ListingShowPage() {
                           justifyContent: "center",
                         }}
                       >
-                        <Check size={10} color={neutral[0]} strokeWidth={3} />
+                        <Check size={10} color={"#fff"} strokeWidth={3} />
                       </div>
                     )}
                   </div>
@@ -1514,7 +1532,7 @@ export default function ListingShowPage() {
                         fontWeight: 700,
                         textTransform: "uppercase",
                         letterSpacing: "0.08em",
-                        color: neutral[400],
+                        color: "var(--color-text-muted)",
                       }}
                     >
                       Hosted by
@@ -1524,7 +1542,7 @@ export default function ListingShowPage() {
                         margin: "2px 0 0",
                         fontWeight: 700,
                         fontSize: "1rem",
-                        color: neutral[800],
+                        color: "var(--color-text)",
                       }}
                     >
                       {listing.owner.firstName
@@ -1536,7 +1554,7 @@ export default function ListingShowPage() {
                         style={{
                           margin: "4px 0 0",
                           fontSize: "0.8125rem",
-                          color: neutral[500],
+                          color: "var(--color-text-secondary)",
                           lineHeight: 1.5,
                           maxWidth: 400,
                         }}
@@ -1573,11 +1591,14 @@ export default function ListingShowPage() {
                           alignItems: "center",
                           gap: 5,
                           fontSize: "0.75rem",
-                          color: neutral[600],
+                          color: "var(--color-text-secondary)",
                           fontWeight: 500,
                         }}
                       >
-                        <span style={{ color: semantic.success.base }}>{icon}</span> {text}
+                        <span style={{ color: semantic.success.base }}>
+                          {icon}
+                        </span>{" "}
+                        {text}
                       </div>
                     ))}
                 </div>
@@ -1590,7 +1611,7 @@ export default function ListingShowPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.5rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   marginBottom: 14,
                 }}
               >
@@ -1600,7 +1621,7 @@ export default function ListingShowPage() {
                 style={{
                   fontSize: "1rem",
                   lineHeight: 1.75,
-                  color: neutral[600],
+                  color: "var(--color-text-secondary)",
                   margin: 0,
                 }}
               >
@@ -1615,7 +1636,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: neutral[800],
+                    color: "var(--color-text)",
                     marginBottom: 20,
                   }}
                 >
@@ -1645,15 +1666,20 @@ export default function ListingShowPage() {
                             alignItems: "center",
                             gap: 10,
                             padding: "12px 14px",
-                            border: "1px solid #ebe7e3",
+                            border: "1px solid var(--color-border)",
                             borderRadius: 12,
                             fontSize: "0.875rem",
-                            color: neutral[700],
+                            color: "var(--color-text)",
                             fontWeight: 500,
-                            background: neutral[50],
+                            background: "var(--color-surface-2)",
                           }}
                         >
-                          <span style={{ color: neutral[500], flexShrink: 0 }}>
+                          <span
+                            style={{
+                              color: "var(--color-text-secondary)",
+                              flexShrink: 0,
+                            }}
+                          >
                             {meta?.icon ?? <Check size={18} />}
                           </span>
                           {label}
@@ -1671,10 +1697,10 @@ export default function ListingShowPage() {
                       padding: "10px 20px",
                       border: "1.5px solid #d6d0ca",
                       borderRadius: 999,
-                      background: neutral[0],
+                      background: "var(--color-surface)",
                       fontSize: "0.875rem",
                       fontWeight: 600,
-                      color: neutral[700],
+                      color: "var(--color-text)",
                       cursor: "pointer",
                       fontFamily: "inherit",
                     }}
@@ -1694,7 +1720,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: neutral[800],
+                    color: "var(--color-text)",
                     marginBottom: 16,
                   }}
                 >
@@ -1746,8 +1772,8 @@ export default function ListingShowPage() {
                         key={label}
                         style={{
                           padding: "12px 14px",
-                          background: neutral[50],
-                          border: "1px solid #ebe7e3",
+                          background: "var(--color-surface-2)",
+                          border: "1px solid var(--color-border)",
                           borderRadius: 12,
                         }}
                       >
@@ -1758,7 +1784,7 @@ export default function ListingShowPage() {
                             fontWeight: 700,
                             textTransform: "uppercase",
                             letterSpacing: "0.07em",
-                            color: neutral[400],
+                            color: "var(--color-text-muted)",
                           }}
                         >
                           {label}
@@ -1768,7 +1794,7 @@ export default function ListingShowPage() {
                             margin: "4px 0 0",
                             fontSize: "0.875rem",
                             fontWeight: 600,
-                            color: neutral[700],
+                            color: "var(--color-text)",
                           }}
                         >
                           {value}
@@ -1791,7 +1817,7 @@ export default function ListingShowPage() {
                         key={i}
                         style={{
                           fontSize: "0.875rem",
-                          color: neutral[600],
+                          color: "var(--color-text-secondary)",
                           lineHeight: 1.6,
                         }}
                       >
@@ -1817,7 +1843,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: neutral[800],
+                    color: "var(--color-text)",
                     margin: 0,
                   }}
                 >
@@ -1827,17 +1853,26 @@ export default function ListingShowPage() {
                   <div
                     style={{ display: "flex", alignItems: "center", gap: 5 }}
                   >
-                    <Star size={16} fill={semantic.warning.base} stroke="none" />
+                    <Star
+                      size={16}
+                      fill={semantic.warning.base}
+                      stroke="none"
+                    />
                     <span
                       style={{
                         fontWeight: 700,
                         fontSize: "1rem",
-                        color: neutral[800],
+                        color: "var(--color-text)",
                       }}
                     >
                       {Number(avgRating).toFixed(1)}
                     </span>
-                    <span style={{ color: neutral[500], fontSize: "0.875rem" }}>
+                    <span
+                      style={{
+                        color: "var(--color-text-secondary)",
+                        fontSize: "0.875rem",
+                      }}
+                    >
                       · {reviewCount} reviews
                     </span>
                   </div>
@@ -1853,8 +1888,8 @@ export default function ListingShowPage() {
                     gap: "8px 24px",
                     marginBottom: 28,
                     padding: "20px",
-                    background: neutral[50],
-                    border: "1px solid #ebe7e3",
+                    background: "var(--color-surface-2)",
+                    border: "1px solid var(--color-border)",
                     borderRadius: 16,
                   }}
                 >
@@ -1866,7 +1901,7 @@ export default function ListingShowPage() {
                       <span
                         style={{
                           fontSize: "0.8125rem",
-                          color: neutral[600],
+                          color: "var(--color-text-secondary)",
                           minWidth: 14,
                           textAlign: "right",
                         }}
@@ -1883,7 +1918,7 @@ export default function ListingShowPage() {
                         style={{
                           flex: 1,
                           height: 4,
-                          background: "#e5e0d8",
+                          background: "var(--color-border-strong)",
                           borderRadius: 2,
                           overflow: "hidden",
                         }}
@@ -1903,7 +1938,7 @@ export default function ListingShowPage() {
                           }}
                           style={{
                             height: "100%",
-                            background: neutral[800],
+                            background: "var(--color-surface-3)",
                             borderRadius: 2,
                           }}
                         />
@@ -1911,7 +1946,7 @@ export default function ListingShowPage() {
                       <span
                         style={{
                           fontSize: "0.75rem",
-                          color: neutral[400],
+                          color: "var(--color-text-muted)",
                           minWidth: 20,
                         }}
                       >
@@ -1946,7 +1981,7 @@ export default function ListingShowPage() {
                   style={{
                     textAlign: "center",
                     padding: "40px 24px",
-                    background: neutral[50],
+                    background: "var(--color-surface-2)",
                     border: "1px dashed #d6d0ca",
                     borderRadius: 16,
                     marginBottom: 28,
@@ -1956,7 +1991,7 @@ export default function ListingShowPage() {
                   <p
                     style={{
                       fontWeight: 700,
-                      color: neutral[800],
+                      color: "var(--color-text)",
                       margin: "0 0 4px",
                     }}
                   >
@@ -1965,7 +2000,7 @@ export default function ListingShowPage() {
                   <p
                     style={{
                       fontSize: "0.875rem",
-                      color: neutral[500],
+                      color: "var(--color-text-secondary)",
                       margin: 0,
                     }}
                   >
@@ -1978,8 +2013,8 @@ export default function ListingShowPage() {
               {user && (
                 <div
                   style={{
-                    background: neutral[0],
-                    border: "1.5px solid #ebe7e3",
+                    background: "var(--color-surface)",
+                    border: "1.5px solid var(--color-border)",
                     borderRadius: 18,
                     padding: "24px",
                   }}
@@ -1988,7 +2023,7 @@ export default function ListingShowPage() {
                     style={{
                       fontFamily: "'DM Serif Display', Georgia, serif",
                       fontSize: "1.2rem",
-                      color: neutral[800],
+                      color: "var(--color-text)",
                       margin: "0 0 20px",
                     }}
                   >
@@ -2005,7 +2040,7 @@ export default function ListingShowPage() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.5rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   marginBottom: 8,
                 }}
               >
@@ -2014,7 +2049,7 @@ export default function ListingShowPage() {
               <p
                 style={{
                   fontSize: "0.9375rem",
-                  color: neutral[600],
+                  color: "var(--color-text-secondary)",
                   marginBottom: 16,
                   display: "flex",
                   alignItems: "center",
@@ -2028,7 +2063,7 @@ export default function ListingShowPage() {
                 style={{
                   borderRadius: 18,
                   overflow: "hidden",
-                  border: "1px solid #ebe7e3",
+                  border: "1px solid var(--color-border)",
                 }}
               >
                 <ListingMap
@@ -2045,7 +2080,7 @@ export default function ListingShowPage() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.5rem",
-                    color: neutral[800],
+                    color: "var(--color-text)",
                     marginBottom: 20,
                   }}
                 >
@@ -2083,7 +2118,7 @@ export default function ListingShowPage() {
                               borderRadius: 16,
                               overflow: "hidden",
                               aspectRatio: "4/3",
-                              background: neutral[100],
+                              background: "var(--color-surface-2)",
                               marginBottom: 10,
                             }}
                           >
@@ -2111,7 +2146,7 @@ export default function ListingShowPage() {
                             style={{
                               fontSize: "0.9rem",
                               fontWeight: 700,
-                              color: neutral[800],
+                              color: "var(--color-text)",
                               margin: "0 0 4px",
                               lineHeight: 1.3,
                               overflow: "hidden",
@@ -2125,7 +2160,7 @@ export default function ListingShowPage() {
                           <p
                             style={{
                               fontSize: "0.75rem",
-                              color: neutral[500],
+                              color: "var(--color-text-secondary)",
                               margin: "0 0 4px",
                             }}
                           >
@@ -2142,14 +2177,14 @@ export default function ListingShowPage() {
                               style={{
                                 fontWeight: 700,
                                 fontSize: "0.9rem",
-                                color: neutral[800],
+                                color: "var(--color-text)",
                               }}
                             >
                               {formatPrice(Number(similar.price))}
                               <span
                                 style={{
                                   fontWeight: 400,
-                                  color: neutral[500],
+                                  color: "var(--color-text-secondary)",
                                   fontSize: "0.8rem",
                                 }}
                               >
@@ -2163,12 +2198,16 @@ export default function ListingShowPage() {
                                 gap: 3,
                               }}
                             >
-                              <Star size={11} fill={semantic.warning.base} stroke="none" />
+                              <Star
+                                size={11}
+                                fill={semantic.warning.base}
+                                stroke="none"
+                              />
                               <span
                                 style={{
                                   fontSize: "0.8rem",
                                   fontWeight: 600,
-                                  color: neutral[700],
+                                  color: "var(--color-text)",
                                 }}
                               >
                                 {Number(rating).toFixed(1)}
@@ -2192,7 +2231,7 @@ export default function ListingShowPage() {
                       borderRadius: 999,
                       fontSize: "0.875rem",
                       fontWeight: 600,
-                      color: neutral[700],
+                      color: "var(--color-text)",
                       textDecoration: "none",
                       transition: "all 0.15s",
                     }}
@@ -2213,7 +2252,7 @@ export default function ListingShowPage() {
                 style={{
                   textAlign: "center",
                   fontSize: "0.8125rem",
-                  color: neutral[400],
+                  color: "var(--color-text-muted)",
                   marginTop: 12,
                   display: "flex",
                   alignItems: "center",

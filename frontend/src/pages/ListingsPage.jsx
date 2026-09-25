@@ -42,7 +42,6 @@ import SearchBar from "../components/search/SearchBar";
 import PriceRangeSlider from "../components/search/PriceRangeSlider";
 import MapBoundsFilter from "../components/search/MapBoundsFilter";
 import ListingCard from "../components/listings/ListingCard";
-import CategoryFilters from "../components/listings/CategoryFilters";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -104,8 +103,8 @@ function CategoryBar({ active, onChange }) {
           width: 32,
           height: 32,
           borderRadius: "50%",
-          background: neutral[0],
-          border: "1.5px solid #ebe7e3",
+          background: "var(--color-surface)",
+          border: "1.5px solid var(--color-border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -114,7 +113,7 @@ function CategoryBar({ active, onChange }) {
           boxShadow: "0 1px 6px rgba(0,0,0,0.08)",
         }}
       >
-        <ChevronLeft size={15} color={neutral[600]} />
+        <ChevronLeft size={15} color={"var(--color-text-secondary)"} />
       </motion.button>
       <div
         ref={scrollRef}
@@ -144,7 +143,7 @@ function CategoryBar({ active, onChange }) {
                 padding: "8px 14px",
                 borderRadius: 12,
                 flexShrink: 0,
-                border: `1.5px solid ${isActive ? neutral[800] : "transparent"}`,
+                border: `1.5px solid ${isActive ? "var(--color-text)" : "transparent"}`,
                 background: isActive ? "rgba(38,31,26,0.06)" : "transparent",
                 cursor: "pointer",
                 fontFamily: "inherit",
@@ -157,7 +156,9 @@ function CategoryBar({ active, onChange }) {
                 style={{
                   fontSize: "0.6875rem",
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? neutral[800] : neutral[500],
+                  color: isActive
+                    ? "var(--color-text)"
+                    : "var(--color-text-secondary)",
                   whiteSpace: "nowrap",
                   letterSpacing: "0.02em",
                 }}
@@ -174,7 +175,7 @@ function CategoryBar({ active, onChange }) {
                     transform: "translateX(-50%)",
                     width: 24,
                     height: 2.5,
-                    background: neutral[800],
+                    background: "var(--color-surface-3)",
                     borderRadius: 999,
                   }}
                   transition={{ type: "spring", stiffness: 380, damping: 35 }}
@@ -192,8 +193,8 @@ function CategoryBar({ active, onChange }) {
           width: 32,
           height: 32,
           borderRadius: "50%",
-          background: neutral[0],
-          border: "1.5px solid #ebe7e3",
+          background: "var(--color-surface)",
+          border: "1.5px solid var(--color-border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -201,7 +202,7 @@ function CategoryBar({ active, onChange }) {
           flexShrink: 0,
         }}
       >
-        <ChevronRight size={15} color={neutral[600]} />
+        <ChevronRight size={15} color={"var(--color-text-secondary)"} />
       </motion.button>
     </div>
   );
@@ -234,9 +235,9 @@ function FilterDrawer({
       PaperProps={{
         sx: {
           width: "min(420px, 95vw)",
-          background: "rgba(253,252,251,0.98)",
+          background: "var(--color-surface)",
           backdropFilter: "blur(20px)",
-          borderLeft: "1.5px solid rgba(230,224,218,0.7)",
+          borderLeft: "1.5px solid var(--color-border)",
         },
       }}
     >
@@ -256,7 +257,7 @@ function FilterDrawer({
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
                 fontSize: "1.4rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 margin: 0,
               }}
             >
@@ -282,11 +283,11 @@ function FilterDrawer({
                 onClick={onReset}
                 style={{
                   padding: "7px 14px",
-                  border: "1.5px solid #ebe7e3",
+                  border: "1.5px solid var(--color-border)",
                   borderRadius: 999,
                   background: "transparent",
                   fontSize: "0.8rem",
-                  color: neutral[600],
+                  color: "var(--color-text-secondary)",
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}
@@ -302,7 +303,7 @@ function FilterDrawer({
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                background: neutral[100],
+                background: "var(--color-surface-2)",
                 border: "none",
                 display: "flex",
                 alignItems: "center",
@@ -310,7 +311,7 @@ function FilterDrawer({
                 cursor: "pointer",
               }}
             >
-              <X size={17} color={neutral[600]} />
+              <X size={17} color={"var(--color-text-secondary)"} />
             </motion.button>
           </div>
         </div>
@@ -349,10 +350,15 @@ function FilterDrawer({
                     gap: 4,
                     padding: "8px 14px",
                     borderRadius: 10,
-                    border: `1.5px solid ${local.rating === r ? brand[500] : neutral[200]}`,
+                    border: `1.5px solid ${local.rating === r ? brand[500] : "var(--color-border)"}`,
                     background:
-                      local.rating === r ? "rgba(255,90,95,0.06)" : neutral[0],
-                    color: local.rating === r ? brand[500] : neutral[600],
+                      local.rating === r
+                        ? "rgba(255,90,95,0.06)"
+                        : "var(--color-surface)",
+                    color:
+                      local.rating === r
+                        ? brand[500]
+                        : "var(--color-text-secondary)",
                     cursor: "pointer",
                     fontFamily: "inherit",
                     fontWeight: local.rating === r ? 700 : 500,
@@ -364,7 +370,12 @@ function FilterDrawer({
                     "Any"
                   ) : (
                     <>
-                      <Star size={12} fill={semantic.warning.base} stroke="none" /> {r}+
+                      <Star
+                        size={12}
+                        fill={semantic.warning.base}
+                        stroke="none"
+                      />{" "}
+                      {r}+
                     </>
                   )}
                 </motion.button>
@@ -385,8 +396,8 @@ function FilterDrawer({
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  border: "1.5px solid #ebe7e3",
-                  background: neutral[0],
+                  border: "1.5px solid var(--color-border)",
+                  background: "var(--color-surface)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -394,14 +405,14 @@ function FilterDrawer({
                   opacity: local.guests <= 1 ? 0.4 : 1,
                 }}
               >
-                <ChevronDown size={16} color={neutral[600]} />
+                <ChevronDown size={16} color={"var(--color-text-secondary)"} />
               </motion.button>
               <div style={{ textAlign: "center", minWidth: 64 }}>
                 <div
                   style={{
                     fontSize: "1.5rem",
                     fontWeight: 700,
-                    color: neutral[800],
+                    color: "var(--color-text)",
                     lineHeight: 1,
                   }}
                 >
@@ -410,7 +421,7 @@ function FilterDrawer({
                 <div
                   style={{
                     fontSize: "0.72rem",
-                    color: neutral[500],
+                    color: "var(--color-text-secondary)",
                     marginTop: 2,
                     fontWeight: 500,
                   }}
@@ -425,15 +436,15 @@ function FilterDrawer({
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  border: "1.5px solid #ebe7e3",
-                  background: neutral[0],
+                  border: "1.5px solid var(--color-border)",
+                  background: "var(--color-surface)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
                 }}
               >
-                <ChevronUp size={16} color={neutral[600]} />
+                <ChevronUp size={16} color={"var(--color-text-secondary)"} />
               </motion.button>
             </div>
           </FSection>
@@ -468,9 +479,13 @@ function FilterDrawer({
                       gap: 8,
                       padding: "10px 12px",
                       borderRadius: 10,
-                      border: `1.5px solid ${isSelected ? brand[500] : neutral[200]}`,
-                      background: isSelected ? "rgba(255,90,95,0.06)" : neutral[0],
-                      color: isSelected ? brand[500] : neutral[600],
+                      border: `1.5px solid ${isSelected ? brand[500] : "var(--color-border)"}`,
+                      background: isSelected
+                        ? "rgba(255,90,95,0.06)"
+                        : "var(--color-surface)",
+                      color: isSelected
+                        ? brand[500]
+                        : "var(--color-text-secondary)",
                       cursor: "pointer",
                       fontFamily: "inherit",
                       fontWeight: isSelected ? 600 : 400,
@@ -478,7 +493,13 @@ function FilterDrawer({
                       transition: "all 0.15s",
                     }}
                   >
-                    <span style={{ color: isSelected ? brand[500] : neutral[500] }}>
+                    <span
+                      style={{
+                        color: isSelected
+                          ? brand[500]
+                          : "var(--color-text-secondary)",
+                      }}
+                    >
                       {icon}
                     </span>
                     {label}
@@ -504,10 +525,10 @@ function FilterDrawer({
             style={{
               flex: 1,
               padding: "13px",
-              border: "1.5px solid #ebe7e3",
+              border: "1.5px solid var(--color-border)",
               borderRadius: 12,
-              background: neutral[0],
-              color: neutral[600],
+              background: "var(--color-surface)",
+              color: "var(--color-text-secondary)",
               fontSize: "0.9rem",
               fontWeight: 600,
               cursor: "pointer",
@@ -528,7 +549,7 @@ function FilterDrawer({
               background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
               border: "none",
               borderRadius: 12,
-              color: neutral[0],
+              color: "#fff",
               fontSize: "0.9rem",
               fontWeight: 700,
               cursor: "pointer",
@@ -552,7 +573,7 @@ function FSection({ title, subtitle, children }) {
           style={{
             fontSize: "1rem",
             fontWeight: 700,
-            color: neutral[800],
+            color: "var(--color-text)",
             margin: 0,
           }}
         >
@@ -560,7 +581,11 @@ function FSection({ title, subtitle, children }) {
         </h3>
         {subtitle && (
           <p
-            style={{ fontSize: "0.8rem", color: neutral[500], margin: "3px 0 0" }}
+            style={{
+              fontSize: "0.8rem",
+              color: "var(--color-text-secondary)",
+              margin: "3px 0 0",
+            }}
           >
             {subtitle}
           </p>
@@ -604,7 +629,7 @@ function EmptyResults({ hasFilters, onReset }) {
           width: 80,
           height: 80,
           borderRadius: 24,
-          background: `linear-gradient(135deg, ${brand[50]}, ${brand[100]})`,
+          background: "var(--color-surface-2)",
           border: "1.5px solid #ffc1b8",
           display: "flex",
           alignItems: "center",
@@ -619,7 +644,7 @@ function EmptyResults({ hasFilters, onReset }) {
           style={{
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "1.6rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             margin: "0 0 8px",
           }}
         >
@@ -628,7 +653,7 @@ function EmptyResults({ hasFilters, onReset }) {
         <p
           style={{
             fontSize: "0.9375rem",
-            color: neutral[500],
+            color: "var(--color-text-secondary)",
             maxWidth: 360,
             margin: "0 auto",
             lineHeight: 1.6,
@@ -649,7 +674,7 @@ function EmptyResults({ hasFilters, onReset }) {
             background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
             border: "none",
             borderRadius: 999,
-            color: neutral[0],
+            color: "#fff",
             fontSize: "0.9rem",
             fontWeight: 700,
             cursor: "pointer",
@@ -780,7 +805,7 @@ function ActiveChips({ filters, onRemove }) {
             borderRadius: 999,
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: neutral[800],
+            color: "var(--color-text)",
             cursor: "pointer",
             fontFamily: "inherit",
           }}
@@ -812,6 +837,7 @@ export default function ListingsPage() {
   } = useSearch({ syncUrl: true });
 
   const [viewMode, setViewMode] = useState("grid");
+  const [showTaxes, setShowTaxes] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const sortRef = useRef(null);
@@ -874,7 +900,7 @@ export default function ListingsPage() {
           flexWrap: "wrap",
           gap: 10,
           padding: "16px 0 14px",
-          borderBottom: "1px solid #ebe7e3",
+          borderBottom: "1px solid var(--color-border)",
           marginBottom: 16,
         }}
       >
@@ -888,12 +914,15 @@ export default function ListingsPage() {
             alignItems: "center",
             gap: 7,
             padding: "9px 16px",
-            border: `1.5px solid ${activeFilterCount > 0 ? brand[500] : neutral[300]}`,
+            border: `1.5px solid ${activeFilterCount > 0 ? brand[500] : "var(--color-border-strong)"}`,
             borderRadius: 10,
-            background: activeFilterCount > 0 ? "rgba(255,90,95,0.05)" : neutral[0],
+            background:
+              activeFilterCount > 0
+                ? "rgba(255,90,95,0.05)"
+                : "var(--color-surface)",
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: activeFilterCount > 0 ? brand[500] : neutral[700],
+            color: activeFilterCount > 0 ? brand[500] : "var(--color-text)",
             cursor: "pointer",
             fontFamily: "inherit",
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
@@ -906,7 +935,7 @@ export default function ListingsPage() {
             <span
               style={{
                 background: brand[500],
-                color: neutral[0],
+                color: "#fff",
                 borderRadius: 999,
                 width: 18,
                 height: 18,
@@ -922,6 +951,28 @@ export default function ListingsPage() {
           )}
         </motion.button>
 
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "9px 12px",
+            border: "1px solid var(--color-border)",
+            borderRadius: 10,
+            color: "var(--color-text-secondary)",
+            fontSize: "0.8125rem",
+            cursor: "pointer",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={showTaxes}
+            onChange={(event) => setShowTaxes(event.target.checked)}
+            style={{ accentColor: brand[500] }}
+          />
+          Show taxes
+        </label>
+
         {/* Sort dropdown */}
         <div ref={sortRef} style={{ position: "relative" }}>
           <motion.button
@@ -935,10 +986,10 @@ export default function ListingsPage() {
               padding: "9px 16px",
               border: "1.5px solid #d6d0ca",
               borderRadius: 10,
-              background: neutral[0],
+              background: "var(--color-surface)",
               fontSize: "0.875rem",
               fontWeight: 600,
-              color: neutral[700],
+              color: "var(--color-text)",
               cursor: "pointer",
               fontFamily: "inherit",
               boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
@@ -950,7 +1001,7 @@ export default function ListingsPage() {
               animate={{ rotate: sortOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ChevronDown size={13} color={neutral[500]} />
+              <ChevronDown size={13} color={"var(--color-text-secondary)"} />
             </motion.div>
           </motion.button>
           <AnimatePresence>
@@ -964,9 +1015,9 @@ export default function ListingsPage() {
                   position: "absolute",
                   top: "calc(100% + 8px)",
                   left: 0,
-                  background: "rgba(255,255,255,0.98)",
+                  background: "var(--color-dropdown-bg)",
                   backdropFilter: "blur(20px)",
-                  border: "1.5px solid rgba(230,224,218,0.7)",
+                  border: "1.5px solid var(--color-border)",
                   borderRadius: 14,
                   boxShadow: "0 16px 48px rgba(61,43,26,0.12)",
                   overflow: "hidden",
@@ -978,7 +1029,7 @@ export default function ListingsPage() {
                 {SORT_OPTIONS.map((opt) => (
                   <motion.button
                     key={opt.value}
-                    whileHover={{ background: neutral[100] }}
+                    whileHover={{ background: "var(--color-surface-2)" }}
                     onClick={() => {
                       setFilter("sort", opt.value);
                       setSortOpen(false);
@@ -994,7 +1045,10 @@ export default function ListingsPage() {
                         filters.sort === opt.value
                           ? "rgba(255,90,95,0.06)"
                           : "transparent",
-                      color: filters.sort === opt.value ? brand[500] : neutral[700],
+                      color:
+                        filters.sort === opt.value
+                          ? brand[500]
+                          : "var(--color-text)",
                       fontSize: "0.875rem",
                       fontWeight: filters.sort === opt.value ? 700 : 500,
                       cursor: "pointer",
@@ -1022,7 +1076,7 @@ export default function ListingsPage() {
             border: "1.5px solid #d6d0ca",
             borderRadius: 10,
             overflow: "hidden",
-            background: neutral[0],
+            background: "var(--color-surface)",
             boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           }}
         >
@@ -1039,10 +1093,14 @@ export default function ListingsPage() {
                 onClick={() => setViewMode(mode)}
                 style={{
                   padding: "8px 14px",
-                  background: viewMode === mode ? neutral[800] : "transparent",
+                  background:
+                    viewMode === mode ? "var(--color-text)" : "transparent",
                   border: "none",
                   cursor: "pointer",
-                  color: viewMode === mode ? neutral[0] : neutral[500],
+                  color:
+                    viewMode === mode
+                      ? "var(--color-bg)"
+                      : "var(--color-text-secondary)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -1061,7 +1119,7 @@ export default function ListingsPage() {
           style={{
             marginLeft: "auto",
             fontSize: "0.8125rem",
-            color: isFetching ? brand[500] : neutral[500],
+            color: isFetching ? brand[500] : "var(--color-text-secondary)",
             fontWeight: 500,
             display: "flex",
             alignItems: "center",
@@ -1102,178 +1160,182 @@ export default function ListingsPage() {
       {/* ── Main Content ──────────────────────────────────────────────── */}
       <div aria-busy={isFetching}>
         <AnimatePresence mode="wait">
-        {isLoading ? (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <SkeletonGrid />
-          </motion.div>
-        ) : isError ? (
-          <motion.div
-            key="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            style={{
-              margin: "32px auto",
-              maxWidth: 520,
-              background: semantic.error.light,
-              border: "1.5px solid #fca5a5",
-              borderRadius: 16,
-              padding: "24px",
-              textAlign: "center",
-            }}
-          >
-            <div style={{ fontSize: "2rem", marginBottom: 12 }}>⚠️</div>
-            <h3
+          {isLoading ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <SkeletonGrid />
+            </motion.div>
+          ) : isError ? (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               style={{
-                fontSize: "1rem",
-                fontWeight: 700,
-                color: "#991b1b",
-                margin: "0 0 8px",
+                margin: "32px auto",
+                maxWidth: 520,
+                background: semantic.error.light,
+                border: "1.5px solid #fca5a5",
+                borderRadius: 16,
+                padding: "24px",
+                textAlign: "center",
               }}
             >
-              Failed to load listings
-            </h3>
-            <p
-              style={{
-                fontSize: "0.875rem",
-                color: semantic.error.text,
-                margin: "0 0 16px",
-              }}
-            >
-              {error?.message ?? "Something went wrong."}
-            </p>
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              onClick={refetch}
-              style={{
-                padding: "9px 20px",
-                background: semantic.error.base,
-                border: "none",
-                borderRadius: 999,
-                color: neutral[0],
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              Try again
-            </motion.button>
-          </motion.div>
-        ) : listings.length === 0 ? (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <EmptyResults
-              hasFilters={hasActiveFilters}
-              onReset={resetFilters}
-            />
-          </motion.div>
-        ) : viewMode === "map" ? (
-          <motion.div
-            key="map"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <MapBoundsFilter
-              bounds={filters.mapBounds}
-              onBoundsChange={(b) => setFilter("mapBounds", b)}
-              listings={listings}
-              height={560}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key={`${viewMode}-${filters.page}-${filters.sort}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            {viewMode === "grid" ? (
-              <div
+              <div style={{ fontSize: "2rem", marginBottom: 12 }}>⚠️</div>
+              <h3
                 style={{
-                  display: "grid",
-                  gap: "28px 20px",
-                  gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))",
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  color: "#991b1b",
+                  margin: "0 0 8px",
                 }}
               >
-                {listings.map((listing, i) => (
-                  <ListingCard
-                    key={listing._id}
-                    listing={listing}
-                    index={i}
-                    showTax={showTaxes}
-                  />
-                ))}
-              </div>
-            ) : (
-              /* List view — reuse the existing ListingCardList from the original page */
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                {listings.map((listing, i) => (
-                  <ListingCardGrid
-                    key={listing._id}
-                    listing={listing}
-                    index={i}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Pagination */}
-            {pagination?.totalPages > 1 && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+                Failed to load listings
+              </h3>
+              <p
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 12,
-                  marginTop: 48,
-                  paddingBottom: 16,
+                  fontSize: "0.875rem",
+                  color: semantic.error.text,
+                  margin: "0 0 16px",
                 }}
               >
-                <Pagination
-                  count={pagination.totalPages}
-                  page={filters.page ?? 1}
-                  onChange={(_, p) => {
-                    setFilter("page", p);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
+                {error?.message ?? "Something went wrong."}
+              </p>
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={refetch}
+                style={{
+                  padding: "9px 20px",
+                  background: semantic.error.base,
+                  border: "none",
+                  borderRadius: 999,
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                Try again
+              </motion.button>
+            </motion.div>
+          ) : listings.length === 0 ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <EmptyResults
+                hasFilters={hasActiveFilters}
+                onReset={resetFilters}
+              />
+            </motion.div>
+          ) : viewMode === "map" ? (
+            <motion.div
+              key="map"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <MapBoundsFilter
+                bounds={filters.mapBounds}
+                onBoundsChange={(b) => setFilter("mapBounds", b)}
+                listings={listings}
+                height={560}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`${viewMode}-${filters.page}-${filters.sort}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {viewMode === "grid" ? (
+                <div
+                  style={{
+                    display: "grid",
+                    gap: "28px 20px",
+                    gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))",
                   }}
-                  shape="rounded"
-                  sx={{
-                    "& .MuiPaginationItem-root": {
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontWeight: 600,
-                      borderRadius: "10px",
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected": {
-                      background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
-                      color: neutral[0],
-                      border: "none",
-                    },
-                  }}
-                />
-                <p
-                  style={{ fontSize: "0.8125rem", color: neutral[400], margin: 0 }}
                 >
-                  Page {filters.page} of {pagination.totalPages} ·{" "}
-                  {pagination.total?.toLocaleString()} total
-                </p>
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  {listings.map((listing, i) => (
+                    <ListingCard
+                      key={listing._id}
+                      listing={listing}
+                      index={i}
+                      showTax={showTaxes}
+                    />
+                  ))}
+                </div>
+              ) : (
+                /* List view — reuse the existing ListingCardList from the original page */
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                >
+                  {listings.map((listing, i) => (
+                    <ListingCardGrid
+                      key={listing._id}
+                      listing={listing}
+                      index={i}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Pagination */}
+              {pagination?.totalPages > 1 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 12,
+                    marginTop: 48,
+                    paddingBottom: 16,
+                  }}
+                >
+                  <Pagination
+                    count={pagination.totalPages}
+                    page={filters.page ?? 1}
+                    onChange={(_, p) => {
+                      setFilter("page", p);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    shape="rounded"
+                    sx={{
+                      "& .MuiPaginationItem-root": {
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontWeight: 600,
+                        borderRadius: "10px",
+                      },
+                      "& .MuiPaginationItem-root.Mui-selected": {
+                        background: `linear-gradient(135deg, ${brand[500]}, ${brand[600]})`,
+                        color: "#fff",
+                        border: "none",
+                      },
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontSize: "0.8125rem",
+                      color: "var(--color-text-muted)",
+                      margin: 0,
+                    }}
+                  >
+                    Page {filters.page} of {pagination.totalPages} ·{" "}
+                    {pagination.total?.toLocaleString()} total
+                  </p>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── Filter Drawer ──────────────────────────────────────────────── */}

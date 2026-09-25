@@ -124,7 +124,7 @@ export function NotFoundPage() {
               alignItems: "center",
               gap: 8,
               padding: "12px 24px",
-              background: "#fff",
+              background: "var(--color-surface)",
               border: "1.5px solid #d6d0ca",
               borderRadius: 999,
               fontWeight: 600,

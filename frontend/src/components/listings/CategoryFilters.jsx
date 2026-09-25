@@ -22,7 +22,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
         alignItems: "center",
         gap: 12,
         padding: "20px 0",
-        borderBottom: "1px solid #ebe7e3",
+        borderBottom: "1px solid var(--color-border)",
         marginBottom: 32,
       }}
     >
@@ -37,8 +37,8 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           width: 36,
           height: 36,
           borderRadius: "50%",
-          background: neutral[0],
-          border: "1.5px solid #ebe7e3",
+          background: "var(--color-surface)",
+          border: "1.5px solid var(--color-border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -47,7 +47,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           boxShadow: "0 2px 8px rgba(61,43,26,0.08)",
         }}
       >
-        <ChevronLeft size={16} color={neutral[600]} />
+        <ChevronLeft size={16} color={"var(--color-text-secondary)"} />
       </motion.button>
 
       {/* Scrollable category list */}
@@ -89,7 +89,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
                     gap: 6,
                     padding: "10px 14px",
                     borderRadius: 14,
-                    border: `1.5px solid ${isActive ? neutral[800] : "transparent"}`,
+                    border: `1.5px solid ${isActive ? "var(--color-text)" : "transparent"}`,
                     background: isActive
                       ? "rgba(38,31,26,0.05)"
                       : "transparent",
@@ -106,7 +106,9 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
                     style={{
                       fontSize: "0.6875rem",
                       fontWeight: isActive ? 700 : 500,
-                      color: isActive ? neutral[800] : neutral[500],
+                      color: isActive
+                        ? "var(--color-text)"
+                        : "var(--color-text-secondary)",
                       letterSpacing: "0.02em",
                       whiteSpace: "nowrap",
                     }}
@@ -123,7 +125,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
                         transform: "translateX(-50%)",
                         width: 28,
                         height: 2.5,
-                        background: neutral[800],
+                        background: "var(--color-surface-3)",
                         borderRadius: 999,
                       }}
                       transition={{
@@ -151,8 +153,8 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           width: 36,
           height: 36,
           borderRadius: "50%",
-          background: neutral[0],
-          border: "1.5px solid #ebe7e3",
+          background: "var(--color-surface)",
+          border: "1.5px solid var(--color-border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -161,7 +163,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           boxShadow: "0 2px 8px rgba(61,43,26,0.08)",
         }}
       >
-        <ChevronRight size={16} color={neutral[600]} />
+        <ChevronRight size={16} color={"var(--color-text-secondary)"} />
       </motion.button>
 
       {/* Tax toggle */}
@@ -173,8 +175,8 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           gap: 8,
           flexShrink: 0,
           padding: "8px 14px",
-          background: showTax ? "rgba(255,90,95,0.08)" : neutral[0],
-          border: `1.5px solid ${showTax ? "rgba(255,90,95,0.3)" : neutral[200]}`,
+          background: showTax ? "rgba(255,90,95,0.08)" : "var(--color-surface)",
+          border: `1.5px solid ${showTax ? "rgba(255,90,95,0.3)" : "var(--color-border)"}`,
           borderRadius: 12,
           cursor: "pointer",
           transition: "all 0.2s",
@@ -195,7 +197,7 @@ export default function CategoryFilters({ showTax, onTaxToggle }) {
           style={{
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: showTax ? brand[500] : neutral[600],
+            color: showTax ? brand[500] : "var(--color-text-secondary)",
             whiteSpace: "nowrap",
           }}
         >

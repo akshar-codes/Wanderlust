@@ -148,7 +148,7 @@ export default function ListingCard({
               ) : (
                 <div
                   style={{
-                    background: "rgba(255,255,255,0.92)",
+                    background: "var(--color-surface)",
                     backdropFilter: "blur(8px)",
                     borderRadius: 999,
                     padding: "4px 10px",

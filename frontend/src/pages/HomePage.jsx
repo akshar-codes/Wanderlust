@@ -1,23 +1,37 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, Compass, LogOut, ArrowRight, Star, Heart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useInView,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { useAuthStore } from "../store/auth.store";
-import { brand, neutral, fonts, shadows, teal, semantic } from "../theme/tokens";
+import {
+  brand,
+  neutral,
+  fonts,
+  shadows,
+  teal,
+  semantic,
+} from "../theme/tokens";
 import { CATEGORIES } from "../constants/categories";
 import { useListings } from "../hooks/useListings";
 import { useIsMobile } from "../hooks/useIsMobile";
 import ListingCard from "../components/listings/ListingCard";
 import { formatPrice } from "../utils/currency";
+import { useColorModeContext } from "../hooks/useColorMode";
 
 // ─── Inline styles injected once ─────────────────────────────────────────────
 const GLOBAL_CSS = `
 
   .hp-root {
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-    color: var(--color-neutral-800);
-    background: var(--color-neutral-25);
-    overflow-x: hidden;
+    color: var(--color-text);
+    background: var(--color-bg);
+    
   }
 
   /* ── Keyframes ── */
@@ -49,7 +63,7 @@ const GLOBAL_CSS = `
 
   /* ── Skeleton ── */
   .hp-skeleton {
-    background: linear-gradient(90deg, var(--color-neutral-100) 25%, var(--color-neutral-200) 50%, var(--color-neutral-100) 75%);
+    background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%);
     background-size: 800px 100%;
     animation: hp-shimmer 1.5s ease-in-out infinite;
     border-radius: 12px;
@@ -263,7 +277,7 @@ function SectionTitle({ eyebrow, title, subtitle, center = false }) {
           fontSize: "clamp(1.9rem, 3.2vw, 2.8rem)",
           fontWeight: 400,
           lineHeight: 1.12,
-          color: neutral[800],
+          color: "var(--color-text)",
           letterSpacing: "-0.01em",
           marginBottom: subtitle ? 12 : 0,
         }}
@@ -275,7 +289,7 @@ function SectionTitle({ eyebrow, title, subtitle, center = false }) {
           style={{
             fontFamily: fonts.body,
             fontSize: "1rem",
-            color: neutral[500],
+            color: "var(--color-text-secondary)",
             lineHeight: 1.65,
             maxWidth: center ? 520 : "none",
             marginInline: center ? "auto" : undefined,
@@ -297,7 +311,11 @@ function Stars({ rating, size = 13 }) {
         <svg key={i} width={size} height={size} viewBox="0 0 24 24">
           <path
             d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-            fill={i <= Math.round(rating) ? semantic.warning.base : neutral[200]}
+            fill={
+              i <= Math.round(rating)
+                ? semantic.warning.base
+                : "var(--color-border)"
+            }
             stroke="none"
           />
         </svg>
@@ -348,8 +366,8 @@ function ExperienceCard({ exp, index }) {
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
       style={{
-        background: neutral[0],
-        border: `1px solid ${neutral[200]}`,
+        background: "var(--color-surface)",
+        border: `1px solid var(--color-border)`,
         borderRadius: 20,
         overflow: "hidden",
         cursor: "pointer",
@@ -388,7 +406,7 @@ function ExperienceCard({ exp, index }) {
             padding: "4px 12px",
             fontSize: "0.72rem",
             fontWeight: 600,
-            color: neutral[0],
+            color: "#fff",
             letterSpacing: "0.04em",
           }}
         >
@@ -411,7 +429,7 @@ function ExperienceCard({ exp, index }) {
               fontFamily: fonts.display,
               fontSize: "1.15rem",
               fontWeight: 400,
-              color: neutral[800],
+              color: "var(--color-text)",
               lineHeight: 1.25,
               flex: 1,
             }}
@@ -422,7 +440,7 @@ function ExperienceCard({ exp, index }) {
         <p
           style={{
             fontSize: "0.8rem",
-            color: neutral[500],
+            color: "var(--color-text-secondary)",
             marginBottom: 12,
             display: "flex",
             alignItems: "center",
@@ -434,7 +452,7 @@ function ExperienceCard({ exp, index }) {
             height={11}
             viewBox="0 0 24 24"
             fill="none"
-            stroke={neutral[400]}
+            stroke={"var(--color-text-muted)"}
             strokeWidth={2.5}
           >
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -448,16 +466,25 @@ function ExperienceCard({ exp, index }) {
             alignItems: "center",
             justifyContent: "space-between",
             paddingTop: 12,
-            borderTop: `1px solid ${neutral[200]}`,
+            borderTop: `1px solid var(--color-border)`,
           }}
         >
           <div>
             <span
-              style={{ fontWeight: 700, fontSize: "0.95rem", color: neutral[800] }}
+              style={{
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                color: "var(--color-text)",
+              }}
             >
               {formatPrice(exp.price)}
             </span>
-            <span style={{ color: neutral[500], fontSize: "0.78rem" }}>
+            <span
+              style={{
+                color: "var(--color-text-secondary)",
+                fontSize: "0.78rem",
+              }}
+            >
               {" "}
               / person
             </span>
@@ -465,11 +492,17 @@ function ExperienceCard({ exp, index }) {
           <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <Stars rating={exp.rating} />
             <span
-              style={{ fontSize: "0.8rem", fontWeight: 700, color: neutral[800] }}
+              style={{
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                color: "var(--color-text)",
+              }}
             >
               {exp.rating}
             </span>
-            <span style={{ fontSize: "0.72rem", color: neutral[400] }}>
+            <span
+              style={{ fontSize: "0.72rem", color: "var(--color-text-muted)" }}
+            >
               ({exp.reviews})
             </span>
           </div>
@@ -540,7 +573,7 @@ function DestinationCard({ dest, index, isLarge }) {
             padding: "4px 13px",
             fontSize: "0.7rem",
             fontWeight: 700,
-            color: neutral[0],
+            color: "#fff",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
           }}
@@ -563,7 +596,7 @@ function DestinationCard({ dest, index, isLarge }) {
               fontFamily: fonts.display,
               fontSize: isLarge ? "2rem" : "1.4rem",
               fontWeight: 400,
-              color: neutral[0],
+              color: "#fff",
               lineHeight: 1.1,
               marginBottom: 5,
             }}
@@ -597,7 +630,7 @@ function DestinationCard({ dest, index, isLarge }) {
                 height={13}
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={neutral[0]}
+                stroke={"#fff"}
                 strokeWidth={2.5}
                 strokeLinecap="round"
               >
@@ -618,8 +651,8 @@ function TestimonialCard({ t, index }) {
       variants={fadeUp}
       custom={index * 0.5}
       style={{
-        background: neutral[0],
-        border: `1px solid ${neutral[200]}`,
+        background: "var(--color-surface)",
+        border: `1px solid var(--color-border)`,
         borderRadius: 22,
         padding: "28px 28px 26px",
         display: "flex",
@@ -657,7 +690,7 @@ function TestimonialCard({ t, index }) {
           fontSize: "1.05rem",
           fontWeight: 300,
           lineHeight: 1.7,
-          color: neutral[800],
+          color: "var(--color-text)",
           fontStyle: "italic",
           flex: 1,
         }}
@@ -701,7 +734,7 @@ function TestimonialCard({ t, index }) {
           alignItems: "center",
           gap: 12,
           paddingTop: 12,
-          borderTop: `1px solid ${neutral[200]}`,
+          borderTop: `1px solid var(--color-border)`,
         }}
       >
         <div
@@ -715,7 +748,7 @@ function TestimonialCard({ t, index }) {
             justifyContent: "center",
             fontFamily: fonts.display,
             fontSize: "1.1rem",
-            color: neutral[0],
+            color: "#fff",
             flexShrink: 0,
           }}
         >
@@ -726,13 +759,18 @@ function TestimonialCard({ t, index }) {
             style={{
               fontWeight: 700,
               fontSize: "0.875rem",
-              color: neutral[800],
+              color: "var(--color-text)",
               marginBottom: 1,
             }}
           >
             {t.name}
           </p>
-          <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
+          <p
+            style={{
+              fontSize: "0.75rem",
+              color: "var(--color-text-secondary)",
+            }}
+          >
             {t.location} · {t.date}
           </p>
         </div>
@@ -766,9 +804,9 @@ function HeroSearch({ listings }) {
   const fieldStyle = (key) => ({
     flex: 1,
     padding: "16px 22px",
-    borderRight: key !== "guests" ? `1px solid ${neutral[200]}` : "none",
+    borderRight: key !== "guests" ? `1px solid var(--color-border)` : "none",
     cursor: "text",
-    background: focused === key ? neutral[0] : "transparent",
+    background: focused === key ? "var(--color-surface)" : "transparent",
     transition: "background 0.2s",
   });
 
@@ -777,9 +815,9 @@ function HeroSearch({ listings }) {
       <form onSubmit={handleSearch}>
         <div
           style={{
-            background: neutral[0],
+            background: "var(--color-surface)",
             borderRadius: 24,
-            border: `1.5px solid ${neutral[200]}`,
+            border: `1.5px solid var(--color-border)`,
             boxShadow:
               "0 20px 60px rgba(26,20,16,0.14), 0 4px 16px rgba(26,20,16,0.08)",
             overflow: "hidden",
@@ -805,7 +843,7 @@ function HeroSearch({ listings }) {
                 fontSize: "0.65rem",
                 fontWeight: 800,
                 letterSpacing: "0.12em",
-                color: neutral[800],
+                color: "var(--color-text)",
                 textTransform: "uppercase",
                 marginBottom: 4,
               }}
@@ -825,7 +863,7 @@ function HeroSearch({ listings }) {
                 background: "transparent",
                 fontFamily: fonts.body,
                 fontSize: "0.9rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 width: "100%",
                 padding: 0,
               }}
@@ -850,7 +888,7 @@ function HeroSearch({ listings }) {
                 fontSize: "0.65rem",
                 fontWeight: 800,
                 letterSpacing: "0.12em",
-                color: neutral[800],
+                color: "var(--color-text)",
                 textTransform: "uppercase",
                 marginBottom: 4,
               }}
@@ -870,7 +908,7 @@ function HeroSearch({ listings }) {
                 background: "transparent",
                 fontFamily: fonts.body,
                 fontSize: "0.9rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 width: "100%",
                 padding: 0,
               }}
@@ -895,7 +933,7 @@ function HeroSearch({ listings }) {
                 fontSize: "0.65rem",
                 fontWeight: 800,
                 letterSpacing: "0.12em",
-                color: neutral[800],
+                color: "var(--color-text)",
                 textTransform: "uppercase",
                 marginBottom: 4,
               }}
@@ -913,7 +951,7 @@ function HeroSearch({ listings }) {
                 background: "transparent",
                 fontFamily: fonts.body,
                 fontSize: "0.9rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 width: "100%",
                 cursor: "pointer",
                 padding: 0,
@@ -961,7 +999,7 @@ function HeroSearch({ listings }) {
                 height={20}
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={neutral[0]}
+                stroke={"#fff"}
                 strokeWidth={2.5}
                 strokeLinecap="round"
               >
@@ -1005,7 +1043,7 @@ function HeroSearch({ listings }) {
                       ? "rgba(255,255,255,0.25)"
                       : "rgba(255,255,255,0.1)",
                   backdropFilter: "blur(10px)",
-                  color: neutral[0],
+                  color: "#fff",
                   fontSize: "0.8rem",
                   fontWeight: 600,
                   cursor: "pointer",
@@ -1025,6 +1063,15 @@ function HeroSearch({ listings }) {
 
 // ─── SECTION 1: Hero ──────────────────────────────────────────────────────────
 function HeroSection({ listings }) {
+  const { resolvedMode } = useColorModeContext();
+  const bgImage =
+    resolvedMode === "dark"
+      ? "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600&q=80"
+      : "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80";
+
+  const { scrollY } = useScroll();
+  const bezelOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+
   return (
     <section
       style={{
@@ -1035,43 +1082,82 @@ function HeroSection({ listings }) {
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
+        width: "100vw",
+        marginLeft: "calc(50% - 50vw)",
       }}
     >
-      {/* Background */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        {/* Main bg image */}
-        <img
-          src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80"
-          alt=""
+      {/* Blurred Bezel Background (Dark Mode Only) */}
+      {resolvedMode === "dark" && (
+        <motion.div
           style={{
-            width: "100%",
+            position: "absolute",
+            inset: -40, // Prevent white vignette from blur
+            zIndex: 0,
+            opacity: bezelOpacity,
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "blur(40px) brightness(0.4)",
+          }}
+        />
+      )}
+
+      {/* Main Image Container */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            width: "calc(100% - var(--page-x) * 2)",
+            maxWidth: "calc(var(--max-w) - var(--page-x) * 2)",
             height: "100%",
-            objectFit: "cover",
-            display: "block",
-            filter: "brightness(0.65)",
+            borderRadius: 24,
+            overflow: "hidden",
           }}
-        />
-        {/* Tonal overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(165deg, rgba(26,20,16,0.7) 0%, rgba(26,20,16,0.3) 50%, rgba(26,20,16,0.6) 100%)",
-          }}
-        />
-        {/* Bottom fade for section continuity */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 200,
-            background: "linear-gradient(to top, var(--color-neutral-25) 0%, transparent 100%)",
-          }}
-        />
+        >
+          <img
+            src={bgImage}
+            alt=""
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+              filter: "brightness(0.65)",
+            }}
+          />
+          {/* Tonal overlay */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(165deg, rgba(26,20,16,0.7) 0%, rgba(26,20,16,0.3) 50%, rgba(26,20,16,0.6) 100%)",
+            }}
+          />
+        </div>
       </div>
+
+      {/* Global Bottom Fade (masks both image and blurred bezels into the page background) */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 200,
+          background:
+            "linear-gradient(to top, var(--color-bg) 0%, transparent 100%)",
+          zIndex: 2,
+        }}
+      />
 
       {/* Content */}
       <div
@@ -1139,7 +1225,7 @@ function HeroSection({ listings }) {
             fontFamily: fonts.display,
             fontSize: "clamp(3rem, 7vw, 6rem)",
             fontWeight: 300,
-            color: neutral[0],
+            color: "#fff",
             lineHeight: 1.06,
             letterSpacing: "-0.015em",
             marginBottom: 20,
@@ -1204,7 +1290,7 @@ function HeroSection({ listings }) {
                 style={{
                   fontFamily: fonts.display,
                   fontSize: "1.8rem",
-                  color: neutral[0],
+                  color: "#fff",
                   lineHeight: 1,
                   marginBottom: 4,
                   fontWeight: 400,
@@ -1244,56 +1330,21 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
     <Reveal>
       <section
         style={{
-          background: neutral[50],
+          background: "var(--color-surface-2)",
           padding: "52px 0 44px",
-          borderTop: `1px solid ${neutral[200]}`,
-          borderBottom: `1px solid ${neutral[200]}`,
+          borderTop: `1px solid var(--color-border)`,
+          borderBottom: `1px solid var(--color-border)`,
         }}
       >
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {/* Left scroll */}
-            <motion.button
-              whileHover={{ scale: 1.08, background: neutral[0] }}
-              whileTap={{ scale: 0.93 }}
-              onClick={() => scroll(-1)}
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: "50%",
-                background: neutral[0],
-                border: `1.5px solid ${neutral[200]}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                flexShrink: 0,
-                boxShadow: "0 2px 8px rgba(26,20,16,0.07)",
-              }}
-              aria-label="Scroll left"
-            >
-              <svg
-                width={14}
-                height={14}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke={neutral[500]}
-                strokeWidth={2.5}
-                strokeLinecap="round"
-              >
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </motion.button>
-
-            {/* Scroll container */}
             <div
               ref={scrollRef}
-              className="hp-scroll-hide"
               style={{
                 display: "flex",
                 gap: 10,
                 flex: 1,
-                overflowX: "auto",
+                flexWrap: "wrap",
                 paddingBottom: 2,
               }}
             >
@@ -1315,8 +1366,10 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                       gap: 7,
                       padding: "14px 20px",
                       borderRadius: 18,
-                      border: `1.5px solid ${active ? neutral[800] : "transparent"}`,
-                      background: active ? "rgba(26,20,16,0.07)" : neutral[0],
+                      border: `1.5px solid ${active ? "var(--color-text)" : "transparent"}`,
+                      background: active
+                        ? "var(--color-surface-2)"
+                        : "var(--color-surface)",
                       cursor: "pointer",
                       whiteSpace: "nowrap",
                       flexShrink: 0,
@@ -1336,7 +1389,9 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                       style={{
                         fontSize: "0.68rem",
                         fontWeight: active ? 700 : 600,
-                        color: active ? neutral[800] : neutral[500],
+                        color: active
+                          ? "var(--color-text)"
+                          : "var(--color-text-secondary)",
                         letterSpacing: "0.04em",
                       }}
                     >
@@ -1352,7 +1407,7 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                           transform: "translateX(-50%)",
                           width: 24,
                           height: 2.5,
-                          background: neutral[800],
+                          background: "var(--color-surface-3)",
                           borderRadius: 999,
                         }}
                         transition={{
@@ -1366,39 +1421,6 @@ function CategoriesSection({ activeCategory, setActiveCategory }) {
                 );
               })}
             </div>
-
-            {/* Right scroll */}
-            <motion.button
-              whileHover={{ scale: 1.08, background: neutral[0] }}
-              whileTap={{ scale: 0.93 }}
-              onClick={() => scroll(1)}
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: "50%",
-                background: neutral[0],
-                border: `1.5px solid ${neutral[200]}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                flexShrink: 0,
-                boxShadow: "0 2px 8px rgba(26,20,16,0.07)",
-              }}
-              aria-label="Scroll right"
-            >
-              <svg
-                width={14}
-                height={14}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke={neutral[500]}
-                strokeWidth={2.5}
-                strokeLinecap="round"
-              >
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </motion.button>
           </div>
         </div>
       </section>
@@ -1462,9 +1484,9 @@ function FeaturedListingsSection({ activeCategory }) {
               gap: 6,
               fontSize: "0.875rem",
               fontWeight: 700,
-              color: neutral[800],
+              color: "var(--color-text)",
               textDecoration: "none",
-              borderBottom: `1.5px solid ${neutral[800]}`,
+              borderBottom: `1.5px solid var(--color-text)`,
               paddingBottom: 2,
               whiteSpace: "nowrap",
               flexShrink: 0,
@@ -1508,7 +1530,11 @@ function FeaturedListingsSection({ activeCategory }) {
               key="empty"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              style={{ textAlign: "center", padding: "60px 0", color: neutral[500] }}
+              style={{
+                textAlign: "center",
+                padding: "60px 0",
+                color: "var(--color-text-secondary)",
+              }}
             >
               <div style={{ fontSize: "3rem", marginBottom: 16 }}>🔍</div>
               <p
@@ -1516,7 +1542,7 @@ function FeaturedListingsSection({ activeCategory }) {
                   fontFamily: fonts.display,
                   fontSize: "1.4rem",
                   marginBottom: 16,
-                  color: neutral[800],
+                  color: "var(--color-text)",
                 }}
               >
                 No listings found
@@ -1566,7 +1592,7 @@ function Ticker() {
   return (
     <div
       style={{
-        background: neutral[800],
+        background: "var(--color-surface-3)",
         overflow: "hidden",
         padding: "14px 0",
         borderTop: `1px solid rgba(255,255,255,0.05)`,
@@ -1649,9 +1675,9 @@ function TrendingDestinationsSection() {
               gap: 6,
               fontSize: "0.875rem",
               fontWeight: 700,
-              color: neutral[800],
+              color: "var(--color-text)",
               textDecoration: "none",
-              borderBottom: `1.5px solid ${neutral[800]}`,
+              borderBottom: `1.5px solid var(--color-text)`,
               paddingBottom: 2,
               whiteSpace: "nowrap",
               flexShrink: 0,
@@ -1705,9 +1731,9 @@ function ExperiencesSection() {
     <Reveal>
       <section
         style={{
-          background: neutral[50],
+          background: "var(--color-surface-2)",
           padding: "72px 0",
-          borderTop: `1px solid ${neutral[200]}`,
+          borderTop: `1px solid var(--color-border)`,
         }}
       >
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
@@ -1726,7 +1752,9 @@ function ExperiencesSection() {
               title={
                 <>
                   More than a place to{" "}
-                  <em style={{ fontStyle: "italic", color: brand[500] }}>sleep</em>
+                  <em style={{ fontStyle: "italic", color: brand[500] }}>
+                    sleep
+                  </em>
                 </>
               }
               subtitle="Local experiences that turn a trip into a memory."
@@ -1739,9 +1767,9 @@ function ExperiencesSection() {
                 gap: 6,
                 fontSize: "0.875rem",
                 fontWeight: 700,
-                color: neutral[800],
+                color: "var(--color-text)",
                 textDecoration: "none",
-                borderBottom: `1.5px solid ${neutral[800]}`,
+                borderBottom: `1.5px solid var(--color-text)`,
                 paddingBottom: 2,
                 whiteSpace: "nowrap",
                 flexShrink: 0,
@@ -1798,7 +1826,7 @@ function HostCTASection() {
             minHeight: 420,
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            background: neutral[800],
+            background: "var(--color-surface-3)",
           }}
         >
           {/* Left: Content */}
@@ -1831,7 +1859,7 @@ function HostCTASection() {
                   fontFamily: fonts.display,
                   fontSize: "clamp(2rem, 3.5vw, 3rem)",
                   fontWeight: 300,
-                  color: neutral[0],
+                  color: "#fff",
                   lineHeight: 1.12,
                   marginBottom: 16,
                 }}
@@ -1896,7 +1924,7 @@ function HostCTASection() {
                     padding: "14px 28px",
                     background: brand[500],
                     borderRadius: 999,
-                    color: neutral[0],
+                    color: "#fff",
                     fontWeight: 700,
                     fontSize: "0.9375rem",
                     textDecoration: "none",
@@ -1988,7 +2016,7 @@ function HostCTASection() {
                 position: "absolute",
                 bottom: 32,
                 left: 32,
-                background: "rgba(255,255,255,0.97)",
+                background: "var(--color-dropdown-bg)",
                 backdropFilter: "blur(16px)",
                 borderRadius: 18,
                 padding: "16px 20px",
@@ -2000,7 +2028,7 @@ function HostCTASection() {
                 style={{
                   fontSize: "0.7rem",
                   fontWeight: 700,
-                  color: neutral[500],
+                  color: "var(--color-text-secondary)",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   marginBottom: 6,
@@ -2012,7 +2040,7 @@ function HostCTASection() {
                 style={{
                   fontFamily: fonts.display,
                   fontSize: "2rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   fontWeight: 400,
                   lineHeight: 1,
                   marginBottom: 4,
@@ -2020,7 +2048,12 @@ function HostCTASection() {
               >
                 {formatPrice(45000)}
               </p>
-              <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
                 per month for 3-bed homes
               </p>
               <div
@@ -2063,10 +2096,10 @@ function TestimonialsSection() {
     <Reveal>
       <section
         style={{
-          background: neutral[50],
+          background: "var(--color-surface-2)",
           padding: "72px 0",
-          borderTop: `1px solid ${neutral[200]}`,
-          borderBottom: `1px solid ${neutral[200]}`,
+          borderTop: `1px solid var(--color-border)`,
+          borderBottom: `1px solid var(--color-border)`,
         }}
       >
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 32px" }}>
@@ -2111,7 +2144,7 @@ function TestimonialsSection() {
               gap: 32,
               marginTop: 48,
               paddingTop: 40,
-              borderTop: `1px solid ${neutral[200]}`,
+              borderTop: `1px solid var(--color-border)`,
               flexWrap: "wrap",
             }}
           >
@@ -2129,7 +2162,7 @@ function TestimonialsSection() {
                   style={{
                     fontSize: "0.85rem",
                     fontWeight: 600,
-                    color: neutral[800],
+                    color: "var(--color-text)",
                   }}
                 >
                   {label}
@@ -2149,7 +2182,7 @@ function MiniFooterCTA() {
     <Reveal>
       <section
         style={{
-          background: neutral[800],
+          background: "var(--color-surface-3)",
           padding: "64px 32px",
           textAlign: "center",
         }}
@@ -2160,7 +2193,7 @@ function MiniFooterCTA() {
               fontFamily: fonts.display,
               fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
               fontWeight: 300,
-              color: neutral[0],
+              color: "#fff",
               lineHeight: 1.2,
               marginBottom: 18,
             }}
@@ -2204,7 +2237,7 @@ function MiniFooterCTA() {
                   padding: "15px 32px",
                   background: brand[500],
                   borderRadius: 999,
-                  color: neutral[0],
+                  color: "#fff",
                   fontWeight: 700,
                   fontSize: "0.9375rem",
                   textDecoration: "none",
