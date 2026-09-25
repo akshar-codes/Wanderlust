@@ -16,10 +16,14 @@ function fieldSx(hasError) {
     "& .MuiOutlinedInput-root": {
       borderRadius: "12px",
       "& fieldset": {
-        borderColor: hasError ? semantic.error.base : neutral[300],
+        borderColor: hasError
+          ? semantic.error.base
+          : "var(--color-border-strong)",
       },
       "&:hover fieldset": {
-        borderColor: hasError ? semantic.error.strong : neutral[500],
+        borderColor: hasError
+          ? semantic.error.strong
+          : "var(--color-text-secondary)",
       },
       "&.Mui-focused fieldset": {
         borderColor: hasError ? semantic.error.base : brand[500],
@@ -42,7 +46,7 @@ const helperSx = (hasError) => ({
   sx: {
     fontSize: "0.8125rem",
     fontWeight: hasError ? 500 : 400,
-    color: hasError ? semantic.error.text : neutral[500],
+    color: hasError ? semantic.error.text : "var(--color-text-secondary)",
   },
 });
 
@@ -163,10 +167,14 @@ export const Select = forwardRef(function Select(
           borderRadius: "12px",
           fontSize: "0.9375rem",
           "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: hasError ? semantic.error.base : neutral[300],
+            borderColor: hasError
+              ? semantic.error.base
+              : "var(--color-border-strong)",
           },
           "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: hasError ? semantic.error.strong : neutral[500],
+            borderColor: hasError
+              ? semantic.error.strong
+              : "var(--color-text-secondary)",
           },
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
             borderColor: hasError ? semantic.error.base : brand[500],
@@ -182,7 +190,7 @@ export const Select = forwardRef(function Select(
         {...props}
       >
         {placeholder && (
-          <MenuItem value="" disabled sx={{ color: neutral[400] }}>
+          <MenuItem value="" disabled sx={{ color: "var(--color-text-muted)" }}>
             {placeholder}
           </MenuItem>
         )}
@@ -230,7 +238,7 @@ export const SearchInput = forwardRef(function SearchInput(
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={neutral[400]}
+                stroke={"var(--color-text-muted)"}
                 strokeWidth="2"
                 strokeLinecap="round"
               >
@@ -244,16 +252,16 @@ export const SearchInput = forwardRef(function SearchInput(
       sx={{
         "& .MuiOutlinedInput-root": {
           borderRadius: "9999px",
-          backgroundColor: neutral[50],
-          "& fieldset": { borderColor: neutral[200] },
-          "&:hover fieldset": { borderColor: neutral[400] },
+          backgroundColor: "var(--color-surface-2)",
+          "& fieldset": { borderColor: "var(--color-border)" },
+          "&:hover fieldset": { borderColor: "var(--color-text-muted)" },
           "&.Mui-focused fieldset": {
             borderColor: brand[500],
             borderWidth: "1.5px",
           },
           "&.Mui-focused": {
             boxShadow: "0 0 0 3px rgba(255,90,95,0.22)",
-            backgroundColor: neutral[0],
+            backgroundColor: "var(--color-surface)",
           },
         },
         "& .MuiOutlinedInput-input": {

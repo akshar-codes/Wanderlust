@@ -114,7 +114,7 @@ export function ListingCard({ listing, to, loading = false, actions }) {
             borderRadius: radii.xl,
             overflow: "hidden",
             aspectRatio: "4 / 3",
-            bgcolor: neutral[100],
+            bgcolor: "var(--color-surface-2)",
           }}
         >
           <CardMedia
@@ -136,7 +136,7 @@ export function ListingCard({ listing, to, loading = false, actions }) {
                 position: "absolute",
                 top: 12,
                 left: 12,
-                bgcolor: "rgba(255,255,255,0.92)",
+                bgcolor: "var(--color-surface)",
                 backdropFilter: "blur(8px)",
                 borderRadius: radii.full,
                 px: 1.25,
@@ -145,7 +145,7 @@ export function ListingCard({ listing, to, loading = false, actions }) {
                 fontWeight: 700,
                 letterSpacing: "0.04em",
                 textTransform: "capitalize",
-                color: neutral[700],
+                color: "var(--color-text)",
               }}
             >
               {category}
@@ -175,13 +175,17 @@ export function ListingCard({ listing, to, loading = false, actions }) {
           </Typography>
           <Typography
             variant="caption"
-            sx={{ color: neutral[500], display: "block", mb: 0.5 }}
+            sx={{
+              color: "var(--color-text-secondary)",
+              display: "block",
+              mb: 0.5,
+            }}
           >
             {location}, {country}
           </Typography>
           <Typography sx={{ fontSize: "0.9rem" }}>
             <strong>{formatPrice(Number(price))}</strong>
-            <Box component="span" sx={{ color: neutral[500] }}>
+            <Box component="span" sx={{ color: "var(--color-text-secondary)" }}>
               {" "}
               / night
             </Box>
@@ -231,7 +235,7 @@ export function StatsCard({ label, value, icon, trend, trendValue }) {
       ? semantic.success.base
       : trend === "down"
         ? semantic.error.base
-        : neutral[400];
+        : "var(--color-text-muted)";
 
   const TrendArrow = () => (
     <svg
@@ -271,7 +275,10 @@ export function StatsCard({ label, value, icon, trend, trendValue }) {
           alignItems: "flex-start",
         }}
       >
-        <Typography variant="overline" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="overline"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           {label}
         </Typography>
         {icon && (
@@ -297,7 +304,7 @@ export function StatsCard({ label, value, icon, trend, trendValue }) {
           fontSize: "2rem",
           fontWeight: 400,
           lineHeight: 1.2,
-          color: neutral[800],
+          color: "var(--color-text)",
         }}
       >
         {value}

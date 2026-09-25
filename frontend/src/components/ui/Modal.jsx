@@ -80,9 +80,12 @@ export function Modal({
               aria-label="Close dialog"
               size="small"
               sx={{
-                color: neutral[500],
+                color: "var(--color-text-secondary)",
                 borderRadius: "8px",
-                "&:hover": { background: neutral[100], color: neutral[700] },
+                "&:hover": {
+                  background: "var(--color-surface-2)",
+                  color: "var(--color-text)",
+                },
               }}
             >
               <XIcon />
@@ -236,7 +239,7 @@ export function Drawer({
               sx={{
                 fontFamily: fonts.display,
                 fontSize: "1.25rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 lineHeight: 1.2,
               }}
             >
@@ -258,10 +261,10 @@ export function Drawer({
           aria-label="Close drawer"
           size="small"
           sx={{
-            color: neutral[500],
+            color: "var(--color-text-secondary)",
             borderRadius: "8px",
             flexShrink: 0,
-            "&:hover": { background: neutral[100] },
+            "&:hover": { background: "var(--color-surface-2)" },
           }}
         >
           <XIcon />

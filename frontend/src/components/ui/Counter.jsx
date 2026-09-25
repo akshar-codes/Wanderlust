@@ -17,12 +17,19 @@ export function Counter({ label, hint, value, onChange, min = 0, max = 50 }) {
     >
       <Box>
         <Typography
-          sx={{ fontWeight: 600, fontSize: "0.9375rem", color: neutral[800] }}
+          sx={{
+            fontWeight: 600,
+            fontSize: "0.9375rem",
+            color: "var(--color-text)",
+          }}
         >
           {label}
         </Typography>
         {hint && (
-          <Typography variant="caption" sx={{ color: neutral[500] }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "var(--color-text-secondary)" }}
+          >
             {hint}
           </Typography>
         )}
@@ -38,20 +45,25 @@ export function Counter({ label, hint, value, onChange, min = 0, max = 50 }) {
             width: 40,
             height: 40,
             borderRadius: "50%",
-            border: `1.5px solid ${neutral[300]}`,
+            border: `1.5px solid var(--color-border-strong)`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: value <= min ? neutral[300] : neutral[700],
+            color:
+              value <= min ? "var(--color-border-strong)" : "var(--color-text)",
             cursor: value <= min ? "not-allowed" : "pointer",
             "&:hover": {
-              borderColor: value <= min ? neutral[300] : brand[500],
+              borderColor:
+                value <= min ? "var(--color-border-strong)" : brand[500],
             },
           }}
         >
           <Minus size={14} />
         </Box>
-        <Typography aria-live="polite" sx={{ minWidth: 20, textAlign: "center", fontWeight: 700 }}>
+        <Typography
+          aria-live="polite"
+          sx={{ minWidth: 20, textAlign: "center", fontWeight: 700 }}
+        >
           {value}
         </Typography>
         <Box
@@ -64,14 +76,16 @@ export function Counter({ label, hint, value, onChange, min = 0, max = 50 }) {
             width: 40,
             height: 40,
             borderRadius: "50%",
-            border: `1.5px solid ${neutral[300]}`,
+            border: `1.5px solid var(--color-border-strong)`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: value >= max ? neutral[300] : neutral[700],
+            color:
+              value >= max ? "var(--color-border-strong)" : "var(--color-text)",
             cursor: value >= max ? "not-allowed" : "pointer",
             "&:hover": {
-              borderColor: value >= max ? neutral[300] : brand[500],
+              borderColor:
+                value >= max ? "var(--color-border-strong)" : brand[500],
             },
           }}
         >

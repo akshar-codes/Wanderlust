@@ -28,19 +28,19 @@ const DANGER_SX = {
 };
 
 const SECONDARY_SX = {
-  borderColor: neutral[300],
-  color: neutral[700],
+  borderColor: "var(--color-border-strong)",
+  color: "var(--color-text)",
   borderWidth: "1.5px",
   "&:hover": {
     borderWidth: "1.5px",
-    borderColor: neutral[600],
-    background: neutral[50],
+    borderColor: "var(--color-text-secondary)",
+    background: "var(--color-surface-2)",
   },
 };
 
 const GHOST_SX = {
-  color: neutral[600],
-  "&:hover": { background: neutral[100] },
+  color: "var(--color-text-secondary)",
+  "&:hover": { background: "var(--color-surface-2)" },
 };
 
 const LINK_SX = {
@@ -136,7 +136,7 @@ export const IconButton = forwardRef(function IconButton(
         "&:hover": { background: brand[50], color: brand[600] },
       },
       danger: {
-        color: neutral[400],
+        color: "var(--color-text-muted)",
         "&:hover": {
           color: semantic.error.base,
           background: semantic.error.light,

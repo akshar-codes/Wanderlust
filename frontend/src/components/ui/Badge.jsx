@@ -3,7 +3,11 @@ import MuiBadge from "@mui/material/Badge";
 import { brand, neutral, semantic, radii } from "../../theme/tokens";
 
 const TONES = {
-  neutral: { bg: neutral[100], fg: neutral[600], border: neutral[300] },
+  neutral: {
+    bg: "var(--color-surface-2)",
+    fg: "var(--color-text-secondary)",
+    border: "var(--color-border-strong)",
+  },
   brand: { bg: brand[50], fg: brand[700], border: brand[300] },
   success: {
     bg: semantic.success.light,
@@ -28,7 +32,7 @@ const TONES = {
 };
 
 const SOLID_BG = {
-  neutral: neutral[600],
+  neutral: "var(--color-text-secondary)",
   brand: brand[500],
   success: semantic.success.base,
   warning: semantic.warning.base,
@@ -59,7 +63,7 @@ export function Badge({
         border: `1.5px solid ${palette.border}`,
       },
       solid: {
-        bgcolor: SOLID_BG[tone] ?? neutral[600],
+        bgcolor: SOLID_BG[tone] ?? "var(--color-text-secondary)",
         color: "#fff",
         border: "1px solid transparent",
       },

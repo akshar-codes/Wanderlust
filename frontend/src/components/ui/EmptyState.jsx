@@ -169,7 +169,7 @@ export function EmptyState({
           sx={{
             fontFamily: fonts.display,
             fontSize: compact ? "1.125rem" : "1.5rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 0.5,
           }}
         >
@@ -178,7 +178,7 @@ export function EmptyState({
         <Typography
           variant="body2"
           sx={{
-            color: neutral[500],
+            color: "var(--color-text-secondary)",
             maxWidth: 340,
             mx: "auto",
             lineHeight: 1.6,

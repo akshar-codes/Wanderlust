@@ -80,7 +80,7 @@ export function Table({
         elevation={0}
         sx={{
           borderRadius: radii.xl,
-          border: `1px solid ${neutral[200]}`,
+          border: `1px solid var(--color-border)`,
           overflow: "hidden",
           ...(maxHeight ? { maxHeight, overflow: "auto" } : {}),
         }}
@@ -96,8 +96,8 @@ export function Table({
                   sortDirection={orderBy === col.key ? order : false}
                   sx={{
                     width: col.width,
-                    background: neutral[50],
-                    borderBottom: `2px solid ${neutral[200]}`,
+                    background: "var(--color-surface-2)",
+                    borderBottom: `2px solid var(--color-border)`,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -113,7 +113,7 @@ export function Table({
                           color: brand[500],
                         },
                         "&.Mui-active": { color: brand[500] },
-                        "&:hover": { color: neutral[800] },
+                        "&:hover": { color: "var(--color-text)" },
                       }}
                     >
                       {col.label}
@@ -146,7 +146,7 @@ export function Table({
                 <TableCell
                   colSpan={columns.length}
                   align="center"
-                  sx={{ py: 6, color: neutral[400] }}
+                  sx={{ py: 6, color: "var(--color-text-muted)" }}
                 >
                   <Typography variant="body2">{emptyMessage}</Typography>
                 </TableCell>
