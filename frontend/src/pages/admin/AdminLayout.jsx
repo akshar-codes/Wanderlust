@@ -64,7 +64,8 @@ export default function AdminLayout() {
     : DEFAULT_SECTION;
 
   const ActiveComponent = useMemo(
-    () => SECTIONS.find((s) => s.key === activeKey)?.Component ?? AdminOverviewPage,
+    () =>
+      SECTIONS.find((s) => s.key === activeKey)?.Component ?? AdminOverviewPage,
     [activeKey],
   );
 
@@ -73,7 +74,7 @@ export default function AdminLayout() {
   const pendingReports = stats?.reports?.pending ?? 0;
 
   return (
-    <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8 }}>
+    <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, md: 4 }, pb: 8 }}>
       <PageHeader
         eyebrow="Admin"
         title="Platform Administration"
@@ -121,23 +122,27 @@ export default function AdminLayout() {
                     fontFamily: "inherit",
                     fontSize: "0.9375rem",
                     fontWeight: active ? 700 : 500,
-                    color: active ? brand[600] : neutral[600],
+                    color: active ? brand[600] : "var(--color-text-secondary)",
                     bgcolor: active ? brand[50] : "transparent",
                     transition: "background-color 120ms, color 120ms",
                     "&:hover": {
-                      bgcolor: active ? brand[50] : neutral[100],
-                      color: active ? brand[600] : neutral[800],
+                      bgcolor: active ? brand[50] : "var(--color-surface-2)",
+                      color: active ? brand[600] : "var(--color-text)",
                     },
                   }}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+                  <Box
+                    sx={{ display: "flex", alignItems: "center", gap: 1.25 }}
+                  >
                     <Icon size={18} />
                     {label}
                   </Box>
                   {key === "reports" && pendingReports > 0 && (
                     <Box
                       sx={{
-                        bgcolor: active ? brand[600] : neutral[300],
+                        bgcolor: active
+                          ? brand[600]
+                          : "var(--color-border-strong)",
                         color: "#fff",
                         borderRadius: 999,
                         minWidth: 20,
@@ -163,8 +168,8 @@ export default function AdminLayout() {
               position: "sticky",
               top: 56,
               zIndex: 10,
-              bgcolor: "#faf8f6",
-              borderBottom: `1px solid ${neutral[200]}`,
+              bgcolor: "var(--color-surface-2)",
+              borderBottom: `1px solid var(--color-border)`,
               mb: 1,
             }}
           >

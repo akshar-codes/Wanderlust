@@ -15,7 +15,14 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { Users, Home, CalendarCheck, IndianRupee, Star, Flag } from "lucide-react";
+import {
+  Users,
+  Home,
+  CalendarCheck,
+  IndianRupee,
+  Star,
+  Flag,
+} from "lucide-react";
 
 import { StatsCard } from "../../components/ui/Card";
 import { Select } from "../../components/ui/Input";
@@ -66,14 +73,21 @@ function ChartPanel({ title, children }) {
   return (
     <Box
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
         p: { xs: 2, sm: 3 },
         height: "100%",
       }}
     >
-      <Typography sx={{ fontWeight: 700, fontSize: "1rem", color: neutral[800], mb: 2 }}>
+      <Typography
+        sx={{
+          fontWeight: 700,
+          fontSize: "1rem",
+          color: "var(--color-text)",
+          mb: 2,
+        }}
+      >
         {title}
       </Typography>
       <Box
@@ -107,16 +121,22 @@ export default function AdminOverviewPage() {
         <Grid item xs={6} md={4} lg={2}>
           <StatsCard
             label="Total users"
-            value={statsLoading ? "—" : stats.users.total.toLocaleString("en-IN")}
+            value={
+              statsLoading ? "—" : stats.users.total.toLocaleString("en-IN")
+            }
             icon={<Users size={18} />}
             trend="flat"
-            trendValue={statsLoading ? "" : `${stats.users.newLast30Days} new (30d)`}
+            trendValue={
+              statsLoading ? "" : `${stats.users.newLast30Days} new (30d)`
+            }
           />
         </Grid>
         <Grid item xs={6} md={4} lg={2}>
           <StatsCard
             label="Total listings"
-            value={statsLoading ? "—" : stats.listings.total.toLocaleString("en-IN")}
+            value={
+              statsLoading ? "—" : stats.listings.total.toLocaleString("en-IN")
+            }
             icon={<Home size={18} />}
             trend="flat"
             trendValue={statsLoading ? "" : `${stats.listings.active} active`}
@@ -125,7 +145,9 @@ export default function AdminOverviewPage() {
         <Grid item xs={6} md={4} lg={2}>
           <StatsCard
             label="Total bookings"
-            value={statsLoading ? "—" : stats.bookings.total.toLocaleString("en-IN")}
+            value={
+              statsLoading ? "—" : stats.bookings.total.toLocaleString("en-IN")
+            }
             icon={<CalendarCheck size={18} />}
             trend="flat"
             trendValue={statsLoading ? "" : `${stats.bookings.pending} pending`}
@@ -137,7 +159,11 @@ export default function AdminOverviewPage() {
             value={statsLoading ? "—" : formatCurrency(stats.revenue.total)}
             icon={<IndianRupee size={18} />}
             trend="flat"
-            trendValue={statsLoading ? "" : `${formatCurrency(stats.revenue.last30Days)} (30d)`}
+            trendValue={
+              statsLoading
+                ? ""
+                : `${formatCurrency(stats.revenue.last30Days)} (30d)`
+            }
           />
         </Grid>
         <Grid item xs={6} md={4} lg={2}>
@@ -179,27 +205,52 @@ export default function AdminOverviewPage() {
         <Grid item xs={12} md={7}>
           <ChartPanel title="Platform Revenue">
             {analyticsLoading ? (
-              <Skeleton variant="rounded" height={260} sx={{ borderRadius: "16px" }} />
+              <Skeleton
+                variant="rounded"
+                height={260}
+                sx={{ borderRadius: "16px" }}
+              />
             ) : (
               <ResponsiveContainer width="100%" height={260}>
-                <AreaChart data={revenueTimeseries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <AreaChart
+                  data={revenueTimeseries}
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
                   <defs>
-                    <linearGradient id="adminRevenueGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={brand[500]} stopOpacity={0.35} />
-                      <stop offset="100%" stopColor={brand[500]} stopOpacity={0} />
+                    <linearGradient
+                      id="adminRevenueGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor={brand[500]}
+                        stopOpacity={0.35}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor={brand[500]}
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={neutral[100]} vertical={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke={"var(--color-surface-2)"}
+                    vertical={false}
+                  />
                   <XAxis
                     dataKey="date"
                     tickFormatter={formatDateLabel}
-                    tick={{ fontSize: 11, fill: neutral[400] }}
-                    axisLine={{ stroke: neutral[200] }}
+                    tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
+                    axisLine={{ stroke: "var(--color-border)" }}
                     tickLine={false}
                     minTickGap={24}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: neutral[400] }}
+                    tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
                     axisLine={false}
                     tickLine={false}
                     tickFormatter={(v) => formatPrice(v)}
@@ -208,7 +259,10 @@ export default function AdminOverviewPage() {
                   <Tooltip
                     labelFormatter={formatDateLabel}
                     formatter={(v) => [formatCurrency(v), "Revenue"]}
-                    contentStyle={{ borderRadius: 10, border: `1px solid ${neutral[200]}` }}
+                    contentStyle={{
+                      borderRadius: 10,
+                      border: `1px solid var(--color-border)`,
+                    }}
                   />
                   <Area
                     type="monotone"
@@ -227,21 +281,32 @@ export default function AdminOverviewPage() {
         <Grid item xs={12} md={5}>
           <ChartPanel title="New Users">
             {analyticsLoading ? (
-              <Skeleton variant="rounded" height={260} sx={{ borderRadius: "16px" }} />
+              <Skeleton
+                variant="rounded"
+                height={260}
+                sx={{ borderRadius: "16px" }}
+              />
             ) : (
               <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={usersGrowth} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={neutral[100]} vertical={false} />
+                <BarChart
+                  data={usersGrowth}
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke={"var(--color-surface-2)"}
+                    vertical={false}
+                  />
                   <XAxis
                     dataKey="date"
                     tickFormatter={formatDateLabel}
-                    tick={{ fontSize: 11, fill: neutral[400] }}
-                    axisLine={{ stroke: neutral[200] }}
+                    tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
+                    axisLine={{ stroke: "var(--color-border)" }}
                     tickLine={false}
                     minTickGap={24}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: neutral[400] }}
+                    tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
                     axisLine={false}
                     tickLine={false}
                     width={28}
@@ -250,9 +315,17 @@ export default function AdminOverviewPage() {
                   <Tooltip
                     labelFormatter={formatDateLabel}
                     formatter={(v) => [v, "New users"]}
-                    contentStyle={{ borderRadius: 10, border: `1px solid ${neutral[200]}` }}
+                    contentStyle={{
+                      borderRadius: 10,
+                      border: `1px solid var(--color-border)`,
+                    }}
                   />
-                  <Bar dataKey="count" fill={teal[500]} radius={[6, 6, 0, 0]} maxBarSize={28} />
+                  <Bar
+                    dataKey="count"
+                    fill={teal[500]}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={28}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -263,24 +336,54 @@ export default function AdminOverviewPage() {
         <Grid item xs={12} md={5}>
           <ChartPanel title="Bookings by Status">
             {analyticsLoading ? (
-              <Skeleton variant="rounded" height={240} sx={{ borderRadius: "16px" }} />
+              <Skeleton
+                variant="rounded"
+                height={240}
+                sx={{ borderRadius: "16px" }}
+              />
             ) : bookingsByStatus.length === 0 ? (
-              <Box sx={{ py: 6, textAlign: "center", color: neutral[400] }}>
+              <Box
+                sx={{
+                  py: 6,
+                  textAlign: "center",
+                  color: "var(--color-text-muted)",
+                }}
+              >
                 <Typography variant="body2">No bookings yet.</Typography>
               </Box>
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
-                  <Pie data={bookingsByStatus} dataKey="count" nameKey="status" innerRadius={55} outerRadius={90} paddingAngle={2}>
+                  <Pie
+                    data={bookingsByStatus}
+                    dataKey="count"
+                    nameKey="status"
+                    innerRadius={55}
+                    outerRadius={90}
+                    paddingAngle={2}
+                  >
                     {bookingsByStatus.map((entry) => (
-                      <Cell key={entry.status} fill={STATUS_COLORS[entry.status] ?? neutral[300]} />
+                      <Cell
+                        key={entry.status}
+                        fill={
+                          STATUS_COLORS[entry.status] ??
+                          "var(--color-border-strong)"
+                        }
+                      />
                     ))}
                   </Pie>
                   <Legend
                     verticalAlign="bottom"
-                    formatter={(value) => value.charAt(0).toUpperCase() + value.slice(1)}
+                    formatter={(value) =>
+                      value.charAt(0).toUpperCase() + value.slice(1)
+                    }
                   />
-                  <Tooltip formatter={(v, n) => [v, n.charAt(0).toUpperCase() + n.slice(1)]} />
+                  <Tooltip
+                    formatter={(v, n) => [
+                      v,
+                      n.charAt(0).toUpperCase() + n.slice(1),
+                    ]}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -291,16 +394,28 @@ export default function AdminOverviewPage() {
         <Grid item xs={12} md={7}>
           <ChartPanel title="Listings by Category">
             {analyticsLoading ? (
-              <Skeleton variant="rounded" height={240} sx={{ borderRadius: "16px" }} />
+              <Skeleton
+                variant="rounded"
+                height={240}
+                sx={{ borderRadius: "16px" }}
+              />
             ) : (
               <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={listingsByCategory} layout="vertical" margin={{ left: 16 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={neutral[100]} horizontal={false} />
+                <BarChart
+                  data={listingsByCategory}
+                  layout="vertical"
+                  margin={{ left: 16 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke={"var(--color-surface-2)"}
+                    horizontal={false}
+                  />
                   <XAxis type="number" hide allowDecimals={false} />
                   <YAxis
                     type="category"
                     dataKey="category"
-                    tick={{ fontSize: 12, fill: neutral[600] }}
+                    tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
                     axisLine={false}
                     tickLine={false}
                     width={90}
@@ -308,7 +423,10 @@ export default function AdminOverviewPage() {
                   <Tooltip formatter={(v) => [`${v} listings`, "Count"]} />
                   <Bar dataKey="count" radius={[0, 6, 6, 0]} maxBarSize={18}>
                     {listingsByCategory.map((entry, i) => (
-                      <Cell key={entry.category} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
+                      <Cell
+                        key={entry.category}
+                        fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]}
+                      />
                     ))}
                   </Bar>
                 </BarChart>
@@ -321,9 +439,20 @@ export default function AdminOverviewPage() {
         <Grid item xs={12}>
           <ChartPanel title="Top Hosts by Revenue">
             {analyticsLoading ? (
-              <Skeleton variant="rounded" height={160} sx={{ borderRadius: "16px" }} />
+              <Skeleton
+                variant="rounded"
+                height={160}
+                sx={{ borderRadius: "16px" }}
+              />
             ) : topHosts.length === 0 ? (
-              <Typography variant="body2" sx={{ color: neutral[400], textAlign: "center", py: 4 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "var(--color-text-muted)",
+                  textAlign: "center",
+                  py: 4,
+                }}
+              >
                 No revenue data for this period.
               </Typography>
             ) : (
@@ -337,31 +466,54 @@ export default function AdminOverviewPage() {
                       justifyContent: "space-between",
                       gap: 2,
                       p: 1.5,
-                      border: `1px solid ${neutral[100]}`,
+                      border: `1px solid ${"var(--color-surface-2)"}`,
                       borderRadius: radii.lg,
                     }}
                   >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, minWidth: 0 }}>
-                      <Typography sx={{ fontWeight: 700, color: brand[600], width: 20 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        minWidth: 0,
+                      }}
+                    >
+                      <Typography
+                        sx={{ fontWeight: 700, color: brand[600], width: 20 }}
+                      >
                         {i + 1}
                       </Typography>
                       <Typography
                         sx={{
                           fontWeight: 600,
-                          color: neutral[800],
+                          color: "var(--color-text)",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {host.firstName ? `${host.firstName} ${host.lastName ?? ""}` : `@${host.username}`}
+                        {host.firstName
+                          ? `${host.firstName} ${host.lastName ?? ""}`
+                          : `@${host.username}`}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
-                      <Typography variant="body2" sx={{ color: neutral[500] }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 3,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "var(--color-text-secondary)" }}
+                      >
                         {host.bookings} bookings
                       </Typography>
-                      <Typography sx={{ fontWeight: 700, color: neutral[800] }}>
+                      <Typography
+                        sx={{ fontWeight: 700, color: "var(--color-text)" }}
+                      >
                         {formatCurrency(host.revenue)}
                       </Typography>
                     </Box>
