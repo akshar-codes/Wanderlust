@@ -162,9 +162,9 @@ export default function ReviewForm({ listingId }) {
                 style={{
                   marginTop: 10,
                   padding: "4px 16px",
-                  background: "#faf8f6",
+                  background: "var(--color-surface-2)",
                   borderRadius: 14,
-                  border: "1px solid #ebe7e3",
+                  border: "1px solid var(--color-border)",
                 }}
               >
                 {CATEGORIES.map(({ key, label, icon }, i) => (
@@ -178,7 +178,9 @@ export default function ReviewForm({ listingId }) {
                       }
                     />
                     {i < CATEGORIES.length - 1 && (
-                      <div style={{ height: 1, background: "#ebe7e3" }} />
+                      <div
+                        style={{ height: 1, background: "var(--color-border)" }}
+                      />
                     )}
                   </div>
                 ))}
@@ -221,7 +223,7 @@ export default function ReviewForm({ listingId }) {
                 height: 76,
                 borderRadius: 12,
                 overflow: "hidden",
-                border: "1.5px solid #ebe7e3",
+                border: "1.5px solid var(--color-border)",
               }}
             >
               <img
@@ -263,7 +265,7 @@ export default function ReviewForm({ listingId }) {
                 height: 76,
                 borderRadius: 12,
                 border: "1.5px dashed #d6d0ca",
-                background: "#faf8f6",
+                background: "var(--color-surface-2)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",

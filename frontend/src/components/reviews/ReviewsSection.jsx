@@ -109,7 +109,7 @@ export default function ReviewsSection({ listingId, listingOwnerId }) {
               <div
                 key={i}
                 style={{
-                  border: "1px solid #ebe7e3",
+                  border: "1px solid var(--color-border)",
                   borderRadius: 20,
                   padding: 20,
                 }}

@@ -67,7 +67,7 @@ function DistributionRow({ star, count, pct, active, onClick }) {
         style={{
           flex: 1,
           height: 6,
-          background: "#ebe7e3",
+          background: "var(--color-border)",
           borderRadius: 999,
           overflow: "hidden",
         }}
@@ -115,8 +115,8 @@ function CategoryScore({ icon, label, value }) {
         flexDirection: "column",
         gap: 8,
         padding: "16px 20px",
-        background: "#faf8f6",
-        border: "1px solid #ebe7e3",
+        background: "var(--color-surface-2)",
+        border: "1px solid var(--color-border)",
         borderRadius: 16,
         minWidth: 130,
       }}
@@ -146,7 +146,7 @@ function CategoryScore({ icon, label, value }) {
       <div
         style={{
           height: 3,
-          background: "#ebe7e3",
+          background: "var(--color-border)",
           borderRadius: 999,
           overflow: "hidden",
         }}
@@ -176,7 +176,7 @@ function StatsSkeleton() {
             style={{
               width: 10,
               height: 12,
-              background: "#f4f1ee",
+              background: "var(--color-surface-2)",
               borderRadius: 4,
             }}
           />
@@ -184,7 +184,7 @@ function StatsSkeleton() {
             style={{
               flex: 1,
               height: 6,
-              background: "#f4f1ee",
+              background: "var(--color-surface-2)",
               borderRadius: 999,
             }}
           />
@@ -192,7 +192,7 @@ function StatsSkeleton() {
             style={{
               width: 24,
               height: 12,
-              background: "#f4f1ee",
+              background: "var(--color-surface-2)",
               borderRadius: 4,
             }}
           />
@@ -237,7 +237,9 @@ export default function ReviewStats({
           gap: 32,
           alignItems: "flex-start",
           padding: "28px 0 24px",
-          borderBottom: hasCategoryRatings ? "1px solid #ebe7e3" : "none",
+          borderBottom: hasCategoryRatings
+            ? "1px solid var(--color-border)"
+            : "none",
           marginBottom: hasCategoryRatings ? 28 : 0,
         }}
       >
@@ -343,8 +345,8 @@ export default function ReviewStats({
               alignItems: "center",
               gap: 4,
               padding: "12px 16px",
-              background: "#faf8f6",
-              border: "1px solid #ebe7e3",
+              background: "var(--color-surface-2)",
+              border: "1px solid var(--color-border)",
               borderRadius: 14,
               cursor: "pointer",
               fontFamily: "inherit",

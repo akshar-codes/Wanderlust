@@ -48,7 +48,7 @@ function PhotoGallery({ photos }) {
               height: 80,
               borderRadius: 12,
               overflow: "hidden",
-              border: "1.5px solid #ebe7e3",
+              border: "1.5px solid var(--color-border)",
               padding: 0,
               cursor: "pointer",
               flexShrink: 0,
@@ -225,9 +225,9 @@ function HostReplyBlock({ reply, reviewId, listingId, isHost }) {
         animate={{ opacity: 1, y: 0 }}
         style={{
           marginTop: 16,
-          background: "#faf8f6",
+          background: "var(--color-surface-2)",
           borderRadius: 14,
-          border: "1.5px solid #ebe7e3",
+          border: "1.5px solid var(--color-border)",
           overflow: "hidden",
         }}
       >
@@ -284,7 +284,7 @@ function HostReplyBlock({ reply, reviewId, listingId, isHost }) {
                 padding: "7px 14px",
                 border: "1.5px solid #d6d0ca",
                 borderRadius: 999,
-                background: "#fff",
+                background: "var(--color-surface)",
                 fontSize: "0.8125rem",
                 fontWeight: 600,
                 color: "#5c544c",
@@ -326,9 +326,9 @@ function HostReplyBlock({ reply, reviewId, listingId, isHost }) {
       animate={{ opacity: 1, y: 0 }}
       style={{
         marginTop: 16,
-        background: "#faf8f6",
+        background: "var(--color-surface-2)",
         borderRadius: 14,
-        border: "1.5px solid #ebe7e3",
+        border: "1.5px solid var(--color-border)",
         padding: "14px 16px",
       }}
     >
@@ -456,8 +456,8 @@ export default function ReviewCard({ review, listingId, listingOwnerId }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98 }}
       style={{
-        background: "#fff",
-        border: "1px solid #ebe7e3",
+        background: "var(--color-surface)",
+        border: "1px solid var(--color-border)",
         borderRadius: 20,
         padding: "20px 22px",
         display: "flex",
@@ -566,7 +566,7 @@ export default function ReviewCard({ review, listingId, listingOwnerId }) {
               height: 32,
               borderRadius: "50%",
               background: "none",
-              border: "1px solid #ebe7e3",
+              border: "1px solid var(--color-border)",
               cursor: "pointer",
               color: "#b8b0a8",
               transition: "all 0.15s",
@@ -579,7 +579,7 @@ export default function ReviewCard({ review, listingId, listingOwnerId }) {
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "none";
-              e.currentTarget.style.borderColor = "#ebe7e3";
+              e.currentTarget.style.borderColor = "var(--color-border)";
               e.currentTarget.style.color = "#b8b0a8";
             }}
           >
@@ -609,8 +609,8 @@ export default function ReviewCard({ review, listingId, listingOwnerId }) {
                   alignItems: "center",
                   gap: 5,
                   padding: "4px 10px",
-                  background: "#faf8f6",
-                  border: "1px solid #ebe7e3",
+                  background: "var(--color-surface-2)",
+                  border: "1px solid var(--color-border)",
                   borderRadius: 999,
                   fontSize: "0.75rem",
                   color: "#5c544c",
@@ -686,7 +686,7 @@ export default function ReviewCard({ review, listingId, listingOwnerId }) {
           justifyContent: "space-between",
           marginTop: 16,
           paddingTop: 12,
-          borderTop: "1px solid #f4f1ee",
+          borderTop: "1px solid var(--color-surface-2)",
         }}
       >
         <span style={{ fontSize: "0.75rem", color: "#b8b0a8" }}>
