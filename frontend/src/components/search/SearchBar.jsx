@@ -122,6 +122,16 @@ export default function SearchBar({
   const isOpen =
     focused && (suggestions.length > 0 || (isFetching && value.length > 0));
 
+  const handleSelect = useCallback(
+    (item) => {
+      onChange?.(item.label);
+      onSelect?.(item);
+      setFocused(false);
+      setHighlightedIndex(-1);
+    },
+    [onChange, onSelect],
+  );
+
   // ── Keyboard navigation ───────────────────────────────────────────────────
   const handleKeyDown = useCallback(
     (e) => {
@@ -156,17 +166,7 @@ export default function SearchBar({
           break;
       }
     },
-    [isOpen, suggestions, highlightedIndex, value, onSubmit],
-  );
-
-  const handleSelect = useCallback(
-    (item) => {
-      onChange?.(item.label);
-      onSelect?.(item);
-      setFocused(false);
-      setHighlightedIndex(-1);
-    },
-    [onChange, onSelect],
+    [isOpen, suggestions, highlightedIndex, value, onSubmit, handleSelect],
   );
 
   // Reset highlight when suggestions change

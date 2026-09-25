@@ -273,6 +273,7 @@ export function useSearchFacets(filters = {}) {
 // ─── Price histogram hook ─────────────────────────────────────────────────────
 export function usePriceHistogram(filters = {}) {
   // Strip price filters so we show the full distribution
+  const amenitiesKey = filters.amenities?.join(",");
   const strippedFilters = useMemo(
     () => ({ ...filters, priceMin: undefined, priceMax: undefined }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -280,7 +281,7 @@ export function usePriceHistogram(filters = {}) {
       filters.q,
       filters.category,
       filters.guests,
-      filters.amenities?.join(","),
+      amenitiesKey,
       filters.mapBounds,
     ],
   );

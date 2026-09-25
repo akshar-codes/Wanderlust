@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { Slider } from "@mui/material";
 import { motion } from "framer-motion";
 
-// ─── Histogram bars ───────────────────────────────────────────────────────────
-function HistogramBars({ buckets, min, max, valueMin, valueMax, height = 56 }) {
+// â”€â”€â”€ Histogram bars â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function HistogramBars({ buckets, valueMin, valueMax, height = 56 }) {
   if (!buckets?.length) return <div style={{ height }} />;
 
   const maxCount = Math.max(...buckets.map((b) => b.count), 1);
@@ -45,21 +45,15 @@ function HistogramBars({ buckets, min, max, valueMin, valueMax, height = 56 }) {
   );
 }
 
-// ─── Currency formatter ───────────────────────────────────────────────────────
-function formatPrice(value, currency = "₹") {
-  if (value >= 100000) return `${currency}${(value / 100000).toFixed(1)}L`;
-  if (value >= 1000) return `${currency}${(value / 1000).toFixed(0)}K`;
-  return `${currency}${value.toLocaleString("en-IN")}`;
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Currency formatter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function PriceRangeSlider({
   min = 0,
   max = 50000,
   value = [0, 50000],
   onChange,
   histogram,
-  currency = "₹",
+  currency = "â‚¹",
   loading = false,
 }) {
   const [low, high] = value;
@@ -91,8 +85,6 @@ export default function PriceRangeSlider({
       ) : (
         <HistogramBars
           buckets={histogram?.buckets ?? []}
-          min={min}
-          max={max}
           valueMin={low}
           valueMax={high}
           height={56}
@@ -188,7 +180,7 @@ export default function PriceRangeSlider({
   );
 }
 
-// ─── Editable price input ─────────────────────────────────────────────────────
+// â”€â”€â”€ Editable price input â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function PriceInput({ label, value, min, max, currency, onChange }) {
   return (
     <label
