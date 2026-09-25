@@ -4,7 +4,7 @@ import { Box, Tabs, Tab, useMediaQuery, useTheme } from "@mui/material";
 import { UserCog, Lock, Bell, ShieldCheck, Palette, Link2 } from "lucide-react";
 
 import { PageHeader } from "../components/layout/PageHeader";
-import { neutral, brand, radii } from "../theme/tokens";
+import { brand, radii } from "../theme/tokens";
 
 import {
   AccountSection,

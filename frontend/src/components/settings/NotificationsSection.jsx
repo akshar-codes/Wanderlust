@@ -6,7 +6,7 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useUpdateNotificationPreferences } from "../../hooks/useUser";
-import { neutral, brand } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 
 const GROUPS = [
   {

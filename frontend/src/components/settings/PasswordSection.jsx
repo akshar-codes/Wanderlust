@@ -5,7 +5,7 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useForgotPassword } from "../../hooks/useAuth";
-import { neutral, brand, semantic, radii } from "../../theme/tokens";
+import { brand, semantic, radii } from "../../theme/tokens";
 
 export default function PasswordSection() {
   const user = useCurrentUser();

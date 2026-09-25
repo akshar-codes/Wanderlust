@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Box, Typography, Stack } from "@mui/material";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { authService } from "../../services/auth.service";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
-import { neutral, brand } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/auth.store";
 
@@ -16,6 +16,7 @@ export default function TwoFactorSetup() {
   const [token, setToken] = useState("");
   const [recoveryCodes, setRecoveryCodes] = useState([]);
   const [showDisableToken, setShowDisableToken] = useState(false);
+  const [showRecoveryToken, setShowRecoveryToken] = useState(false);
 
   const isEnabled = user?.settings?.twoFactorEnabled;
 
@@ -75,6 +76,7 @@ export default function TwoFactorSetup() {
       setLoading(true);
       const data = await authService.generateRecoveryCodes({ token });
       setRecoveryCodes(data.recoveryCodes);
+      setShowRecoveryToken(false);
       toast.success("Recovery codes generated. Save them safely.");
       setToken("");
     } catch (err) {
@@ -158,8 +160,15 @@ export default function TwoFactorSetup() {
         </Stack>
       )}
 
-      {isEnabled && recoveryCodes.length === 0 && !showDisableToken && (
+      {isEnabled && recoveryCodes.length === 0 && !showDisableToken && !showRecoveryToken && (
         <Stack spacing={2} direction="row">
+          <Button
+            variant="outline"
+            onClick={() => setShowRecoveryToken(true)}
+            disabled={loading}
+          >
+            Generate recovery codes
+          </Button>
           <Button
             variant="ghost"
             onClick={() => setShowDisableToken(true)}
@@ -167,6 +176,38 @@ export default function TwoFactorSetup() {
           >
             Disable 2FA
           </Button>
+        </Stack>
+      )}
+
+      {isEnabled && showRecoveryToken && (
+        <Stack spacing={2} sx={{ maxWidth: 400 }}>
+          <Typography variant="body2" sx={{ color: "var(--color-text)" }}>
+            Enter a 6-digit code from your authenticator app.
+          </Typography>
+          <Input
+            placeholder="000000"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+          />
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="primary"
+              onClick={generateRecoveryCodes}
+              disabled={loading || !token}
+            >
+              Generate codes
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowRecoveryToken(false);
+                setToken("");
+              }}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+          </Stack>
         </Stack>
       )}
 

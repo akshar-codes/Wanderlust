@@ -7,7 +7,7 @@ import { Select } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useUpdateSettings } from "../../hooks/useUser";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 
 const THEME_OPTIONS = [
   { value: "light", label: "Light", icon: Sun },
@@ -39,7 +39,7 @@ const CURRENCY_OPTIONS = [
   { value: "SGD", label: "SGD — Singapore Dollar (S$)" },
 ];
 
-import { useColorModeContext } from "../../hooks/useColorMode";
+import { useColorModeContext } from "../../hooks/colorModeContext";
 
 export default function AppearanceSection() {
   const user = useCurrentUser();
@@ -62,7 +62,7 @@ export default function AppearanceSection() {
       setCurrency(user.settings.currency ?? "INR");
       setDirty(false);
     }
-  }, [user?.settings]);
+  }, [user?.settings, setMode]);
 
   const handleSave = () => {
     updateSettings(

@@ -18,7 +18,7 @@ import {
   useRemoveAvatar,
   useDeleteAccount,
 } from "../../hooks/useUser";
-import { neutral, semantic } from "../../theme/tokens";
+import { semantic } from "../../theme/tokens";
 
 export default function AccountSection() {
   const user = useCurrentUser();

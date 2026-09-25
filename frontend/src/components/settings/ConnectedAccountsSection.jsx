@@ -8,7 +8,7 @@ import { ConfirmModal } from "../ui/Modal";
 import { Badge } from "../ui/Badge";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useUnlinkProvider } from "../../hooks/useAuth";
-import { neutral, brand, radii, semantic } from "../../theme/tokens";
+import { radii, semantic } from "../../theme/tokens";
 
 function GoogleIcon() {
   return (

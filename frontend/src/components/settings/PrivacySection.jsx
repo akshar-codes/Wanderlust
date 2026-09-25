@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Stack, Switch } from "@mui/material";
-import { Eye, ShieldQuestion } from "lucide-react";
+import { Box, Typography, Stack } from "@mui/material";
+import { Eye } from "lucide-react";
 import TwoFactorSetup from "./TwoFactorSetup";
 
 import { Card } from "../ui/Card";
@@ -8,7 +8,7 @@ import { Select } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useUpdateSettings } from "../../hooks/useUser";
-import { neutral, brand } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 
 const VISIBILITY_OPTIONS = [
   { value: "public", label: "Public — anyone can view your profile" },
