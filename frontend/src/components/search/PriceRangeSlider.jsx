@@ -81,7 +81,7 @@ export default function PriceRangeSlider({
           style={{
             height: 56,
             background:
-              "linear-gradient(90deg, #f4f1ee 25%, #ebe7e3 50%, #f4f1ee 75%)",
+              "linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%)",
             backgroundSize: "200% 100%",
             animation: "shimmer 1.5s infinite",
             borderRadius: 4,
@@ -116,7 +116,7 @@ export default function PriceRangeSlider({
           "& .MuiSlider-thumb": {
             width: 22,
             height: 22,
-            background: "#fff",
+            background: "var(--color-surface)",
             border: "2.5px solid #ff5a5f",
             boxShadow: "0 2px 8px rgba(255,90,95,0.30)",
             "&:hover, &.Mui-active": {
@@ -218,7 +218,7 @@ function PriceInput({ label, value, min, max, currency, onChange }) {
           border: "1.5px solid #d6d0ca",
           borderRadius: 10,
           padding: "7px 10px",
-          background: "#fff",
+          background: "var(--color-surface)",
           gap: 4,
           transition: "border-color 0.15s",
         }}

@@ -14,7 +14,7 @@ function SuggestionRow({ id, item, isHighlighted, onSelect }) {
         e.preventDefault();
         onSelect(item);
       }}
-      whileHover={{ background: "rgba(250,248,246,1)" }}
+      whileHover={{ background: "var(--color-surface-2)" }}
       style={{
         display: "flex",
         alignItems: "center",
@@ -35,7 +35,9 @@ function SuggestionRow({ id, item, isHighlighted, onSelect }) {
           width: 30,
           height: 30,
           borderRadius: 8,
-          background: isHighlighted ? "rgba(255,90,95,0.1)" : "#f4f1ee",
+          background: isHighlighted
+            ? "rgba(255,90,95,0.1)"
+            : "var(--color-surface-2)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -198,7 +200,7 @@ export default function SearchBar({
           display: "flex",
           alignItems: "center",
           height: s.height,
-          background: "rgba(255,255,255,0.95)",
+          background: "var(--color-dropdown-bg)",
           border: `1.5px solid ${focused ? "rgba(255,90,95,0.4)" : "rgba(230,224,218,0.9)"}`,
           borderRadius: 999,
           paddingLeft: 16,
@@ -349,9 +351,9 @@ export default function SearchBar({
               top: "calc(100% + 8px)",
               left: 0,
               right: 0,
-              background: "rgba(255,255,255,0.98)",
+              background: "var(--color-dropdown-bg)",
               backdropFilter: "blur(24px)",
-              border: "1.5px solid rgba(230,224,218,0.8)",
+              border: "1.5px solid var(--color-nav-border)",
               borderRadius: 18,
               boxShadow:
                 "0 20px 60px rgba(61,43,26,0.14), 0 4px 16px rgba(61,43,26,0.06)",
@@ -380,14 +382,14 @@ export default function SearchBar({
                         width: 30,
                         height: 30,
                         borderRadius: 8,
-                        background: "#f4f1ee",
+                        background: "var(--color-surface-2)",
                       }}
                     />
                     <div
                       style={{
                         height: 13,
                         width: `${w}%`,
-                        background: "#f4f1ee",
+                        background: "var(--color-surface-2)",
                         borderRadius: 6,
                       }}
                     />
@@ -439,7 +441,7 @@ export default function SearchBar({
                 <kbd
                   style={{
                     fontFamily: "monospace",
-                    background: "#f4f1ee",
+                    background: "var(--color-surface-2)",
                     padding: "1px 5px",
                     borderRadius: 4,
                     fontSize: "0.7rem",

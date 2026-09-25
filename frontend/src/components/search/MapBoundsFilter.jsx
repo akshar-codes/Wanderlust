@@ -102,7 +102,7 @@ export default function MapBoundsFilter({
 
         const el = document.createElement("div");
         el.style.cssText = `
-          background: #fff;
+          background: var(--color-surface);
           border: 2px solid #ff5a5f;
           border-radius: 999px;
           padding: 4px 10px;
@@ -124,7 +124,7 @@ export default function MapBoundsFilter({
           el.style.transform = "scale(1.08)";
         });
         el.addEventListener("mouseleave", () => {
-          el.style.background = "#fff";
+          el.style.background = "var(--color-surface)";
           el.style.color = "#261f1a";
           el.style.transform = "scale(1)";
         });
@@ -174,7 +174,7 @@ export default function MapBoundsFilter({
         style={{
           height,
           borderRadius: 20,
-          background: "linear-gradient(135deg, #f4f1ee, #ebe7e3)",
+          background: "var(--color-surface-2)",
           border: "1.5px solid #d6d0ca",
           display: "flex",
           flexDirection: "column",
@@ -194,7 +194,7 @@ export default function MapBoundsFilter({
             Add{" "}
             <code
               style={{
-                background: "#fff",
+                background: "var(--color-surface)",
                 padding: "2px 6px",
                 borderRadius: 4,
               }}
@@ -253,8 +253,8 @@ export default function MapBoundsFilter({
                 alignItems: "center",
                 gap: 7,
                 padding: "10px 18px",
-                background: "#fff",
-                border: "1.5px solid rgba(230,224,218,0.8)",
+                background: "var(--color-surface)",
+                border: "1.5px solid var(--color-nav-border)",
                 borderRadius: 999,
                 fontSize: "0.875rem",
                 fontWeight: 700,
@@ -284,8 +284,8 @@ export default function MapBoundsFilter({
                 width: 36,
                 height: 36,
                 borderRadius: "50%",
-                background: "rgba(255,255,255,0.95)",
-                border: "1.5px solid rgba(230,224,218,0.8)",
+                background: "var(--color-dropdown-bg)",
+                border: "1.5px solid var(--color-nav-border)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
