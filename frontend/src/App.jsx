@@ -34,9 +34,16 @@ import SignupPage from "./pages/auth/SignupPage";
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
-import { PrivacyPage, TermsPage } from "./pages/LegalPages";
+import { PrivacyPage, TermsPage, CookieSettingsPage } from "./pages/LegalPages";
+import AboutPage from "./pages/AboutPage";
+import SiteInformationPage from "./pages/SiteInformationPage";
+import SitemapPage from "./pages/SitemapPage";
+import ReportConcernPage from "./pages/ReportConcernPage";
+import ApiReferencePage from "./pages/ApiReferencePage";
+import MessagesPage from "./pages/MessagesPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import DesignSystemPage from "./pages/DesignSystemPage";
+import HelpCenterPage from "./pages/HelpCenterPage";
 
 // Mobile-aware responsive wrappers — pick the mobile-optimized page below
 // the breakpoint and the existing desktop page above it, sharing the same
@@ -73,178 +80,224 @@ export default function App() {
     <ColorModeProvider>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <ErrorBoundary>
             <AuthInit>
               <MotionConfig reducedMotion="user">
                 <Routes>
                   <Route path="/" element={<AppLayout />}>
-                  {/* ── Public ───────────────────────────────────────────── */}
-                  <Route index element={<HomePage />} />
-                  <Route path="listings" element={<ResponsiveListingsPage />} />
-                  <Route path="listings/:id" element={<ResponsiveListingShowPage />} />
-
-                  {/* ── User profile (public — self gets editable sections) ── */}
-                  <Route path="users/:username" element={<UserProfilePage />} />
-
-                  {/* ── Protected — authenticated + email verified ────────── */}
-                  <Route
-                    path="listings/new"
-                    element={
-                      <EmailVerifiedRoute>
-                        <NewListingPage />
-                      </EmailVerifiedRoute>
-                    }
-                  />
-                  <Route
-                    path="listings/:id/edit"
-                    element={
-                      <ProtectedRoute>
-                        <EditListingPage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ── User dashboard (protected) ─────────────────────────── */}
-                  <Route
-                    path="dashboard/:section?"
-                    element={
-                      <ProtectedRoute>
-                        <DashboardPage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ── Mobile account hub (Airbnb-style "Profile" tab) ────── */}
-                  <Route
-                    path="account"
-                    element={
-                      <ProtectedRoute>
-                        <MobileProfilePage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ── Account settings (protected) ───────────────────────── */}
-                  <Route
-                    path="settings/:section?"
-                    element={
-                      <ProtectedRoute>
-                        <SettingsPage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ── Admin dashboard (protected, admin role only) ───────── */}
-                  <Route
-                    path="admin/:section?"
-                    element={
-                      <RoleRoute roles={["admin"]}>
-                        <AdminLayout />
-                      </RoleRoute>
-                    }
-                  />
-
-                  {/* ── Wishlists ──────────────────────────────────────────── */}
-                  <Route
-                    path="wishlist/shared/:token"
-                    element={<SharedWishlistPage />}
-                  />
-                  <Route
-                    path="wishlist"
-                    element={
-                      <ProtectedRoute>
-                        <WishlistPage />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="wishlist/:id"
-                    element={
-                      <ProtectedRoute>
-                        <WishlistPage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ── Notifications ──────────────────────────────────────── */}
-                  <Route
-                    path="notifications"
-                    element={
-                      <ProtectedRoute>
-                        <NotificationsPage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ── Wishlists ──────────────────────────────────────────── */}
-                  <Route
-                    path="wishlists"
-                    element={
-                      <ProtectedRoute>
-                        <ResponsiveWishlistCollectionPage />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* ── Auth pages (redirect away if already logged in) ───── */}
-                  <Route
-                    path="login"
-                    element={
-                      <GuestRoute>
-                        <LoginPage />
-                      </GuestRoute>
-                    }
-                  />
-                  <Route
-                    path="login/2fa"
-                    element={
-                      <GuestRoute>
-                        <TwoFactorChallengePage />
-                      </GuestRoute>
-                    }
-                  />
-                  <Route
-                    path="signup"
-                    element={
-                      <GuestRoute>
-                        <SignupPage />
-                      </GuestRoute>
-                    }
-                  />
-
-                  {/* ── Password recovery (always public) ────────────────── */}
-                  <Route
-                    path="forgot-password"
-                    element={<ForgotPasswordPage />}
-                  />
-                  <Route
-                    path="reset-password"
-                    element={<ResetPasswordPage />}
-                  />
-
-                  {/* ── Email verification ────────────────────────────────── */}
-                  <Route path="verify-email" element={<VerifyEmailPage />} />
-                  <Route
-                    path="verify-email/pending"
-                    element={<VerifyEmailPage />}
-                  />
-
-                  {/* ── Legal ────────────────────────────────────────────── */}
-                  <Route path="privacy" element={<PrivacyPage />} />
-                  <Route path="terms" element={<TermsPage />} />
-
-                  {/* ── Dev-only ─────────────────────────────────────────── */}
-                  {isDev && (
+                    {/* ── Public ───────────────────────────────────────────── */}
+                    <Route index element={<HomePage />} />
+                    <Route path="help" element={<HelpCenterPage />} />
                     <Route
-                      path="design-system"
-                      element={<DesignSystemPage />}
+                      path="listings"
+                      element={<ResponsiveListingsPage />}
                     />
-                  )}
+                    <Route
+                      path="listings/:id"
+                      element={<ResponsiveListingShowPage />}
+                    />
 
-                  {/* ── 404 ──────────────────────────────────────────────── */}
-                  <Route path="*" element={<NotFoundPage />} />
-                </Route>
+                    {/* ── User profile (public — self gets editable sections) ── */}
+                    <Route
+                      path="users/:username"
+                      element={<UserProfilePage />}
+                    />
+
+                    {/* ── Protected — authenticated + email verified ────────── */}
+                    <Route
+                      path="listings/new"
+                      element={
+                        <EmailVerifiedRoute>
+                          <NewListingPage />
+                        </EmailVerifiedRoute>
+                      }
+                    />
+                    <Route
+                      path="listings/:id/edit"
+                      element={
+                        <ProtectedRoute>
+                          <EditListingPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── User dashboard (protected) ─────────────────────────── */}
+                    <Route
+                      path="dashboard/:section?"
+                      element={
+                        <ProtectedRoute>
+                          <DashboardPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── Mobile account hub (Airbnb-style "Profile" tab) ────── */}
+                    <Route
+                      path="account"
+                      element={
+                        <ProtectedRoute>
+                          <MobileProfilePage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── Account settings (protected) ───────────────────────── */}
+                    <Route
+                      path="settings/:section?"
+                      element={
+                        <ProtectedRoute>
+                          <SettingsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── Admin dashboard (protected, admin role only) ───────── */}
+                    <Route
+                      path="admin/:section?"
+                      element={
+                        <RoleRoute roles={["admin"]}>
+                          <AdminLayout />
+                        </RoleRoute>
+                      }
+                    />
+
+                    {/* ── Wishlists ──────────────────────────────────────────── */}
+                    <Route
+                      path="wishlist/shared/:token"
+                      element={<SharedWishlistPage />}
+                    />
+                    <Route
+                      path="wishlist"
+                      element={
+                        <ProtectedRoute>
+                          <WishlistPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="wishlist/:id"
+                      element={
+                        <ProtectedRoute>
+                          <WishlistPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── Notifications ──────────────────────────────────────── */}
+                    <Route
+                      path="notifications"
+                      element={
+                        <ProtectedRoute>
+                          <NotificationsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── Wishlists ──────────────────────────────────────────── */}
+                    <Route
+                      path="wishlists"
+                      element={
+                        <ProtectedRoute>
+                          <ResponsiveWishlistCollectionPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── Auth pages (redirect away if already logged in) ───── */}
+                    <Route
+                      path="login"
+                      element={
+                        <GuestRoute>
+                          <LoginPage />
+                        </GuestRoute>
+                      }
+                    />
+                    <Route
+                      path="login/2fa"
+                      element={
+                        <GuestRoute>
+                          <TwoFactorChallengePage />
+                        </GuestRoute>
+                      }
+                    />
+                    <Route
+                      path="signup"
+                      element={
+                        <GuestRoute>
+                          <SignupPage />
+                        </GuestRoute>
+                      }
+                    />
+
+                    {/* ── Password recovery (always public) ────────────────── */}
+                    <Route
+                      path="forgot-password"
+                      element={<ForgotPasswordPage />}
+                    />
+                    <Route
+                      path="reset-password"
+                      element={<ResetPasswordPage />}
+                    />
+
+                    {/* ── Email verification ────────────────────────────────── */}
+                    <Route path="verify-email" element={<VerifyEmailPage />} />
+                    <Route
+                      path="verify-email/pending"
+                      element={<VerifyEmailPage />}
+                    />
+
+                    {/* ── Legal ────────────────────────────────────────────── */}
+                    <Route path="privacy" element={<PrivacyPage />} />
+                    <Route path="terms" element={<TermsPage />} />
+                    <Route path="cookies" element={<CookieSettingsPage />} />
+                    <Route path="about" element={<AboutPage />} />
+                    <Route path="sitemap" element={<SitemapPage />} />
+                    <Route
+                      path="developers/api"
+                      element={<ApiReferencePage />}
+                    />
+                    <Route
+                      path="messages/:bookingId?"
+                      element={
+                        <ProtectedRoute>
+                          <MessagesPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="company/:slug"
+                      element={<SiteInformationPage />}
+                    />
+                    <Route
+                      path="support/:slug"
+                      element={<SiteInformationPage />}
+                    />
+                    <Route
+                      path="support/report"
+                      element={
+                        <ProtectedRoute>
+                          <ReportConcernPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* ── Dev-only ─────────────────────────────────────────── */}
+                    {isDev && (
+                      <Route
+                        path="design-system"
+                        element={<DesignSystemPage />}
+                      />
+                    )}
+
+                    {/* ── 404 ──────────────────────────────────────────────── */}
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Route>
                 </Routes>
               </MotionConfig>
             </AuthInit>

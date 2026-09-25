@@ -7,9 +7,8 @@ function Breadcrumbs({ items }) {
     <Stack
       direction="row"
       spacing={0.75}
-      alignItems="center"
       aria-label="Breadcrumb"
-      sx={{ mb: 1, flexWrap: "wrap" }}
+      sx={{ mb: 1, flexWrap: "wrap", alignItems: "center" }}
     >
       {items.map((item, i) => {
         const isLast = i === items.length - 1;
@@ -18,7 +17,7 @@ function Breadcrumbs({ items }) {
             key={item.label}
             direction="row"
             spacing={0.75}
-            alignItems="center"
+            sx={{ alignItems: "center" }}
           >
             {item.to && !isLast ? (
               <Typography
@@ -26,7 +25,7 @@ function Breadcrumbs({ items }) {
                 to={item.to}
                 variant="caption"
                 sx={{
-                  color: neutral[500],
+                  color: "var(--color-text-secondary)",
                   textDecoration: "none",
                   fontWeight: 600,
                   "&:hover": { color: brand[600], textDecoration: "underline" },
@@ -39,7 +38,9 @@ function Breadcrumbs({ items }) {
                 variant="caption"
                 aria-current={isLast ? "page" : undefined}
                 sx={{
-                  color: isLast ? neutral[700] : neutral[500],
+                  color: isLast
+                    ? "var(--color-text)"
+                    : "var(--color-text-secondary)",
                   fontWeight: 600,
                 }}
               >
@@ -50,7 +51,7 @@ function Breadcrumbs({ items }) {
               <Typography
                 variant="caption"
                 aria-hidden="true"
-                sx={{ color: neutral[300] }}
+                sx={{ color: "var(--color-border-strong)" }}
               >
                 /
               </Typography>
@@ -77,6 +78,7 @@ export function PageHeader({
     <Box
       component="header"
       sx={{
+        pt: { xs: 4, md: 6 },
         pb: 3,
         mb: 4,
         borderBottom: divider ? "1px solid" : "none",
@@ -97,12 +99,14 @@ export function PageHeader({
 
       <Stack
         direction={{ xs: "column", sm: "row" }}
-        alignItems={{
-          xs: isCenter ? "center" : "flex-start",
-          sm: isCenter ? "center" : "flex-end",
-        }}
-        justifyContent={isCenter ? "center" : "space-between"}
         spacing={2}
+        sx={{
+          alignItems: {
+            xs: isCenter ? "center" : "flex-start",
+            sm: isCenter ? "center" : "flex-end",
+          },
+          justifyContent: isCenter ? "center" : "space-between",
+        }}
       >
         <Box sx={{ minWidth: 0 }}>
           {eyebrow && (
@@ -121,7 +125,7 @@ export function PageHeader({
                 fontWeight: 400,
                 fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)",
                 lineHeight: 1.15,
-                color: neutral[800],
+                color: "var(--color-text)",
                 letterSpacing: "-0.015em",
               }}
             >
@@ -135,7 +139,11 @@ export function PageHeader({
             (typeof subtitle === "string" ? (
               <Typography
                 variant="body2"
-                sx={{ color: neutral[500], mt: 0.75, maxWidth: 560 }}
+                sx={{
+                  color: "var(--color-text-secondary)",
+                  mt: 0.75,
+                  maxWidth: 560,
+                }}
               >
                 {subtitle}
               </Typography>
@@ -148,9 +156,12 @@ export function PageHeader({
           <Stack
             direction="row"
             spacing={1.5}
-            alignItems="center"
-            flexWrap="wrap"
-            sx={{ flexShrink: 0, width: { xs: "100%", sm: "auto" } }}
+            sx={{
+              alignItems: "center",
+              flexWrap: "wrap",
+              flexShrink: 0,
+              width: { xs: "100%", sm: "auto" },
+            }}
           >
             {actions}
           </Stack>

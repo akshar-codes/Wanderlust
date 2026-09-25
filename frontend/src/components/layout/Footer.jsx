@@ -2,8 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { brand, neutral, semantic } from "../../theme/tokens";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import { useCurrency } from "../../hooks/useCurrency";
+import { useColorModeContext } from "../../hooks/useColorMode";
 import { formatPrice } from "../../utils/currency";
+import { useAuthStore } from "../../store/auth.store";
+import { translateFooter } from "../../i18n/footer";
 import {
   Compass,
   Twitter,
@@ -42,33 +46,34 @@ const columns = [
     heading: "Hosting",
     links: [
       { label: "List your space", to: "/listings/new" },
-      { label: "Host resources", to: "#" },
-      { label: "Community forum", to: "#" },
-      { label: "Host guarantee", to: "#" },
-      { label: "Responsible hosting", to: "#" },
-      { label: "Superhost programme", to: "#" },
+      { label: "Host resources", to: "/help" },
+      { label: "Community forum", to: "/help" },
+      { label: "Host guarantee", to: "/help" },
+      { label: "Responsible hosting", to: "/help" },
+      { label: "Superhost programme", to: "/help" },
     ],
   },
   {
     heading: "Support",
     links: [
-      { label: "Help centre", to: "#" },
-      { label: "Safety information", to: "#" },
-      { label: "Cancellation options", to: "#" },
-      { label: "Report a concern", to: "#" },
-      { label: "Accessibility", to: "#" },
-      { label: "Contact us", to: "#" },
+      { label: "Help centre", to: "/help" },
+      { label: "Safety information", to: "/support/safety" },
+      { label: "Cancellation options", to: "/support/cancellations" },
+      { label: "Report a concern", to: "/support/report" },
+      { label: "Accessibility", to: "/support/accessibility" },
+      { label: "Contact us", to: "/support/contact" },
     ],
   },
   {
     heading: "Company",
     links: [
-      { label: "About Wanderlust", to: "#" },
-      { label: "Newsroom", to: "#" },
-      { label: "Careers", to: "#" },
-      { label: "Investors", to: "#" },
-      { label: "Gift cards", to: "#" },
-      { label: "Brand assets", to: "#" },
+      { label: "About Wanderlust", to: "/about" },
+      { label: "Newsroom", to: "/company/newsroom" },
+      { label: "Careers", to: "/company/careers" },
+      { label: "Investors", to: "/company/investors" },
+      { label: "Gift cards", to: "/company/gift-cards" },
+      { label: "Brand assets", to: "/company/brand-assets" },
+      { label: "Developer API", to: "/developers/api" },
     ],
   },
 ];
@@ -108,7 +113,14 @@ const badges = [
 ];
 
 export default function Footer() {
+  const { resolvedMode } = useColorModeContext();
+  const isDark = resolvedMode === "dark";
+
   const { currency } = useCurrency();
+  const language = useAuthStore(
+    (state) => state.user?.settings?.language ?? "en",
+  );
+  const t = (text) => translateFooter(language, text);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
@@ -123,16 +135,19 @@ export default function Footer() {
   return (
     <footer
       style={{
-        background: neutral[50],
-        borderTop: "1px solid #ebe7e3",
+        background: "var(--color-surface-2)",
+        borderTop: "1px solid var(--color-border)",
         marginTop: "auto",
       }}
     >
       {/* Top band — newsletter */}
       <div
         style={{
-          background: `linear-gradient(135deg, ${neutral[800]}, ${neutral[700]})`,
+          background: isDark
+            ? "linear-gradient(135deg, #261f1a, #3d3630)"
+            : `linear-gradient(135deg, ${brand[50]}, ${brand[100]})`,
           padding: "48px 24px",
+          borderBottom: isDark ? "none" : "1px solid var(--color-border)",
         }}
       >
         <div
@@ -153,32 +168,35 @@ export default function Footer() {
                 fontWeight: 700,
                 letterSpacing: "0.12em",
                 textTransform: "uppercase",
-                color: brand[200],
+                color: isDark ? brand[200] : brand[600],
                 marginBottom: 10,
               }}
             >
-              Stay inspired
+              {t("Stay inspired")}
             </p>
             <h3
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
                 fontSize: "clamp(1.5rem, 3vw, 2rem)",
-                color: neutral[0],
+                color: isDark ? "#fff" : "var(--color-text)",
                 marginBottom: 10,
                 lineHeight: 1.2,
               }}
             >
-              Discover places you'll love
+              {t("Discover places you'll love")}
             </h3>
             <p
               style={{
                 fontSize: "0.875rem",
-                color: "rgba(255,255,255,0.55)",
+                color: isDark
+                  ? "rgba(255,255,255,0.55)"
+                  : "var(--color-text-secondary)",
                 lineHeight: 1.7,
               }}
             >
-              Get handpicked listings, travel inspo, and exclusive deals
-              delivered to your inbox.
+              {t(
+                "Get handpicked listings, travel inspo, and exclusive deals delivered to your inbox.",
+              )}
             </p>
           </div>
 
@@ -219,16 +237,20 @@ export default function Footer() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email address"
+                  placeholder={t("Your email address")}
                   required
                   style={{
                     flex: 1,
                     padding: "13px 18px",
-                    background: "rgba(255,255,255,0.1)",
-                    border: "1.5px solid rgba(255,255,255,0.15)",
+                    background: isDark
+                      ? "rgba(255,255,255,0.1)"
+                      : "var(--color-surface)",
+                    border: isDark
+                      ? "1.5px solid rgba(255,255,255,0.15)"
+                      : "1.5px solid var(--color-border)",
                     borderRight: "none",
                     borderRadius: "12px 0 0 12px",
-                    color: neutral[0],
+                    color: isDark ? "#fff" : "var(--color-text)",
                     fontSize: "0.875rem",
                     outline: "none",
                     fontFamily: "inherit",
@@ -246,7 +268,7 @@ export default function Footer() {
                     background: brand[500],
                     border: "1.5px solid #ff5a5f",
                     borderRadius: "0 12px 12px 0",
-                    color: neutral[0],
+                    color: "#fff",
                     fontWeight: 600,
                     fontSize: "0.875rem",
                     cursor: "pointer",
@@ -254,7 +276,7 @@ export default function Footer() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  Subscribe <ArrowRight size={14} />
+                  {t("Subscribe")} <ArrowRight size={14} />
                 </motion.button>
               </>
             )}
@@ -290,7 +312,7 @@ export default function Footer() {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.2rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                 }}
               >
                 Wanderlust
@@ -299,7 +321,7 @@ export default function Footer() {
             <p
               style={{
                 fontSize: "0.8125rem",
-                color: neutral[500],
+                color: "var(--color-text-secondary)",
                 lineHeight: 1.7,
                 marginBottom: 20,
               }}
@@ -318,11 +340,11 @@ export default function Footer() {
                   <span
                     style={{
                       fontSize: "0.75rem",
-                      color: neutral[600],
+                      color: "var(--color-text-secondary)",
                       fontWeight: 500,
                     }}
                   >
-                    {b.label}
+                    {t(b.label)}
                   </span>
                 </div>
               ))}
@@ -343,23 +365,23 @@ export default function Footer() {
                     width: 40,
                     height: 40,
                     borderRadius: 10,
-                    background: neutral[100],
-                    border: "1px solid #ebe7e3",
+                    background: "var(--color-surface-2)",
+                    border: "1px solid var(--color-border)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: neutral[600],
+                    color: "var(--color-text-secondary)",
                     textDecoration: "none",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = brand[500];
-                    e.currentTarget.style.color = neutral[0];
+                    e.currentTarget.style.color = "#fff";
                     e.currentTarget.style.borderColor = brand[500];
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = neutral[100];
-                    e.currentTarget.style.color = neutral[600];
-                    e.currentTarget.style.borderColor = neutral[200];
+                    e.currentTarget.style.background = "var(--color-surface-2)";
+                    e.currentTarget.style.color = "var(--color-text-secondary)";
+                    e.currentTarget.style.borderColor = "var(--color-border)";
                   }}
                 >
                   {s.icon}
@@ -377,11 +399,11 @@ export default function Footer() {
                   fontWeight: 700,
                   letterSpacing: "0.10em",
                   textTransform: "uppercase",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   marginBottom: 16,
                 }}
               >
-                {col.heading}
+                {t(col.heading)}
               </h4>
               <ul
                 style={{
@@ -399,7 +421,7 @@ export default function Footer() {
                       to={link.to}
                       style={{
                         fontSize: "0.875rem",
-                        color: neutral[500],
+                        color: "var(--color-text-secondary)",
                         textDecoration: "none",
                         transition: "color 0.15s",
                       }}
@@ -407,10 +429,11 @@ export default function Footer() {
                         e.currentTarget.style.color = brand[500];
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.color = neutral[500];
+                        e.currentTarget.style.color =
+                          "var(--color-text-secondary)";
                       }}
                     >
-                      {link.label}
+                      {t(link.label)}
                     </Link>
                   </li>
                 ))}
@@ -424,7 +447,7 @@ export default function Footer() {
           style={{
             marginTop: 40,
             paddingTop: 32,
-            borderTop: "1px solid #ebe7e3",
+            borderTop: "1px solid var(--color-border)",
             display: "flex",
             flexWrap: "wrap",
             alignItems: "center",
@@ -444,7 +467,7 @@ export default function Footer() {
                   alignItems: "center",
                   gap: 8,
                   padding: "9px 16px",
-                  background: neutral[800],
+                  background: "var(--color-surface-3)",
                   borderRadius: 10,
                   textDecoration: "none",
                 }}
@@ -462,7 +485,7 @@ export default function Footer() {
                 <span
                   style={{
                     fontSize: "0.875rem",
-                    color: neutral[0],
+                    color: "#fff",
                     fontWeight: 600,
                     lineHeight: 1,
                   }}
@@ -485,13 +508,13 @@ export default function Footer() {
                 border: "1px solid #d6d0ca",
                 borderRadius: 8,
                 fontSize: "0.8125rem",
-                color: neutral[600],
+                color: "var(--color-text-secondary)",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 fontWeight: 500,
               }}
             >
-              <Globe size={13} /> English
+              <Globe size={13} /> {t("English")}
             </button>
             <button
               style={{
@@ -503,7 +526,7 @@ export default function Footer() {
                 border: "1px solid #d6d0ca",
                 borderRadius: 8,
                 fontSize: "0.8125rem",
-                color: neutral[600],
+                color: "var(--color-text-secondary)",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 fontWeight: 500,
@@ -525,7 +548,7 @@ export default function Footer() {
             gap: 12,
           }}
         >
-          <p style={{ fontSize: "0.8rem", color: neutral[400] }}>
+          <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
             © {new Date().getFullYear()} WanderLust Private Limited · All rights
             reserved.
           </p>
@@ -533,21 +556,25 @@ export default function Footer() {
             {[
               { label: "Privacy Policy", to: "/privacy" },
               { label: "Terms of Service", to: "/terms" },
-              { label: "Cookie Settings", to: "#" },
-              { label: "Sitemap", to: "#" },
+              { label: "Cookie Settings", to: "/cookies" },
+              { label: "Sitemap", to: "/sitemap" },
             ].map((link) => (
               <Link
                 key={link.label}
                 to={link.to}
                 style={{
                   fontSize: "0.8rem",
-                  color: neutral[400],
+                  color: "var(--color-text-muted)",
                   textDecoration: "none",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = neutral[600])}
-                onMouseLeave={(e) => (e.currentTarget.style.color = neutral[400])}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = "var(--color-text-secondary)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "var(--color-text-muted)")
+                }
               >
-                {link.label}
+                {t(link.label)}
               </Link>
             ))}
           </div>

@@ -25,13 +25,13 @@ export default class ErrorBoundary extends Component {
             justifyContent: "center",
             minHeight: "100svh",
             padding: 24,
-            background: "#faf8f6",
+            background: "var(--color-surface-2)",
           }}
         >
           <div
             style={{
-              background: "#fff",
-              border: "1px solid #ebe7e3",
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
               borderRadius: 28,
               padding: "48px 40px",
               maxWidth: 480,
@@ -96,7 +96,7 @@ export default class ErrorBoundary extends Component {
                 onClick={() => this.setState({ hasError: false, error: null })}
                 style={{
                   padding: "10px 22px",
-                  background: "#fff",
+                  background: "var(--color-surface)",
                   border: "1.5px solid #d6d0ca",
                   borderRadius: 999,
                   fontWeight: 600,

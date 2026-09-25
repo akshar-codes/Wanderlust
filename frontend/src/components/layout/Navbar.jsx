@@ -16,13 +16,19 @@ import {
   Settings,
   HelpCircle,
   Sparkles,
+  MessageSquare,
 } from "lucide-react";
 import { Badge, Avatar, Tooltip, Drawer, Divider } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../../store/auth.store";
 import { useLogout } from "../../hooks/useAuth";
 import { useColorModeContext } from "../../hooks/useColorMode";
-import { useNotifications, useUnreadCount, useMarkRead, useMarkAllRead } from "../../hooks/useNotifications";
+import {
+  useNotifications,
+  useUnreadCount,
+  useMarkRead,
+  useMarkAllRead,
+} from "../../hooks/useNotifications";
 import { Moon, Sun } from "lucide-react";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 
@@ -71,9 +77,7 @@ function NavSearch({ onSubmitSearch }) {
     <motion.div
       className="nav-search-pill"
       animate={{
-        boxShadow: focused
-          ? shadows.focus
-          : "0 2px 12px rgba(0,0,0,0.08)",
+        boxShadow: focused ? shadows.focus : "0 2px 12px rgba(0,0,0,0.08)",
       }}
       transition={{ duration: 0.2 }}
       style={{
@@ -113,7 +117,7 @@ function NavSearch({ onSubmitSearch }) {
           outline: "none",
           background: "transparent",
           fontSize: "0.875rem",
-          color: neutral[700],
+          color: "var(--color-text)",
           fontFamily: "inherit",
         }}
       />
@@ -193,8 +197,8 @@ function NotificationMenu() {
             width: 40,
             height: 40,
             borderRadius: 999,
-            background: open ? "rgba(255,90,95,0.08)" : "rgba(255,255,255,0.7)",
-            border: "1.5px solid rgba(230,224,218,0.8)",
+            background: open ? "rgba(255,90,95,0.08)" : "var(--color-surface)",
+            border: "1.5px solid var(--color-nav-border)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -203,7 +207,10 @@ function NotificationMenu() {
             position: "relative",
           }}
         >
-          <Bell size={17} color={open ? brand[500] : neutral[600]} />
+          <Bell
+            size={17}
+            color={open ? brand[500] : "var(--color-text-secondary)"}
+          />
           {unreadCount > 0 && (
             <span
               style={{
@@ -245,9 +252,9 @@ function NotificationMenu() {
               top: "calc(100% + 10px)",
               right: 0,
               width: 340,
-              background: "rgba(255,255,255,0.97)",
+              background: "var(--color-dropdown-bg)",
               backdropFilter: "blur(24px)",
-              border: "1.5px solid rgba(230,224,218,0.8)",
+              border: "1.5px solid var(--color-nav-border)",
               borderRadius: 18,
               boxShadow:
                 "0 20px 60px rgba(61,43,26,0.14), 0 4px 16px rgba(61,43,26,0.06)",
@@ -258,7 +265,7 @@ function NotificationMenu() {
             <div
               style={{
                 padding: "16px 20px 12px",
-                borderBottom: "1px solid rgba(230,224,218,0.6)",
+                borderBottom: "1px solid var(--color-nav-border)",
               }}
             >
               <div
@@ -272,7 +279,7 @@ function NotificationMenu() {
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                     fontSize: "1.1rem",
-                    color: neutral[800],
+                    color: "var(--color-text)",
                   }}
                 >
                   Notifications
@@ -294,7 +301,14 @@ function NotificationMenu() {
               </div>
             </div>
             {notifications.length === 0 ? (
-              <div style={{ padding: "30px 20px", textAlign: "center", color: neutral[500], fontSize: "0.875rem" }}>
+              <div
+                style={{
+                  padding: "30px 20px",
+                  textAlign: "center",
+                  color: "var(--color-text-secondary)",
+                  fontSize: "0.875rem",
+                }}
+              >
                 No new notifications.
               </div>
             ) : (
@@ -303,7 +317,7 @@ function NotificationMenu() {
                   type="button"
                   key={n.id}
                   onClick={() => handleNotificationClick(n)}
-                  whileHover={{ background: "rgba(250,248,246,1)" }}
+                  whileHover={{ background: "var(--color-surface-2)" }}
                   style={{
                     display: "flex",
                     width: "100%",
@@ -311,8 +325,10 @@ function NotificationMenu() {
                     border: "none",
                     gap: 12,
                     padding: "14px 20px",
-                    background: !n.read ? "rgba(255,90,95,0.04)" : "transparent",
-                    borderBottom: "1px solid rgba(230,224,218,0.4)",
+                    background: !n.read
+                      ? "rgba(255,90,95,0.04)"
+                      : "transparent",
+                    borderBottom: "1px solid var(--color-nav-border)",
                     cursor: "pointer",
                     alignItems: "flex-start",
                   }}
@@ -322,21 +338,28 @@ function NotificationMenu() {
                       width: 36,
                       height: 36,
                       borderRadius: 10,
-                      background: !n.read ? "rgba(255,90,95,0.12)" : neutral[100],
+                      background: !n.read
+                        ? "rgba(255,90,95,0.12)"
+                        : neutral[100],
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       flexShrink: 0,
                     }}
                   >
-                    <Bell size={15} color={!n.read ? brand[500] : neutral[500]} />
+                    <Bell
+                      size={15}
+                      color={
+                        !n.read ? brand[500] : "var(--color-text-secondary)"
+                      }
+                    />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p
                       style={{
                         fontSize: "0.8125rem",
                         fontWeight: 600,
-                        color: neutral[800],
+                        color: "var(--color-text)",
                         marginBottom: 2,
                       }}
                     >
@@ -345,7 +368,7 @@ function NotificationMenu() {
                     <p
                       style={{
                         fontSize: "0.75rem",
-                        color: neutral[500],
+                        color: "var(--color-text-secondary)",
                         marginBottom: 4,
                         lineHeight: 1.4,
                       }}
@@ -422,6 +445,7 @@ function UserMenu({ user, onLogout, isPending }) {
     },
     { icon: <Heart size={15} />, label: "Wishlist", to: "/wishlist" },
     { icon: <Sparkles size={15} />, label: "My listings", to: "/dashboard" },
+    { icon: <MessageSquare size={15} />, label: "Messages", to: "/messages" },
     null,
     { icon: <Settings size={15} />, label: "Settings", to: "/settings" },
     {
@@ -429,8 +453,12 @@ function UserMenu({ user, onLogout, isPending }) {
       label: mode === "dark" ? "Light Mode" : "Dark Mode",
       onClick: toggle,
     },
-    { icon: <HelpCircle size={15} />, label: "Help", to: "#" },
-    { icon: <Globe size={15} />, label: "Language · EN", to: "#" },
+    { icon: <HelpCircle size={15} />, label: "Help", to: "/help" },
+    {
+      icon: <Globe size={15} />,
+      label: "Language · EN",
+      to: "/settings/appearance",
+    },
     null,
     {
       icon: <LogOut size={15} />,
@@ -454,8 +482,8 @@ function UserMenu({ user, onLogout, isPending }) {
           alignItems: "center",
           gap: 8,
           padding: "5px 8px 5px 5px",
-          background: open ? "rgba(250,248,246,1)" : "rgba(255,255,255,0.7)",
-          border: `1.5px solid ${open ? "rgba(180,168,160,0.8)" : "rgba(230,224,218,0.8)"}`,
+          background: open ? "var(--color-surface-2)" : "var(--color-surface)",
+          border: `1.5px solid ${open ? "rgba(180,168,160,0.8)" : "var(--color-nav-border)"}`,
           borderRadius: 999,
           cursor: "pointer",
           backdropFilter: "blur(8px)",
@@ -475,7 +503,11 @@ function UserMenu({ user, onLogout, isPending }) {
           {initial}
         </Avatar>
         <span
-          style={{ fontSize: "0.8125rem", fontWeight: 600, color: neutral[700] }}
+          style={{
+            fontSize: "0.8125rem",
+            fontWeight: 600,
+            color: "var(--color-text)",
+          }}
         >
           {user?.username ?? "Account"}
         </span>
@@ -483,7 +515,7 @@ function UserMenu({ user, onLogout, isPending }) {
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown size={13} color={neutral[500]} />
+          <ChevronDown size={13} color={"var(--color-text-secondary)"} />
         </motion.div>
       </motion.button>
 
@@ -503,9 +535,9 @@ function UserMenu({ user, onLogout, isPending }) {
               top: "calc(100% + 10px)",
               right: 0,
               width: 220,
-              background: "rgba(255,255,255,0.97)",
+              background: "var(--color-dropdown-bg)",
               backdropFilter: "blur(24px)",
-              border: "1.5px solid rgba(230,224,218,0.8)",
+              border: "1.5px solid var(--color-nav-border)",
               borderRadius: 16,
               boxShadow:
                 "0 20px 60px rgba(61,43,26,0.14), 0 4px 16px rgba(61,43,26,0.06)",
@@ -530,20 +562,25 @@ function UserMenu({ user, onLogout, isPending }) {
                 style={{
                   fontSize: "0.875rem",
                   fontWeight: 700,
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   marginTop: 2,
                 }}
               >
                 {user?.username}
               </p>
-              <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
                 {user?.email}
               </p>
             </div>
             <div
               style={{
                 height: 1,
-                background: "rgba(230,224,218,0.6)",
+                background: "var(--color-nav-border)",
                 margin: "4px 0",
               }}
             />
@@ -553,7 +590,7 @@ function UserMenu({ user, onLogout, isPending }) {
                   key={`div-${i}`}
                   style={{
                     height: 1,
-                    background: "rgba(230,224,218,0.6)",
+                    background: "var(--color-nav-border)",
                     margin: "4px 0",
                   }}
                 />
@@ -563,7 +600,7 @@ function UserMenu({ user, onLogout, isPending }) {
                   whileHover={{
                     background: item.danger
                       ? "rgba(255,90,95,0.06)"
-                      : "rgba(250,248,246,1)",
+                      : "var(--color-surface-2)",
                   }}
                   style={{ borderRadius: 10, overflow: "hidden" }}
                 >
@@ -585,12 +622,16 @@ function UserMenu({ user, onLogout, isPending }) {
                         width: "100%",
                         fontSize: "0.875rem",
                         fontWeight: 500,
-                        color: item.danger ? brand[600] : neutral[700],
+                        color: item.danger ? brand[600] : "var(--color-text)",
                         fontFamily: "inherit",
                       }}
                     >
                       <span
-                        style={{ color: item.danger ? brand[600] : neutral[500] }}
+                        style={{
+                          color: item.danger
+                            ? brand[600]
+                            : "var(--color-text-secondary)",
+                        }}
                       >
                         {item.icon}
                       </span>
@@ -607,11 +648,13 @@ function UserMenu({ user, onLogout, isPending }) {
                         padding: "9px 14px",
                         fontSize: "0.875rem",
                         fontWeight: 500,
-                        color: neutral[700],
+                        color: "var(--color-text)",
                         textDecoration: "none",
                       }}
                     >
-                      <span style={{ color: neutral[500] }}>{item.icon}</span>
+                      <span style={{ color: "var(--color-text-secondary)" }}>
+                        {item.icon}
+                      </span>
                       {item.label}
                     </Link>
                   )}
@@ -636,14 +679,14 @@ function GuestButtons() {
             display: "inline-flex",
             alignItems: "center",
             padding: "8px 16px",
-            border: "1.5px solid rgba(230,224,218,0.9)",
+            border: "1.5px solid var(--color-nav-border)",
             borderRadius: 999,
             fontSize: "0.875rem",
             fontWeight: 600,
-            color: neutral[700],
+            color: "var(--color-text)",
             textDecoration: "none",
             backdropFilter: "blur(8px)",
-            background: "rgba(255,255,255,0.7)",
+            background: "var(--color-surface)",
           }}
         >
           Sign up
@@ -699,7 +742,7 @@ function MobileDrawer({
         { icon: <Heart size={18} />, label: "Wishlist", to: "#" },
         { icon: <Sparkles size={18} />, label: "My listings", to: "#" },
         { icon: <Settings size={18} />, label: "Settings", to: "/settings" },
-        { icon: <HelpCircle size={18} />, label: "Help centre", to: "#" },
+        { icon: <HelpCircle size={18} />, label: "Help centre", to: "/help" },
       ]
     : [
         { icon: <Search size={18} />, label: "Explore stays", to: "/listings" },
@@ -708,7 +751,7 @@ function MobileDrawer({
           label: "List your home",
           to: "/listings/new",
         },
-        { icon: <HelpCircle size={18} />, label: "Help centre", to: "#" },
+        { icon: <HelpCircle size={18} />, label: "Help centre", to: "/help" },
       ];
 
   const submitSearch = () => {
@@ -726,9 +769,9 @@ function MobileDrawer({
       PaperProps={{
         sx: {
           width: "min(360px, 90vw)",
-          background: "rgba(253,252,251,0.97)",
+          background: "var(--color-nav-bg)",
           backdropFilter: "blur(24px)",
-          borderLeft: "1.5px solid rgba(230,224,218,0.6)",
+          borderLeft: "1.5px solid var(--color-nav-border)",
         },
       }}
     >
@@ -740,7 +783,7 @@ function MobileDrawer({
             alignItems: "center",
             justifyContent: "space-between",
             padding: "18px 20px",
-            borderBottom: "1px solid rgba(230,224,218,0.6)",
+            borderBottom: "1px solid var(--color-nav-border)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -749,7 +792,7 @@ function MobileDrawer({
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
                 fontSize: "1.15rem",
-                color: neutral[800],
+                color: "var(--color-text)",
               }}
             >
               Wanderlust
@@ -772,7 +815,7 @@ function MobileDrawer({
               cursor: "pointer",
             }}
           >
-            <X size={18} color={neutral[600]} />
+            <X size={18} color={"var(--color-text-secondary)"} />
           </motion.button>
         </div>
 
@@ -780,7 +823,7 @@ function MobileDrawer({
         <div
           style={{
             padding: "16px 20px",
-            borderBottom: "1px solid rgba(230,224,218,0.4)",
+            borderBottom: "1px solid var(--color-nav-border)",
           }}
         >
           <div
@@ -793,7 +836,7 @@ function MobileDrawer({
               padding: "10px 14px",
             }}
           >
-            <Search size={15} color={neutral[500]} />
+            <Search size={15} color={"var(--color-text-secondary)"} />
             <input
               aria-label="Search destinations"
               value={query}
@@ -812,7 +855,7 @@ function MobileDrawer({
                 flex: 1,
                 fontSize: "0.875rem",
                 fontFamily: "inherit",
-                color: neutral[700],
+                color: "var(--color-text)",
               }}
             />
           </div>
@@ -823,7 +866,7 @@ function MobileDrawer({
           <div
             style={{
               padding: "16px 20px",
-              borderBottom: "1px solid rgba(230,224,218,0.4)",
+              borderBottom: "1px solid var(--color-nav-border)",
               display: "flex",
               alignItems: "center",
               gap: 12,
@@ -845,12 +888,17 @@ function MobileDrawer({
                 style={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                 }}
               >
                 {user.username}
               </p>
-              <p style={{ fontSize: "0.75rem", color: neutral[500] }}>
+              <p
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
                 {user.email}
               </p>
             </div>
@@ -877,7 +925,7 @@ function MobileDrawer({
                   padding: "12px 14px",
                   borderRadius: 12,
                   textDecoration: "none",
-                  color: neutral[700],
+                  color: "var(--color-text)",
                   fontWeight: 500,
                   fontSize: "0.9375rem",
                   marginBottom: 2,
@@ -889,7 +937,9 @@ function MobileDrawer({
                   (e.currentTarget.style.background = "transparent")
                 }
               >
-                <span style={{ color: neutral[500] }}>{item.icon}</span>
+                <span style={{ color: "var(--color-text-secondary)" }}>
+                  {item.icon}
+                </span>
                 {item.label}
               </Link>
             </motion.div>
@@ -900,7 +950,7 @@ function MobileDrawer({
         <div
           style={{
             padding: "16px 20px",
-            borderTop: "1px solid rgba(230,224,218,0.6)",
+            borderTop: "1px solid var(--color-nav-border)",
           }}
         >
           {isAuthenticated ? (
@@ -940,11 +990,11 @@ function MobileDrawer({
                   alignItems: "center",
                   justifyContent: "center",
                   padding: "12px",
-                  border: "1.5px solid rgba(230,224,218,0.9)",
+                  border: "1.5px solid var(--color-nav-border)",
                   borderRadius: 12,
                   fontWeight: 600,
                   fontSize: "0.875rem",
-                  color: neutral[700],
+                  color: "var(--color-text)",
                   textDecoration: "none",
                 }}
               >
@@ -985,6 +1035,7 @@ function MobileDrawer({
 //   - "collapsed" → rendered only after scrolling past the hero (Home)
 //   - "visible"   → always rendered (reserved for future use)
 export default function Navbar({ searchMode = "hidden" }) {
+  const { resolvedMode, toggle } = useColorModeContext();
   const { isAuthenticated, user } = useAuthStore();
   const { mutate: logout, isPending } = useLogout();
   const [scrolled, setScrolled] = useState(false);
@@ -1032,8 +1083,8 @@ export default function Navbar({ searchMode = "hidden" }) {
         initial={false}
         animate={{
           boxShadow: scrolled
-            ? "0 4px 32px rgba(61,43,26,0.10), 0 1px 0 rgba(230,224,218,0.8)"
-            : "0 1px 0 rgba(230,224,218,0.6)",
+            ? "0 4px 32px rgba(61,43,26,0.10), 0 1px 0 var(--color-nav-border)"
+            : "0 1px 0 var(--color-nav-border)",
         }}
         transition={{ duration: 0.3 }}
         style={{
@@ -1041,11 +1092,11 @@ export default function Navbar({ searchMode = "hidden" }) {
           top: 0,
           zIndex: 500,
           background: scrolled
-            ? "rgba(253,252,251,0.88)"
-            : "rgba(253,252,251,0.75)",
+            ? "var(--color-nav-bg-scrolled)"
+            : "var(--color-nav-bg)",
           backdropFilter: "blur(24px) saturate(1.8)",
           WebkitBackdropFilter: "blur(24px) saturate(1.8)",
-          borderBottom: "1px solid rgba(230,224,218,0.6)",
+          borderBottom: "1px solid var(--color-nav-border)",
           transition: "background 0.3s",
         }}
       >
@@ -1082,7 +1133,7 @@ export default function Navbar({ searchMode = "hidden" }) {
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                   fontSize: "1.35rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   letterSpacing: "-0.01em",
                 }}
               >
@@ -1128,6 +1179,35 @@ export default function Navbar({ searchMode = "hidden" }) {
             }}
             className="navbar-desktop-actions"
           >
+            <Tooltip
+              title={resolvedMode === "dark" ? "Light Mode" : "Dark Mode"}
+              placement="bottom"
+            >
+              <motion.button
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={toggle}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 999,
+                  background: "var(--color-surface)",
+                  border: "1.5px solid var(--color-nav-border)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  backdropFilter: "blur(8px)",
+                }}
+              >
+                {resolvedMode === "dark" ? (
+                  <Sun size={17} color="var(--color-text-secondary)" />
+                ) : (
+                  <Moon size={17} color="var(--color-text-secondary)" />
+                )}
+              </motion.button>
+            </Tooltip>
+
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
               <Link
                 to="/listings/new"
@@ -1136,12 +1216,12 @@ export default function Navbar({ searchMode = "hidden" }) {
                   alignItems: "center",
                   gap: 6,
                   padding: "8px 16px",
-                  background: "rgba(255,255,255,0.7)",
-                  border: "1.5px solid rgba(230,224,218,0.8)",
+                  background: "var(--color-surface)",
+                  border: "1.5px solid var(--color-nav-border)",
                   borderRadius: 999,
                   fontSize: "0.8125rem",
                   fontWeight: 600,
-                  color: neutral[700],
+                  color: "var(--color-text)",
                   textDecoration: "none",
                   backdropFilter: "blur(8px)",
                   whiteSpace: "nowrap",
@@ -1171,8 +1251,8 @@ export default function Navbar({ searchMode = "hidden" }) {
               width: 40,
               height: 40,
               borderRadius: 12,
-              background: "rgba(255,255,255,0.7)",
-              border: "1.5px solid rgba(230,224,218,0.8)",
+              background: "var(--color-surface)",
+              border: "1.5px solid var(--color-nav-border)",
               display: "none",
               alignItems: "center",
               justifyContent: "center",
@@ -1181,7 +1261,7 @@ export default function Navbar({ searchMode = "hidden" }) {
               backdropFilter: "blur(8px)",
             }}
           >
-            <Menu size={19} color={neutral[700]} />
+            <Menu size={19} color={"var(--color-text)"} />
           </motion.button>
         </div>
       </motion.nav>
