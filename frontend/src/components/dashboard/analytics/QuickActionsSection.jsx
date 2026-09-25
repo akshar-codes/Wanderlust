@@ -61,9 +61,9 @@ export default function QuickActionsSection() {
   return (
     <Box
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -71,7 +71,7 @@ export default function QuickActionsSection() {
         sx={{
           fontWeight: 700,
           fontSize: "1.0625rem",
-          color: neutral[800],
+          color: "var(--color-text)",
           mb: 2,
         }}
       >
@@ -90,9 +90,9 @@ export default function QuickActionsSection() {
                 gap: 1.5,
                 p: 2,
                 width: "100%",
-                border: `1px solid ${neutral[200]}`,
+                border: `1px solid var(--color-border)`,
                 borderRadius: radii.xl,
-                bgcolor: neutral[50],
+                bgcolor: "var(--color-surface-2)",
                 cursor: "pointer",
                 fontFamily: "inherit",
                 textAlign: "left",
@@ -125,14 +125,14 @@ export default function QuickActionsSection() {
                   sx={{
                     fontWeight: 700,
                     fontSize: "0.875rem",
-                    color: neutral[800],
+                    color: "var(--color-text)",
                   }}
                 >
                   {label}
                 </Typography>
                 <Typography
                   variant="caption"
-                  sx={{ color: neutral[500], lineHeight: 1.4 }}
+                  sx={{ color: "var(--color-text-secondary)", lineHeight: 1.4 }}
                 >
                   {description}
                 </Typography>

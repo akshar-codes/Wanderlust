@@ -48,9 +48,9 @@ export default function ReviewsAnalyticsSection({ range }) {
   return (
     <Box
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -58,7 +58,7 @@ export default function ReviewsAnalyticsSection({ range }) {
         sx={{
           fontWeight: 700,
           fontSize: "1.0625rem",
-          color: neutral[800],
+          color: "var(--color-text)",
           mb: 2,
         }}
       >
@@ -99,7 +99,11 @@ export default function ReviewsAnalyticsSection({ range }) {
         <Grid item xs={12} md={6}>
           <Typography
             variant="overline"
-            sx={{ color: neutral[500], display: "block", mb: 1 }}
+            sx={{
+              color: "var(--color-text-secondary)",
+              display: "block",
+              mb: 1,
+            }}
           >
             Rating distribution
           </Typography>
@@ -118,7 +122,7 @@ export default function ReviewsAnalyticsSection({ range }) {
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke={neutral[100]}
+                  stroke={"var(--color-surface-2)"}
                   horizontal={false}
                 />
                 <XAxis type="number" hide />
@@ -126,7 +130,7 @@ export default function ReviewsAnalyticsSection({ range }) {
                   type="category"
                   dataKey="star"
                   tickFormatter={(v) => `${v}★`}
-                  tick={{ fontSize: 12, fill: neutral[500] }}
+                  tick={{ fontSize: 12, fill: "var(--color-text-secondary)" }}
                   axisLine={false}
                   tickLine={false}
                   width={32}
@@ -147,7 +151,11 @@ export default function ReviewsAnalyticsSection({ range }) {
         <Grid item xs={12} md={6}>
           <Typography
             variant="overline"
-            sx={{ color: neutral[500], display: "block", mb: 1 }}
+            sx={{
+              color: "var(--color-text-secondary)",
+              display: "block",
+              mb: 1,
+            }}
           >
             Category ratings
           </Typography>
@@ -158,7 +166,13 @@ export default function ReviewsAnalyticsSection({ range }) {
               sx={{ borderRadius: "16px" }}
             />
           ) : categoryData.length === 0 ? (
-            <Box sx={{ py: 5, textAlign: "center", color: neutral[400] }}>
+            <Box
+              sx={{
+                py: 5,
+                textAlign: "center",
+                color: "var(--color-text-muted)",
+              }}
+            >
               <Typography variant="body2">No category ratings yet.</Typography>
             </Box>
           ) : (
@@ -166,13 +180,13 @@ export default function ReviewsAnalyticsSection({ range }) {
               <BarChart data={categoryData} margin={{ top: 8 }}>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke={neutral[100]}
+                  stroke={"var(--color-surface-2)"}
                   vertical={false}
                 />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 10, fill: neutral[500] }}
-                  axisLine={{ stroke: neutral[200] }}
+                  tick={{ fontSize: 10, fill: "var(--color-text-secondary)" }}
+                  axisLine={{ stroke: "var(--color-border)" }}
                   tickLine={false}
                   interval={0}
                   angle={-20}
@@ -181,7 +195,7 @@ export default function ReviewsAnalyticsSection({ range }) {
                 />
                 <YAxis
                   domain={[0, 5]}
-                  tick={{ fontSize: 11, fill: neutral[400] }}
+                  tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
                   axisLine={false}
                   tickLine={false}
                   width={24}
@@ -203,7 +217,11 @@ export default function ReviewsAnalyticsSection({ range }) {
           <Grid item xs={12}>
             <Typography
               variant="overline"
-              sx={{ color: neutral[500], display: "block", mb: 1 }}
+              sx={{
+                color: "var(--color-text-secondary)",
+                display: "block",
+                mb: 1,
+              }}
             >
               Rating trend
             </Typography>
@@ -214,20 +232,20 @@ export default function ReviewsAnalyticsSection({ range }) {
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke={neutral[100]}
+                  stroke={"var(--color-surface-2)"}
                   vertical={false}
                 />
                 <XAxis
                   dataKey="date"
                   tickFormatter={formatDateLabel}
-                  tick={{ fontSize: 11, fill: neutral[400] }}
-                  axisLine={{ stroke: neutral[200] }}
+                  tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
+                  axisLine={{ stroke: "var(--color-border)" }}
                   tickLine={false}
                   minTickGap={24}
                 />
                 <YAxis
                   domain={[0, 5]}
-                  tick={{ fontSize: 11, fill: neutral[400] }}
+                  tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
                   axisLine={false}
                   tickLine={false}
                   width={24}
@@ -254,7 +272,11 @@ export default function ReviewsAnalyticsSection({ range }) {
         <Box sx={{ mt: 3 }}>
           <Typography
             variant="overline"
-            sx={{ color: neutral[500], display: "block", mb: 1.5 }}
+            sx={{
+              color: "var(--color-text-secondary)",
+              display: "block",
+              mb: 1.5,
+            }}
           >
             Recent reviews
           </Typography>
@@ -266,7 +288,7 @@ export default function ReviewsAnalyticsSection({ range }) {
                   display: "flex",
                   gap: 1.5,
                   p: 1.5,
-                  border: `1px solid ${neutral[200]}`,
+                  border: `1px solid var(--color-border)`,
                   borderRadius: "12px",
                 }}
               >
@@ -294,7 +316,7 @@ export default function ReviewsAnalyticsSection({ range }) {
                       sx={{
                         fontWeight: 700,
                         fontSize: "0.8125rem",
-                        color: neutral[800],
+                        color: "var(--color-text)",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -306,7 +328,7 @@ export default function ReviewsAnalyticsSection({ range }) {
                     <Typography
                       sx={{
                         fontSize: "0.75rem",
-                        color: neutral[400],
+                        color: "var(--color-text-muted)",
                         flexShrink: 0,
                       }}
                     >
@@ -316,7 +338,7 @@ export default function ReviewsAnalyticsSection({ range }) {
                   <Typography
                     variant="body2"
                     sx={{
-                      color: neutral[600],
+                      color: "var(--color-text-secondary)",
                       mt: 0.25,
                       overflow: "hidden",
                       display: "-webkit-box",

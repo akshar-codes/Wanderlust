@@ -39,9 +39,9 @@ export default function BookingTrendsSection({ range, listingId }) {
   return (
     <Box
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -49,7 +49,7 @@ export default function BookingTrendsSection({ range, listingId }) {
         sx={{
           fontWeight: 700,
           fontSize: "1.0625rem",
-          color: neutral[800],
+          color: "var(--color-text)",
           mb: 2,
         }}
       >
@@ -98,19 +98,19 @@ export default function BookingTrendsSection({ range, listingId }) {
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke={neutral[100]}
+              stroke={"var(--color-surface-2)"}
               vertical={false}
             />
             <XAxis
               dataKey="date"
               tickFormatter={formatDateLabel}
-              tick={{ fontSize: 11, fill: neutral[400] }}
-              axisLine={{ stroke: neutral[200] }}
+              tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
+              axisLine={{ stroke: "var(--color-border)" }}
               tickLine={false}
               minTickGap={24}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: neutral[400] }}
+              tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
               axisLine={false}
               tickLine={false}
               width={32}
@@ -120,7 +120,7 @@ export default function BookingTrendsSection({ range, listingId }) {
               labelFormatter={formatDateLabel}
               contentStyle={{
                 borderRadius: 10,
-                border: `1px solid ${neutral[200]}`,
+                border: `1px solid var(--color-border)`,
               }}
             />
             <Legend

@@ -8,7 +8,13 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { TrendingUp, TrendingDown, IndianRupee, Receipt, ArrowUpRight } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  IndianRupee,
+  Receipt,
+  ArrowUpRight,
+} from "lucide-react";
 import { StatsCard } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
 import { useRevenueAnalytics } from "../../../hooks/useAnalytics";
@@ -28,8 +34,8 @@ function ChartTooltip({ active, payload, label }) {
   return (
     <Box
       sx={{
-        bgcolor: "#fff",
-        border: `1px solid ${neutral[200]}`,
+        bgcolor: "var(--color-surface)",
+        border: `1px solid var(--color-border)`,
         borderRadius: "10px",
         p: 1.5,
         boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
@@ -37,7 +43,7 @@ function ChartTooltip({ active, payload, label }) {
     >
       <Typography
         variant="caption"
-        sx={{ color: neutral[500], display: "block", mb: 0.5 }}
+        sx={{ color: "var(--color-text-secondary)", display: "block", mb: 0.5 }}
       >
         {formatDateLabel(label)}
       </Typography>
@@ -62,9 +68,9 @@ export default function RevenueAnalyticsSection({ range, listingId }) {
   return (
     <Box
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -72,7 +78,7 @@ export default function RevenueAnalyticsSection({ range, listingId }) {
         sx={{
           fontWeight: 700,
           fontSize: "1.0625rem",
-          color: neutral[800],
+          color: "var(--color-text)",
           mb: 2,
         }}
       >
@@ -114,7 +120,9 @@ export default function RevenueAnalyticsSection({ range, listingId }) {
           sx={{ borderRadius: "16px" }}
         />
       ) : timeseries.length === 0 ? (
-        <Box sx={{ py: 6, textAlign: "center", color: neutral[400] }}>
+        <Box
+          sx={{ py: 6, textAlign: "center", color: "var(--color-text-muted)" }}
+        >
           <Typography variant="body2">
             No revenue data for this period.
           </Typography>
@@ -133,19 +141,19 @@ export default function RevenueAnalyticsSection({ range, listingId }) {
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke={neutral[100]}
+              stroke={"var(--color-surface-2)"}
               vertical={false}
             />
             <XAxis
               dataKey="date"
               tickFormatter={formatDateLabel}
-              tick={{ fontSize: 11, fill: neutral[400] }}
-              axisLine={{ stroke: neutral[200] }}
+              tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
+              axisLine={{ stroke: "var(--color-border)" }}
               tickLine={false}
               minTickGap={24}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: neutral[400] }}
+              tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v) => {

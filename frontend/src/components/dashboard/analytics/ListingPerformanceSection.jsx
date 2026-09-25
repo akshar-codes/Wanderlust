@@ -4,34 +4,21 @@ import { Table } from "../../ui/Table";
 import { useListingPerformance } from "../../../hooks/useAnalytics";
 import { neutral, brand, radii } from "../../../theme/tokens";
 import { formatPrice } from "../../../utils/currency";
+import { STATUS_CHIP } from "../../../utils/statusColors";
 
 function StatusChip({ draft, status }) {
   if (draft) {
-    return (
-      <Chip
-        label="Draft"
-        size="small"
-        sx={{ bgcolor: "#fef9c3", color: "#b45309", fontWeight: 700 }}
-      />
-    );
+    return <Chip label="Draft" size="small" sx={STATUS_CHIP.warning} />;
   }
   if (status === "active") {
-    return (
-      <Chip
-        label="Live"
-        size="small"
-        sx={{ bgcolor: "#dcfce7", color: "#15803d", fontWeight: 700 }}
-      />
-    );
+    return <Chip label="Live" size="small" sx={STATUS_CHIP.success} />;
   }
   return (
     <Chip
       label={status}
       size="small"
       sx={{
-        bgcolor: "#fee2e2",
-        color: "#b91c1c",
-        fontWeight: 700,
+        ...STATUS_CHIP.error,
         textTransform: "capitalize",
       }}
     />
@@ -62,7 +49,7 @@ export default function ListingPerformanceSection({ range }) {
               height: 44,
               borderRadius: "10px",
               objectFit: "cover",
-              bgcolor: neutral[100],
+              bgcolor: "var(--color-surface-2)",
               flexShrink: 0,
             }}
           />
@@ -72,7 +59,7 @@ export default function ListingPerformanceSection({ range }) {
             sx={{
               fontWeight: 700,
               fontSize: "0.8125rem",
-              color: neutral[800],
+              color: "var(--color-text)",
               textDecoration: "none",
               "&:hover": { color: brand[600] },
               whiteSpace: "nowrap",
@@ -118,9 +105,9 @@ export default function ListingPerformanceSection({ range }) {
   return (
     <Box
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -128,7 +115,7 @@ export default function ListingPerformanceSection({ range }) {
         sx={{
           fontWeight: 700,
           fontSize: "1.0625rem",
-          color: neutral[800],
+          color: "var(--color-text)",
           mb: 2,
         }}
       >

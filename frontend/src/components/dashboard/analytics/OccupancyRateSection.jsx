@@ -32,9 +32,9 @@ export default function OccupancyRateSection({ range, listingId }) {
   return (
     <Box
       sx={{
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii["2xl"],
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
         p: { xs: 2, sm: 3 },
       }}
     >
@@ -42,7 +42,7 @@ export default function OccupancyRateSection({ range, listingId }) {
         sx={{
           fontWeight: 700,
           fontSize: "1.0625rem",
-          color: neutral[800],
+          color: "var(--color-text)",
           mb: 2,
         }}
       >
@@ -89,19 +89,19 @@ export default function OccupancyRateSection({ range, listingId }) {
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke={neutral[100]}
+              stroke={"var(--color-surface-2)"}
               vertical={false}
             />
             <XAxis
               dataKey="date"
               tickFormatter={formatDateLabel}
-              tick={{ fontSize: 11, fill: neutral[400] }}
-              axisLine={{ stroke: neutral[200] }}
+              tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
+              axisLine={{ stroke: "var(--color-border)" }}
               tickLine={false}
               minTickGap={24}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: neutral[400] }}
+              tick={{ fontSize: 11, fill: "var(--color-text-muted)" }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v) => `${v}%`}
@@ -113,7 +113,7 @@ export default function OccupancyRateSection({ range, listingId }) {
               labelFormatter={formatDateLabel}
               contentStyle={{
                 borderRadius: 10,
-                border: `1px solid ${neutral[200]}`,
+                border: `1px solid var(--color-border)`,
               }}
             />
             <Bar
@@ -130,7 +130,11 @@ export default function OccupancyRateSection({ range, listingId }) {
         <Box sx={{ mt: 3 }}>
           <Typography
             variant="overline"
-            sx={{ color: neutral[500], display: "block", mb: 1.5 }}
+            sx={{
+              color: "var(--color-text-secondary)",
+              display: "block",
+              mb: 1.5,
+            }}
           >
             By listing
           </Typography>
@@ -146,11 +150,14 @@ export default function OccupancyRateSection({ range, listingId }) {
                 >
                   <Typography
                     variant="body2"
-                    sx={{ color: neutral[700], fontWeight: 600 }}
+                    sx={{ color: "var(--color-text)", fontWeight: 600 }}
                   >
                     {l.title}
                   </Typography>
-                  <Typography variant="body2" sx={{ color: neutral[500] }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "var(--color-text-secondary)" }}
+                  >
                     {l.occupancyRate}%
                   </Typography>
                 </Box>
@@ -160,7 +167,7 @@ export default function OccupancyRateSection({ range, listingId }) {
                   sx={{
                     height: 6,
                     borderRadius: 999,
-                    bgcolor: neutral[100],
+                    bgcolor: "var(--color-surface-2)",
                     "& .MuiLinearProgress-bar": {
                       bgcolor: brand[500],
                       borderRadius: 999,

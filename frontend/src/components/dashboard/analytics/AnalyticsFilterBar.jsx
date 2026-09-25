@@ -31,9 +31,9 @@ export default function AnalyticsFilterBar({
       sx={{
         mb: 3,
         p: 2,
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii.xl,
-        bgcolor: "#fff",
+        bgcolor: "var(--color-surface)",
       }}
     >
       <Box sx={{ flex: 1, minWidth: 180 }}>
