@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuthStore } from "../store/auth.store";
+import { useBackendStatusStore } from "../store/backendStatus.store";
 
 const api = axios.create({
   baseURL: "/api",
@@ -21,8 +22,26 @@ api.interceptors.request.use((config) => {
 
 // ── Response interceptor ───────────────────────────────────────────────────────
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const isHealthCheck = response.config.url
+      ?.replace(/\/$/, "")
+      .endsWith("/health");
+    const backendStatus = useBackendStatusStore.getState();
+    if (isHealthCheck) {
+      backendStatus.setUnavailable(response.data?.data?.db !== "connected");
+    } else {
+      backendStatus.setUnavailable(false);
+    }
+    return response;
+  },
   (error) => {
+    const status = error.response?.status;
+    const backendUnavailable = !error.response || status >= 500;
+    error.backendUnavailable = backendUnavailable;
+    if (backendUnavailable) {
+      useBackendStatusStore.getState().setUnavailable(true);
+    }
+
     if (error.response?.status === 401) {
       const { isAuthenticated } = useAuthStore.getState();
       if (isAuthenticated) {
