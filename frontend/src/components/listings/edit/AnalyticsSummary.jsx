@@ -1,7 +1,7 @@
 import { Box, Grid, Typography, Chip } from "@mui/material";
 import { Star, Heart, CalendarCheck, MessageSquare } from "lucide-react";
 import { StatsCard } from "../../ui/Card";
-import { neutral, brand } from "../../../theme/tokens";
+import { brand } from "../../../theme/tokens";
 import { STATUS_CHIP } from "../../../utils/statusColors";
 
 function StatusChip({ draft, status }) {

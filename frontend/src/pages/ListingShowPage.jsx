@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { brand, neutral, semantic, shadows } from "../theme/tokens";
+import { brand, semantic } from "../theme/tokens";
 import { CATEGORY_ICONS } from "../constants/categories";
 import { useFocusTrap } from "../hooks/useFocusTrap";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,10 +8,8 @@ import {
   Tooltip,
   Skeleton as MuiSkeleton,
   Avatar,
-  LinearProgress,
 } from "@mui/material";
 import {
-  Heart,
   Share2,
   Star,
   MapPin,
@@ -51,7 +49,6 @@ import { useListings } from "../hooks/useListings";
 import { useAuthStore } from "../store/auth.store";
 import ListingMap from "../components/map/ListingMap";
 import BookingWidget from "../components/booking/BookingWidget";
-import { reviewsService } from "../services/reviews.service";
 import { useCreateReview, useDeleteReview } from "../hooks/useReviews";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -952,7 +949,6 @@ export default function ListingShowPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
 
-  const bookingRef = useRef(null);
   const headerRef = useRef(null);
 
   if (isLoading) return <ShowPageSkeleton />;

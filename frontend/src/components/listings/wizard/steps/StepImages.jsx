@@ -2,7 +2,7 @@ import { useRef, useState, useCallback } from "react";
 import { Box, Typography } from "@mui/material";
 import { UploadCloud, X, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { neutral, brand, radii } from "../../../../theme/tokens";
+import { brand, radii } from "../../../../theme/tokens";
 
 const ACCEPTED = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB, matches backend upload.js

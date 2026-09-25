@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Box, Typography, CircularProgress } from "@mui/material";
 import { UploadCloud, X, Star } from "lucide-react";
 import { motion } from "framer-motion";
-import { neutral, brand, radii } from "../../../theme/tokens";
+import { brand, radii } from "../../../theme/tokens";
 import {
   useAddListingImages,
   useRemoveListingImage,

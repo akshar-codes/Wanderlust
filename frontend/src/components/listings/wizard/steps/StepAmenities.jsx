@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { Check } from "lucide-react";
 import { AMENITY_GROUPS } from "../../../../schemas/listingWizard";
-import { neutral, brand, radii } from "../../../../theme/tokens";
+import { brand, radii } from "../../../../theme/tokens";
 
 export default function StepAmenities({ selected, onChange }) {
   const toggle = (key) =>

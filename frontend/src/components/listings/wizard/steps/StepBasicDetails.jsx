@@ -1,12 +1,12 @@
 import { forwardRef, useImperativeHandle } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Input, Textarea } from "../../../ui/Input";
 import { Counter } from "../../../ui/Counter";
 import { basicDetailsSchema } from "../../../../schemas/listingWizard";
 import { LISTING_CATEGORIES } from "../../../../schemas";
-import { brand, neutral } from "../../../../theme/tokens";
+import { brand } from "../../../../theme/tokens";
 
 const CATEGORY_META = {
   trending: { icon: "🔥", label: "Trending" },
@@ -39,7 +39,6 @@ const StepBasicDetails = forwardRef(function StepBasicDetails(
   });
 
   const description = watch("description") ?? "";
-  const category = watch("category");
 
   useImperativeHandle(ref, () => ({
     submit: () =>

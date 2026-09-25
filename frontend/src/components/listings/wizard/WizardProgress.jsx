@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
-import { brand, neutral } from "../../../theme/tokens";
+import { brand } from "../../../theme/tokens";
 import { WIZARD_STEPS } from "../../../store/listingWizard.store";
 
 export default function WizardProgress({ step, maxReachedStep, onStepClick }) {

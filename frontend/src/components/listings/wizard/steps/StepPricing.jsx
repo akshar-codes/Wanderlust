@@ -5,7 +5,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import { Input } from "../../../ui/Input";
 import { Counter } from "../../../ui/Counter";
 import { pricingSchema } from "../../../../schemas/listingWizard";
-import { neutral, brand, radii } from "../../../../theme/tokens";
+import { brand, radii } from "../../../../theme/tokens";
 import { formatPrice } from "../../../../utils/currency";
 
 const GST_RATE = 0.18;

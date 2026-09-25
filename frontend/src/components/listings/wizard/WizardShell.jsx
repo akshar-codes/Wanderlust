@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Cloud, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "../../ui/Button";
-import { neutral, brand, radii, shadows } from "../../../theme/tokens";
+import { radii, shadows } from "../../../theme/tokens";
 import WizardProgress from "./WizardProgress";
 import { WIZARD_STEPS } from "../../../store/listingWizard.store";
 

@@ -1,8 +1,9 @@
 import { Box, Typography, Stack } from "@mui/material";
 import { Edit2, MapPin, Image as ImageIcon, Tag } from "lucide-react";
 import { Button } from "../../../ui/Button";
-import { neutral, brand, radii } from "../../../../theme/tokens";
-import { WIZARD_STEPS } from "../../../../store/listingWizard.store";
+import { Card } from "../../../ui/Card";
+import { brand, radii } from "../../../../theme/tokens";
+import { formatPrice } from "../../../../utils/currency";
 
 function SummaryRow({ icon, label, value, onEdit }) {
   return (
@@ -73,8 +74,6 @@ export default function StepPublish({
   onSubmit,
   submitting,
 }) {
-  const publishMutation = usePublishListing();
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box>

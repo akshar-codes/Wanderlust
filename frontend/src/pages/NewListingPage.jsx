@@ -16,7 +16,6 @@ import {
 } from "../store/listingWizard.store";
 import { useCreateListing } from "../hooks/useListings";
 import { listingsService } from "../services/listings.service";
-import { neutral } from "../theme/tokens";
 
 export default function NewListingPage() {
   const navigate = useNavigate();
@@ -202,7 +201,6 @@ export default function NewListingPage() {
   }
 
   const stepKey = WIZARD_STEPS[step].key;
-  const isFormStep = ["basics", "location", "pricing"].includes(stepKey);
 
   return (
     <WizardShell

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import CategoryFilters from "../CategoryFilters";
 import userEvent from "@testing-library/user-event";
@@ -16,17 +16,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-// Since CATEGORIES is not exported but used globally in the component, we'll mock the module or test around it.
-// Assuming CATEGORIES is defined globally in the testing env or we just check the tax toggle.
 describe("CategoryFilters", () => {
-  // If CATEGORIES is undefined during test, the component will crash.
-  // We can attach it to global just in case.
-  beforeEach(() => {
-    global.CATEGORIES = [
-      { key: "mountains", icon: "⛰", label: "Mountains" },
-      { key: "beach", icon: "🏖", label: "Beach" },
-    ];
-  });
 
   it("renders category chips and tax toggle", () => {
     render(

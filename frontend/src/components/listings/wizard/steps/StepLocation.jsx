@@ -5,7 +5,7 @@ import { Box, Typography } from "@mui/material";
 import { MapPin } from "lucide-react";
 import { Input } from "../../../ui/Input";
 import { locationSchema } from "../../../../schemas/listingWizard";
-import { neutral, radii } from "../../../../theme/tokens";
+import { radii } from "../../../../theme/tokens";
 
 // Lightweight static-map preview via Mapbox's static images API — avoids
 // spinning up a full mapbox-gl instance just to show a confirmation pin.

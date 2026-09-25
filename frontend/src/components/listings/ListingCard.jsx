@@ -1,10 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Star, MapPin, TrendingUp } from "lucide-react";
 import WishlistHeartButton from "../wishlist/WishlistHeartButton";
 import { cloudinaryUrl } from "../../utils/cloudinaryUrl";
 import { formatPrice } from "../../utils/currency";
-import { useWishlistStatus } from "../../hooks/useWishlist";
 
 const CATEGORY_ICONS = {
   trending: "🔥",
@@ -27,9 +26,6 @@ export default function ListingCard({
   index = 0,
   noLink = false,
 }) {
-  const navigate = useNavigate();
-
-  const wishlisted = useWishlistStatus(listing._id);
   const {
     _id,
     title,

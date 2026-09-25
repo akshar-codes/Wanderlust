@@ -34,7 +34,7 @@ import EditImageManager from "../components/listings/edit/EditImageManager";
 import DraftVisibilityPanel from "../components/listings/edit/DraftVisibilityPanel";
 import ConfirmChangesDialog from "../components/listings/edit/ConfirmChangesDialog";
 
-import { neutral, brand, radii, shadows } from "../theme/tokens";
+import { brand, radii, shadows } from "../theme/tokens";
 import { formatPrice } from "../utils/currency";
 
 // ── Listing → editable-shape mapping ────────────────────────────────────────

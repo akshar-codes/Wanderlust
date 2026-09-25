@@ -1,6 +1,6 @@
 import { Box, Switch, Typography } from "@mui/material";
 import { Eye, EyeOff } from "lucide-react";
-import { neutral, brand } from "../../../theme/tokens";
+import { brand } from "../../../theme/tokens";
 
 export default function DraftVisibilityPanel({ draft, onChange }) {
   return (

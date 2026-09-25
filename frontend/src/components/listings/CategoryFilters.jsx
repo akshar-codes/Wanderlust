@@ -2,7 +2,8 @@ import { useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { neutral, brand } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
+import { CATEGORIES } from "../../constants/categories";
 
 export default function CategoryFilters({ showTax, onTaxToggle }) {
   const [params] = useSearchParams();

@@ -3,7 +3,6 @@ import { describe, it, expect, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ListingCard from "../ListingCard";
-import userEvent from "@testing-library/user-event";
 
 // Mock hooks
 vi.mock("react-router-dom", async () => {
@@ -68,7 +67,7 @@ describe("ListingCard", () => {
   });
 
   it("renders noLink mode", () => {
-    const { container } = renderCard({ noLink: true });
+    renderCard({ noLink: true });
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(screen.getByText("Cozy Cabin")).toBeInTheDocument();
   });

@@ -2,7 +2,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import { ArrowRight } from "lucide-react";
 import { Modal } from "../../ui/Modal";
 import { Button } from "../../ui/Button";
-import { neutral, semantic } from "../../../theme/tokens";
+import { semantic } from "../../../theme/tokens";
 
 export default function ConfirmChangesDialog({
   open,
