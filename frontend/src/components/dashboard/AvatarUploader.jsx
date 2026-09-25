@@ -54,7 +54,7 @@ export default function AvatarUploader({
             justifyContent: "center",
             fontSize: size * 0.42,
             fontWeight: 700,
-            border: `2px solid ${neutral[200]}`,
+            border: `2px solid var(--color-border)`,
           }}
         >
           {avatarUrl ? (
@@ -119,11 +119,18 @@ export default function AvatarUploader({
       {showLabel && (
         <Stack spacing={0.75}>
           <Typography
-            sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "0.9375rem",
+              color: "var(--color-text)",
+            }}
           >
             Profile photo
           </Typography>
-          <Typography variant="caption" sx={{ color: neutral[500] }}>
+          <Typography
+            variant="caption"
+            sx={{ color: "var(--color-text-secondary)" }}
+          >
             JPG, PNG, or WebP · up to 5MB
           </Typography>
           {avatarUrl && onRemove && (

@@ -16,34 +16,21 @@ import { useDeleteListing, LISTINGS_KEY } from "../../hooks/useListings";
 import listingsService from "../../services/listings.service";
 import { neutral } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
+import { STATUS_CHIP } from "../../utils/statusColors";
 
 function StatusChip({ listing }) {
   if (listing.draft) {
-    return (
-      <Chip
-        label="Draft"
-        size="small"
-        sx={{ bgcolor: "#fef9c3", color: "#b45309", fontWeight: 700 }}
-      />
-    );
+    return <Chip label="Draft" size="small" sx={STATUS_CHIP.warning} />;
   }
   if (listing.status === "active") {
-    return (
-      <Chip
-        label="Live"
-        size="small"
-        sx={{ bgcolor: "#dcfce7", color: "#15803d", fontWeight: 700 }}
-      />
-    );
+    return <Chip label="Live" size="small" sx={STATUS_CHIP.success} />;
   }
   return (
     <Chip
       label={listing.status}
       size="small"
       sx={{
-        bgcolor: "#fee2e2",
-        color: "#b91c1c",
-        fontWeight: 700,
+        ...STATUS_CHIP.error,
         textTransform: "capitalize",
       }}
     />
@@ -78,7 +65,6 @@ export default function MyListingsSection() {
   const [page, setPage] = useState(1);
   const [deleteId, setDeleteId] = useState(null);
   const { data, isLoading, isError } = useMyListings(user?.username, { page });
-  
 
   const deleteMutation = useDeleteListing();
   const deleteListing = deleteMutation.mutate;
@@ -114,7 +100,7 @@ export default function MyListingsSection() {
               borderRadius: "10px",
               objectFit: "cover",
               flexShrink: 0,
-              bgcolor: neutral[100],
+              bgcolor: "var(--color-surface-2)",
             }}
           />
           <Box sx={{ minWidth: 0 }}>
@@ -122,7 +108,7 @@ export default function MyListingsSection() {
               sx={{
                 fontWeight: 700,
                 fontSize: "0.875rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -131,7 +117,10 @@ export default function MyListingsSection() {
             >
               {row.title}
             </Typography>
-            <Typography variant="caption" sx={{ color: neutral[500] }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--color-text-secondary)" }}
+            >
               {row.location}, {row.country}
             </Typography>
           </Box>
@@ -231,7 +220,11 @@ export default function MyListingsSection() {
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, fontSize: "1.0625rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "1.0625rem",
+              color: "var(--color-text)",
+            }}
           >
             My Listings
           </Typography>

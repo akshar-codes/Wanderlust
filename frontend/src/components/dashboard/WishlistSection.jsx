@@ -35,7 +35,11 @@ export default function WishlistSection() {
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, fontSize: "1.0625rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "1.0625rem",
+              color: "var(--color-text)",
+            }}
           >
             Wishlist
           </Typography>
@@ -84,7 +88,7 @@ export default function WishlistSection() {
                         });
                       }}
                       sx={{
-                        bgcolor: "rgba(255,255,255,0.92)",
+                        bgcolor: "var(--color-surface)",
                         backdropFilter: "blur(8px)",
                         "&:hover": { bgcolor: "#fee2e2" },
                       }}

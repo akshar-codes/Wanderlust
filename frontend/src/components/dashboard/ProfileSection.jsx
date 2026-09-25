@@ -92,18 +92,21 @@ export default function ProfileSection() {
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <Mail size={18} color={neutral[500]} />
+            <Mail size={18} color={"var(--color-text-secondary)"} />
             <Box>
               <Typography
                 sx={{
                   fontWeight: 600,
                   fontSize: "0.9375rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                 }}
               >
                 {authUser?.email}
               </Typography>
-              <Typography variant="caption" sx={{ color: neutral[500] }}>
+              <Typography
+                variant="caption"
+                sx={{ color: "var(--color-text-secondary)" }}
+              >
                 Account email
               </Typography>
             </Box>
@@ -154,7 +157,7 @@ export default function ProfileSection() {
             </Typography>
           )}
 
-          <Box sx={{ height: 1, bgcolor: neutral[100] }} />
+          <Box sx={{ height: 1, bgcolor: "var(--color-surface-2)" }} />
 
           <Box
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"

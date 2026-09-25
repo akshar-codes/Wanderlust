@@ -95,7 +95,7 @@ export default function DashboardPage() {
   const goTo = (key) => navigate(`/dashboard/${key}`, { replace: true });
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8 }}>
+    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 4 }, pb: 8 }}>
       <PageHeader
         eyebrow="Account"
         title={`Welcome back${user?.firstName ? `, ${user.firstName}` : ""}`}
@@ -143,12 +143,12 @@ export default function DashboardPage() {
                     fontFamily: "inherit",
                     fontSize: "0.9375rem",
                     fontWeight: active ? 700 : 500,
-                    color: active ? brand[600] : neutral[600],
+                    color: active ? brand[600] : "var(--color-text-secondary)",
                     bgcolor: active ? brand[50] : "transparent",
                     transition: "background-color 120ms, color 120ms",
                     "&:hover": {
-                      bgcolor: active ? brand[50] : neutral[100],
-                      color: active ? brand[600] : neutral[800],
+                      bgcolor: active ? brand[50] : "var(--color-surface-2)",
+                      color: active ? brand[600] : "var(--color-text)",
                     },
                   }}
                 >
@@ -164,8 +164,8 @@ export default function DashboardPage() {
               position: "sticky",
               top: 56,
               zIndex: 10,
-              bgcolor: "#faf8f6",
-              borderBottom: `1px solid ${neutral[200]}`,
+              bgcolor: "var(--color-surface-2)",
+              borderBottom: `1px solid var(--color-border)`,
               mb: 1,
             }}
           >

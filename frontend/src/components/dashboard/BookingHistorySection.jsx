@@ -11,6 +11,7 @@ import { ConfirmModal } from "../ui/Modal";
 import { useMyBookings, useCancelBooking } from "../../hooks/useBookings";
 import { neutral, brand, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
+import { BOOKING_STATUS_COLORS as STATUS_STYLES } from "../../utils/statusColors";
 
 const PAGE_LIMIT = 10;
 
@@ -21,13 +22,6 @@ const STATUS_TABS = [
   { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
 ];
-
-const STATUS_STYLES = {
-  confirmed: { bg: "#dcfce7", color: "#15803d" },
-  pending: { bg: "#fef9c3", color: "#b45309" },
-  completed: { bg: "#e0e7ff", color: "#3730a3" },
-  cancelled: { bg: "#fee2e2", color: "#b91c1c" },
-};
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-IN", {
@@ -50,7 +44,7 @@ function BookingCard({ booking, onCancel }) {
         display: "flex",
         gap: 2,
         p: 2.5,
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii.xl,
         flexWrap: { xs: "wrap", sm: "nowrap" },
       }}
@@ -70,7 +64,7 @@ function BookingCard({ booking, onCancel }) {
               height: 96,
               borderRadius: radii.lg,
               objectFit: "cover",
-              bgcolor: neutral[100],
+              bgcolor: "var(--color-surface-2)",
             }}
           />
         </Box>
@@ -94,7 +88,7 @@ function BookingCard({ booking, onCancel }) {
                 sx={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   textDecoration: "none",
                   "&:hover": { color: brand[600] },
                 }}
@@ -106,7 +100,7 @@ function BookingCard({ booking, onCancel }) {
                 sx={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: neutral[500],
+                  color: "var(--color-text-secondary)",
                 }}
               >
                 Listing no longer available
@@ -121,8 +115,11 @@ function BookingCard({ booking, onCancel }) {
                   mt: 0.5,
                 }}
               >
-                <MapPin size={11} color={neutral[400]} />
-                <Typography variant="caption" sx={{ color: neutral[500] }}>
+                <MapPin size={11} color={"var(--color-text-muted)"} />
+                <Typography
+                  variant="caption"
+                  sx={{ color: "var(--color-text-secondary)" }}
+                >
                   {listing.location}, {listing.country}
                 </Typography>
               </Box>
@@ -149,14 +146,20 @@ function BookingCard({ booking, onCancel }) {
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-            <CalendarCheck size={14} color={neutral[400]} />
-            <Typography variant="body2" sx={{ color: neutral[600] }}>
+            <CalendarCheck size={14} color={"var(--color-text-muted)"} />
+            <Typography
+              variant="body2"
+              sx={{ color: "var(--color-text-secondary)" }}
+            >
               {formatDate(booking.checkIn)} → {formatDate(booking.checkOut)}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-            <Users size={14} color={neutral[400]} />
-            <Typography variant="body2" sx={{ color: neutral[600] }}>
+            <Users size={14} color={"var(--color-text-muted)"} />
+            <Typography
+              variant="body2"
+              sx={{ color: "var(--color-text-secondary)" }}
+            >
               {booking.guestsCount} guest{booking.guestsCount > 1 ? "s" : ""} ·{" "}
               {booking.nights} night{booking.nights > 1 ? "s" : ""}
             </Typography>
@@ -174,10 +177,17 @@ function BookingCard({ booking, onCancel }) {
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "0.9375rem",
+              color: "var(--color-text)",
+            }}
           >
             {formatPrice(booking.pricing?.total || 0)}
-            <Box component="span" sx={{ color: neutral[500], fontWeight: 400 }}>
+            <Box
+              component="span"
+              sx={{ color: "var(--color-text-secondary)", fontWeight: 400 }}
+            >
               {" "}
               total
             </Box>
@@ -199,7 +209,11 @@ function BookingCard({ booking, onCancel }) {
         {booking.status === "cancelled" && booking.cancellationReason && (
           <Typography
             variant="caption"
-            sx={{ color: neutral[500], display: "block", mt: 1 }}
+            sx={{
+              color: "var(--color-text-secondary)",
+              display: "block",
+              mt: 1,
+            }}
           >
             Reason: {booking.cancellationReason}
           </Typography>
@@ -217,7 +231,7 @@ export default function BookingHistorySection() {
     limit: PAGE_LIMIT,
     status,
   });
-  
+
   const cancelMutation = useCancelBooking();
   const { mutate: cancelBooking, isPending: cancelling } = useCancelBooking();
   const [pendingCancel, setPendingCancel] = useState(null);
@@ -232,7 +246,7 @@ export default function BookingHistorySection() {
           sx={{
             fontWeight: 700,
             fontSize: "1.0625rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 2,
           }}
         >
@@ -255,9 +269,11 @@ export default function BookingHistorySection() {
                   px: 1.75,
                   py: 0.75,
                   borderRadius: 999,
-                  border: `1.5px solid ${active ? brand[500] : neutral[200]}`,
-                  bgcolor: active ? "rgba(255,90,95,0.06)" : "#fff",
-                  color: active ? brand[600] : neutral[600],
+                  border: `1.5px solid ${active ? brand[500] : "var(--color-border)"}`,
+                  bgcolor: active
+                    ? "rgba(255,90,95,0.06)"
+                    : "var(--color-surface)",
+                  color: active ? brand[600] : "var(--color-text-secondary)",
                   fontWeight: active ? 700 : 500,
                   fontSize: "0.8125rem",
                   cursor: "pointer",
@@ -276,7 +292,7 @@ export default function BookingHistorySection() {
               <Box
                 key={i}
                 sx={{
-                  border: `1px solid ${neutral[200]}`,
+                  border: `1px solid var(--color-border)`,
                   borderRadius: radii.xl,
                   p: 2.5,
                 }}

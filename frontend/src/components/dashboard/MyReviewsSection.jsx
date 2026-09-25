@@ -22,7 +22,7 @@ function ReviewRow({ review, onDelete }) {
         display: "flex",
         gap: 2,
         p: 2.5,
-        border: `1px solid ${neutral[200]}`,
+        border: `1px solid var(--color-border)`,
         borderRadius: radii.xl,
       }}
     >
@@ -41,7 +41,7 @@ function ReviewRow({ review, onDelete }) {
               height: 72,
               borderRadius: radii.lg,
               objectFit: "cover",
-              bgcolor: neutral[100],
+              bgcolor: "var(--color-surface-2)",
             }}
           />
         </Box>
@@ -64,7 +64,7 @@ function ReviewRow({ review, onDelete }) {
                 sx={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: neutral[800],
+                  color: "var(--color-text)",
                   textDecoration: "none",
                   "&:hover": { color: brand[600] },
                 }}
@@ -76,7 +76,7 @@ function ReviewRow({ review, onDelete }) {
                 sx={{
                   fontWeight: 700,
                   fontSize: "0.9375rem",
-                  color: neutral[500],
+                  color: "var(--color-text-secondary)",
                 }}
               >
                 Listing no longer available
@@ -87,7 +87,10 @@ function ReviewRow({ review, onDelete }) {
             >
               <StarRating rating={review.rating} size={14} />
               {review.createdAt && (
-                <Typography variant="caption" sx={{ color: neutral[400] }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "var(--color-text-muted)" }}
+                >
                   {new Date(review.createdAt).toLocaleDateString("en-IN", {
                     year: "numeric",
                     month: "short",
@@ -110,9 +113,9 @@ function ReviewRow({ review, onDelete }) {
               width: 30,
               height: 30,
               borderRadius: "50%",
-              border: `1px solid ${neutral[200]}`,
+              border: `1px solid var(--color-border)`,
               background: "none",
-              color: neutral[400],
+              color: "var(--color-text-muted)",
               cursor: "pointer",
               flexShrink: 0,
               "&:hover": {
@@ -129,7 +132,11 @@ function ReviewRow({ review, onDelete }) {
         {review.comment && (
           <Typography
             variant="body2"
-            sx={{ color: neutral[600], mt: 1, lineHeight: 1.6 }}
+            sx={{
+              color: "var(--color-text-secondary)",
+              mt: 1,
+              lineHeight: 1.6,
+            }}
           >
             {review.comment}
           </Typography>
@@ -139,19 +146,22 @@ function ReviewRow({ review, onDelete }) {
           <Box
             sx={{
               mt: 1.5,
-              bgcolor: neutral[50],
-              border: `1px solid ${neutral[200]}`,
+              bgcolor: "var(--color-surface-2)",
+              border: `1px solid var(--color-border)`,
               borderRadius: radii.md,
               p: 1.5,
             }}
           >
             <Typography
               variant="caption"
-              sx={{ fontWeight: 700, color: neutral[700] }}
+              sx={{ fontWeight: 700, color: "var(--color-text)" }}
             >
               Host response
             </Typography>
-            <Typography variant="body2" sx={{ color: neutral[600], mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "var(--color-text-secondary)", mt: 0.5 }}
+            >
               {review.hostReply.text}
             </Typography>
           </Box>
@@ -177,7 +187,7 @@ export default function MyReviewsSection() {
           sx={{
             fontWeight: 700,
             fontSize: "1.0625rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 2.5,
           }}
         >
@@ -190,7 +200,7 @@ export default function MyReviewsSection() {
               <Box
                 key={i}
                 sx={{
-                  border: `1px solid ${neutral[200]}`,
+                  border: `1px solid var(--color-border)`,
                   borderRadius: radii.xl,
                   p: 2.5,
                 }}
