@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { numericQueryParam } from "./primitives.js";
 import { USER_ROLES, LISTING_CATEGORIES, LISTING_STATUSES } from "./enums.js";
-import { REPORT_TARGET_TYPES, REPORT_STATUSES } from "../models/report.js";
+import { REPORT_TARGET_TYPES, REPORT_STATUSES } from "../models/Report.js";
 
 // ── Users ──────────────────────────────────────────────────────────────────────
 

@@ -1,6 +1,8 @@
 import rateLimit from "express-rate-limit";
 import logger from "../utils/logger.js";
 
+const skipRateLimitsInTests = () => process.env.NODE_ENV === "test";
+
 // ── Shared handler: log every rate-limit hit ──────────────────────────────────
 
 function onLimitReached(req, _res, options) {
@@ -16,6 +18,7 @@ function onLimitReached(req, _res, options) {
 
 // ── 1. Global limiter — all routes ───────────────────────────────────────────
 export const globalLimiter = rateLimit({
+  skip: skipRateLimitsInTests,
   windowMs: 15 * 60 * 1000,
   limit: 200,
   standardHeaders: true,
@@ -33,6 +36,7 @@ export const globalLimiter = rateLimit({
 
 // ── 2. Auth limiter — /login, /signup ────────────────────────────────────────
 export const authLimiter = rateLimit({
+  skip: skipRateLimitsInTests,
   windowMs: 15 * 60 * 1000,
   limit: 20,
   standardHeaders: true,
@@ -56,6 +60,7 @@ export const authLimiter = rateLimit({
 
 // ── 3. API write limiter — POST /listings, POST /reviews ─────────────────────
 export const createLimiter = rateLimit({
+  skip: skipRateLimitsInTests,
   windowMs: 60 * 60 * 1000,
   limit: 30,
   standardHeaders: true,
@@ -73,6 +78,7 @@ export const createLimiter = rateLimit({
 
 // ── 4. Resend-verification limiter ────────────────────────────────────────────
 export const resendLimiter = rateLimit({
+  skip: skipRateLimitsInTests,
   windowMs: 60 * 60 * 1000,
   limit: 5,
   standardHeaders: true,

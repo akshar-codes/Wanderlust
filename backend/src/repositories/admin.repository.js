@@ -2,7 +2,7 @@ import User from "../models/user.js";
 import Listing from "../models/listing.js";
 import Review from "../models/review.js";
 import Booking from "../models/booking.js";
-import Report from "../models/report.js";
+import Report from "../models/Report.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

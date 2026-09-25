@@ -10,7 +10,7 @@ jobs:
     env:
       MONGO_URL: mongodb://localhost:27017/wanderlust_test?replicaSet=rs0
       SESSION_SECRET: dummy_secret_for_tests_32_chars_long
-      MAP_TOKEN: dummy_map_token
+      MAP_TOKEN: pk.eyJ1IjoiZHVtbXkiLCJhIjoiZHVtbXkifQ
       NODE_ENV: test
     steps:
       - uses: actions/checkout@v4

@@ -99,63 +99,84 @@ export const createBooking = async (guestId, payload) => {
   }
 
   // ── Transaction: atomic multi-document write ──────────────────────────────
-  const session = await mongoose.startSession();
   let booking;
-  try {
-    session.startTransaction();
+  const maxTransactionAttempts = 3;
 
-    const updatedListing = await listingRepo.addBlockedDateAtomic(
-      listing._id,
-      checkInDate,
-      checkOutDate,
-      {
-        _id: blockedDateId,
-        startDate: checkInDate,
-        endDate: checkOutDate,
-        reason: "booked",
-      },
-      session,
-    );
+  for (let attempt = 1; attempt <= maxTransactionAttempts; attempt += 1) {
+    const session = await mongoose.startSession();
+    try {
+      session.startTransaction();
 
-    if (!updatedListing) {
-      await session.abortTransaction();
-      throw AppError.conflict("These dates are no longer available");
-    }
-
-    booking = await bookingRepo.createWithSession(
-      {
-        listing: listing._id,
-        guest: guestId,
-        host: listing.owner,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        nights,
-        guestsCount,
-        pricing: {
-          nightlyPrice,
-          cleaningFee,
-          serviceFee,
-          taxes,
-          subtotal,
-          total,
+      const updatedListing = await listingRepo.addBlockedDateAtomic(
+        listing._id,
+        checkInDate,
+        checkOutDate,
+        {
+          _id: blockedDateId,
+          startDate: checkInDate,
+          endDate: checkOutDate,
+          reason: "booked",
         },
-        status: "pending",
-        guestNote: guestNote?.trim() || null,
-        blockedDateId,
-      },
-      session,
-    );
+        session,
+      );
 
-    await listingRepo.incrementCounter(listing._id, "bookingCount", 1, session);
+      if (!updatedListing) {
+        await session.abortTransaction();
+        throw AppError.conflict("These dates are no longer available");
+      }
 
-    await session.commitTransaction();
-  } catch (err) {
-    if (session.inTransaction()) {
-      await session.abortTransaction();
+      booking = await bookingRepo.createWithSession(
+        {
+          listing: listing._id,
+          guest: guestId,
+          host: listing.owner,
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          nights,
+          guestsCount,
+          pricing: {
+            nightlyPrice,
+            cleaningFee,
+            serviceFee,
+            taxes,
+            subtotal,
+            total,
+          },
+          status: "pending",
+          guestNote: guestNote?.trim() || null,
+          blockedDateId,
+        },
+        session,
+      );
+
+      await listingRepo.incrementCounter(
+        listing._id,
+        "bookingCount",
+        1,
+        session,
+      );
+
+      await session.commitTransaction();
+      break;
+    } catch (err) {
+      if (session.inTransaction()) {
+        try {
+          await session.abortTransaction();
+        } catch (abortError) {
+          logger.warn("Could not abort failed booking transaction", {
+            error: abortError,
+          });
+        }
+      }
+
+      const retryable =
+        err.hasErrorLabel?.("TransientTransactionError") || err.code === 112;
+      if (!retryable || attempt === maxTransactionAttempts) {
+        throw err;
+      }
+    } finally {
+      await session.endSession();
     }
-    throw err;
-  } finally {
-    await session.endSession();
   }
 
   const populatedBooking = await bookingRepo.findById(booking._id);

@@ -1,4 +1,4 @@
-import Report from "../models/report.js";
+import Report from "../models/Report.js";
 
 // ── Write ──────────────────────────────────────────────────────────────────────
 

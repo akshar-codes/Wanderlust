@@ -4,7 +4,7 @@ import {
   REPORT_TARGET_TYPES,
   REPORT_REASONS,
   REPORT_RESOLUTION_ACTIONS,
-} from "../models/report.js";
+} from "../models/Report.js";
 
 export const createReportBodySchema = z.object({
   targetType: z.enum(REPORT_TARGET_TYPES, {

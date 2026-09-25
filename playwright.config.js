@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "node:path";
 
 export default defineConfig({
   testDir: "./e2e/specs",
@@ -15,32 +16,40 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "Google Chrome",
+      name: "Chromium",
       use: {
         ...devices["Desktop Chrome"],
-        channel: "chrome", // Uses the Chrome browser already installed on your PC
+        ...(process.env.E2E_USE_SYSTEM_CHROME === "1"
+          ? { channel: "chrome" }
+          : {}),
       },
     },
     {
-      name: "Mobile Chrome",
+      name: "Mobile Chromium",
       use: {
         ...devices["Pixel 5"],
-        channel: "chrome",
+        ...(process.env.E2E_USE_SYSTEM_CHROME === "1"
+          ? { channel: "chrome" }
+          : {}),
       },
     },
   ],
   webServer: [
     {
-      command: "cd backend && npm run start",
+      command: "npm run start",
+      cwd: path.resolve("backend"),
       url: "http://127.0.0.1:8080/api/health",
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
+      stdout: "pipe",
     },
     {
-      command: "cd frontend && npm run dev",
+      command: "npm run dev",
+      cwd: path.resolve("frontend"),
       url: "http://127.0.0.1:5173",
       reuseExistingServer: !process.env.CI,
       timeout: 120000,
+      stdout: "pipe",
     },
   ],
 });
