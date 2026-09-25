@@ -73,7 +73,7 @@ export function useToggleWishlist() {
       }
       toast.error(err.message || "Failed to update wishlist");
     },
-    onSuccess: (data, { listingId }) => {
+    onSuccess: (data) => {
       toast.success(
         data.wishlisted ? "Saved to wishlist" : "Removed from wishlist",
       );

@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { brand, neutral, fonts, radii } from "../../theme/tokens";
+import { brand, fonts, radii } from "../../theme/tokens";
 
 // ── Inline icon set (no external deps) ────────────────────────────────────────
 const ICONS = {

@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { Minus, Plus } from "lucide-react";
-import { neutral, brand } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 
 export function Counter({ label, hint, value, onChange, min = 0, max = 50 }) {
   const dec = () => onChange(Math.max(min, value - 1));

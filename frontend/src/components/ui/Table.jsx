@@ -13,7 +13,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { brand, neutral, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 
 // ── Helper: stable sort ───────────────────────────────────────────────────────
 function stableSort(array, comparator) {

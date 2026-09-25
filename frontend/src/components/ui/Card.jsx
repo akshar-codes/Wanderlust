@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 import { formatPrice } from "../../utils/currency";
 import {
   brand,
-  neutral,
   semantic,
   fonts,
   radii,

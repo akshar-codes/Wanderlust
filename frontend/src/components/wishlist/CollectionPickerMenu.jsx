@@ -14,7 +14,7 @@ import {
   useToggleWishlist,
   useCreateWishlistCollection,
 } from "../../hooks/useWishlist";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { radii } from "../../theme/tokens";
 
 /**
  * Popover listing every one of the current user's wishlists with a

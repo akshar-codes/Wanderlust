@@ -8,7 +8,7 @@ import {
   Select as MuiSelect,
   MenuItem,
 } from "@mui/material";
-import { brand, neutral, semantic } from "../../theme/tokens";
+import { brand, semantic } from "../../theme/tokens";
 
 // ── Shared sx factory ─────────────────────────────────────────────────────────
 function fieldSx(hasError) {

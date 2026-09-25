@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Button } from "./Button";
-import { brand, neutral, semantic, fonts, radii } from "../../theme/tokens";
+import { fonts, radii } from "../../theme/tokens";
 
 // Slide-up transition
 const SlideUp = forwardRef(function SlideUp(props, ref) {

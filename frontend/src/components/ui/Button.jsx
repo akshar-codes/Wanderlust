@@ -5,7 +5,7 @@ import {
   IconButton as MuiIconButton,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { brand, semantic, neutral } from "../../theme/tokens";
+import { brand, semantic } from "../../theme/tokens";
 
 // ── Variant→MUI mapping ───────────────────────────────────────────────────────
 const VARIANTS = {

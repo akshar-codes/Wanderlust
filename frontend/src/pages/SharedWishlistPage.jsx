@@ -5,7 +5,7 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { Skeleton } from "../components/ui/Skeleton";
 import { ListingCard } from "../components/ui/Card";
 import { useSharedWishlist } from "../hooks/useWishlist";
-import { neutral, brand, fonts } from "../theme/tokens";
+import { brand, fonts } from "../theme/tokens";
 
 export default function SharedWishlistPage() {
   const { token } = useParams();

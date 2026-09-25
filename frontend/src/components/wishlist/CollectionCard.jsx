@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { Heart, Lock, Globe } from "lucide-react";
 import { motion } from "framer-motion";
-import { neutral, brand, radii, shadows } from "../../theme/tokens";
+import { brand, radii, shadows } from "../../theme/tokens";
 import { cloudinaryUrl } from "../../utils/cloudinaryUrl";
 
 export default function CollectionCard({ collection, onClick }) {

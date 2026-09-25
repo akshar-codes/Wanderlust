@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import MuiBadge from "@mui/material/Badge";
-import { brand, neutral, semantic, radii } from "../../theme/tokens";
+import { brand, semantic, radii } from "../../theme/tokens";
 
 const TONES = {
   neutral: {

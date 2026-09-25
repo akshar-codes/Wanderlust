@@ -7,7 +7,7 @@ import {
   useEnableWishlistSharing,
   useDisableWishlistSharing,
 } from "../../hooks/useWishlist";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 
 export default function ShareCollectionModal({ open, onClose, collection }) {
   const [copied, setCopied] = useState(false);
