@@ -1,0 +1,60 @@
+name: CI
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+    env:
+      MONGO_URL: mongodb://localhost:27017/wanderlust_test
+      SESSION_SECRET: dummy_secret_for_tests_32_chars_long
+      MAP_TOKEN: dummy_map_token
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.16.0
+      - name: Cache backend modules
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: backend-${{ hashFiles('backend/package-lock.json') }}
+      - run: npm ci
+        working-directory: ./backend
+      - name: Cache frontend modules
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: frontend-${{ hashFiles('frontend/package-lock.json') }}
+      - run: npm ci
+        working-directory: ./frontend
+      - run: npm install
+        working-directory: ./
+      - run: npm run lint
+        working-directory: ./frontend
+      - run: npm run test:unit
+        working-directory: ./backend
+      - run: npm run test:integration
+        working-directory: ./backend
+      - run: npm run test:security
+        working-directory: ./backend
+      - run: npm test
+        working-directory: ./frontend
+      - run: npm run build
+        working-directory: ./frontend
+      - run: npm run validate:api
+        working-directory: ./backend
+      - run: npx playwright install --with-deps
+      - run: npm run e2e
+        env:
+          CLOUD_NAME: dummy
+          CLOUD_API_KEY: dummy
+          CLOUD_API_SECRET: dummy

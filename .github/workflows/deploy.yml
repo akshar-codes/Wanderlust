@@ -1,0 +1,24 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and Push Docker Images
+        run: |
+          echo "Logging into GitHub Container Registry..."
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u gupta-akshar --password-stdin
+
+          echo "Building images..."
+          docker-compose build
+
+          echo "Tagging images..."
+          docker tag wanderlust-backend:latest ghcr.io/gupta-akshar/wanderlust-backend:latest
+          docker tag wanderlust-frontend:latest ghcr.io/gupta-akshar/wanderlust-frontend:latest
+
+          echo "Pushing images..."
+          docker push ghcr.io/gupta-akshar/wanderlust-backend:latest
+          docker push ghcr.io/gupta-akshar/wanderlust-frontend:latest
