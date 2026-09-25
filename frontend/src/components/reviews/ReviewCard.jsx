@@ -6,7 +6,6 @@ import {
   ChevronUp,
   Edit2,
   X,
-  Check,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import StarRating from "../common/StarRating";

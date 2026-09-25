@@ -1,7 +1,7 @@
 import { Box, Typography, LinearProgress } from "@mui/material";
 import { Check, Circle } from "lucide-react";
 import { Card } from "../ui/Card";
-import { brand, neutral, semantic, radii } from "../../theme/tokens";
+import { brand, semantic, radii } from "../../theme/tokens";
 
 const CHECKLIST = [
   { key: "firstName", label: "Add your first name" },

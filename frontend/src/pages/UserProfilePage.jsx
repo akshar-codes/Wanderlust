@@ -26,7 +26,6 @@ import {
 } from "../components/profile";
 import WishlistSection from "../components/dashboard/WishlistSection";
 import { Skeleton } from "../components/ui/Skeleton";
-import { neutral } from "../theme/tokens";
 
 const TIMELINE_FETCH_LIMIT = 5;
 

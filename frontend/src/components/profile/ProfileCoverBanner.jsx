@@ -3,7 +3,7 @@ import { Edit2, ShieldCheck, MapPin, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import AvatarUploader from "../dashboard/AvatarUploader";
 import { Badge } from "../ui/Badge";
-import { brand, neutral, fonts, radii } from "../../theme/tokens";
+import { brand, fonts, radii } from "../../theme/tokens";
 
 function formatMemberSince(date) {
   if (!date) return null;

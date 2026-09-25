@@ -7,7 +7,7 @@ import { EmptyState } from "../ui/EmptyState";
 import { Skeleton } from "../ui/Skeleton";
 import ReviewCard from "../reviews/ReviewCard";
 import { useUserReviewsReceived } from "../../hooks/useUser";
-import { neutral, brand } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 
 const PAGE_LIMIT = 10;
 

@@ -5,7 +5,6 @@ import { Card, ListingCard } from "../ui/Card";
 import { EmptyState } from "../ui/EmptyState";
 import { Skeleton } from "../ui/Skeleton";
 import { Button } from "../ui/Button";
-import { neutral } from "../../theme/tokens";
 
 export default function HostedListingsSection({ listings, loading, isSelf }) {
   const navigate = useNavigate();

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Card } from "../ui/Card";
 import { EmptyState } from "../ui/EmptyState";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 
 const MAX_EVENTS = 15;
 

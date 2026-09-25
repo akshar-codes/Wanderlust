@@ -8,7 +8,6 @@ import { Button } from "../ui/Button";
 import { Input, Textarea } from "../ui/Input";
 import { profileSchema } from "../../schemas";
 import { useUpdateProfile } from "../../hooks/useUser";
-import { neutral, brand } from "../../theme/tokens";
 
 /**
  * ProfileInfoCard — displays bio (+ phone number for the owner only).
