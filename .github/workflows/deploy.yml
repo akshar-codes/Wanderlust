@@ -5,20 +5,33 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
-      - name: Build and Push Docker Images
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.16.0
+      - name: Log in to GitHub Container Registry
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+      - name: Build Backend Docker Image
+        run: docker build --pull -t wanderlust-backend:latest ./backend
+      - name: Build Frontend Assets
+        working-directory: ./frontend
         run: |
-          echo "Logging into GitHub Container Registry..."
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u gupta-akshar --password-stdin
-
-          echo "Building images..."
-          docker-compose build
-
-          echo "Tagging images..."
-          docker tag wanderlust-backend:latest ghcr.io/gupta-akshar/wanderlust-backend:latest
-          docker tag wanderlust-frontend:latest ghcr.io/gupta-akshar/wanderlust-frontend:latest
-
-          echo "Pushing images..."
-          docker push ghcr.io/gupta-akshar/wanderlust-backend:latest
-          docker push ghcr.io/gupta-akshar/wanderlust-frontend:latest
+          npm ci
+          npm run build
+      - name: Build Frontend Docker Image
+        run: docker build --pull -f frontend/Dockerfile.release -t wanderlust-frontend:latest ./frontend
+      - name: Tag and Push Docker Images
+        env:
+          GHCR_OWNER: ${{ github.repository_owner }}
+        run: |
+          IMAGE_OWNER="$(printf '%s' "$GHCR_OWNER" | tr '[:upper:]' '[:lower:]')"
+          docker tag wanderlust-backend:latest "ghcr.io/$IMAGE_OWNER/wanderlust-backend:latest"
+          docker tag wanderlust-frontend:latest "ghcr.io/$IMAGE_OWNER/wanderlust-frontend:latest"
+          docker push "ghcr.io/$IMAGE_OWNER/wanderlust-backend:latest"
+          docker push "ghcr.io/$IMAGE_OWNER/wanderlust-frontend:latest"
