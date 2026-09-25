@@ -124,7 +124,7 @@ export default function ActivityTimeline(props) {
           sx={{
             fontWeight: 700,
             fontSize: "1.0625rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 2.5,
           }}
         >
@@ -146,7 +146,7 @@ export default function ActivityTimeline(props) {
                 top: 6,
                 bottom: 6,
                 width: 2,
-                bgcolor: neutral[100],
+                bgcolor: "var(--color-surface-2)",
               }}
             />
             {events.map((event) => {
@@ -169,7 +169,7 @@ export default function ActivityTimeline(props) {
                       width: 16,
                       height: 16,
                       borderRadius: "50%",
-                      bgcolor: "#fff",
+                      bgcolor: "var(--color-surface)",
                       border: `2px solid ${meta.color}`,
                       display: "flex",
                       alignItems: "center",
@@ -184,14 +184,17 @@ export default function ActivityTimeline(props) {
                     sx={{
                       fontSize: "0.875rem",
                       fontWeight: 600,
-                      color: neutral[700],
+                      color: "var(--color-text)",
                       textDecoration: "none",
                       "&:hover": event.to ? { color: brand[600] } : undefined,
                     }}
                   >
                     {event.title}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: neutral[400] }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "var(--color-text-muted)" }}
+                  >
                     {formatDate(event.date)}
                   </Typography>
                 </Box>

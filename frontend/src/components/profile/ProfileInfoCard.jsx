@@ -78,7 +78,11 @@ export default function ProfileInfoCard({
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, fontSize: "1.0625rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "1.0625rem",
+              color: "var(--color-text)",
+            }}
           >
             About
           </Typography>
@@ -149,14 +153,14 @@ export default function ProfileInfoCard({
             {profile?.bio ? (
               <Typography
                 variant="body2"
-                sx={{ color: neutral[600], lineHeight: 1.7 }}
+                sx={{ color: "var(--color-text-secondary)", lineHeight: 1.7 }}
               >
                 {profile.bio}
               </Typography>
             ) : (
               <Typography
                 variant="body2"
-                sx={{ color: neutral[400], fontStyle: "italic" }}
+                sx={{ color: "var(--color-text-muted)", fontStyle: "italic" }}
               >
                 {isSelf
                   ? "You haven't written a bio yet."
@@ -165,9 +169,12 @@ export default function ProfileInfoCard({
             )}
 
             {isSelf && profile?.phoneNumber && (
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Phone size={14} color={neutral[400]} />
-                <Typography variant="body2" sx={{ color: neutral[600] }}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                <Phone size={14} color={"var(--color-text-muted)"} />
+                <Typography
+                  variant="body2"
+                  sx={{ color: "var(--color-text-secondary)" }}
+                >
                   {profile.phoneNumber}
                 </Typography>
               </Stack>

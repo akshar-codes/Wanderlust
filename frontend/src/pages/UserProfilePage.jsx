@@ -99,13 +99,20 @@ export default function UserProfilePage() {
           textAlign: "center",
         }}
       >
-        <AlertTriangle size={40} color={neutral[400]} />
+        <AlertTriangle size={40} color={"var(--color-text-muted)"} />
         <Typography
-          sx={{ fontWeight: 700, fontSize: "1.25rem", color: neutral[800] }}
+          sx={{
+            fontWeight: 700,
+            fontSize: "1.25rem",
+            color: "var(--color-text)",
+          }}
         >
           User not found
         </Typography>
-        <Typography variant="body2" sx={{ color: neutral[500] }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "var(--color-text-secondary)" }}
+        >
           We couldn't find a profile for “{username}”.
         </Typography>
       </Box>
@@ -116,7 +123,14 @@ export default function UserProfilePage() {
   const hostStats = profileData?.hostStats;
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8 }}>
+    <Box
+      sx={{
+        maxWidth: 1200,
+        mx: "auto",
+        px: { xs: 2, md: 4 },
+        py: { xs: 4, md: 6 },
+      }}
+    >
       {profileLoading ? (
         <Box sx={{ pt: 4 }}>
           <Skeleton.Avatar size={104} lines={2} />
@@ -138,7 +152,7 @@ export default function UserProfilePage() {
 
       <Grid container spacing={3}>
         {/* ── Sidebar: completion score + editable info ─────────────────── */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Box
             sx={{
               display: "flex",
@@ -162,7 +176,7 @@ export default function UserProfilePage() {
         </Grid>
 
         {/* ── Main content ──────────────────────────────────────────────── */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <HostedListingsSection
               listings={listings}

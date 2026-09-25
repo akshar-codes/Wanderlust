@@ -42,7 +42,11 @@ export default function ProfileCompletionScore({ user }) {
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, fontSize: "0.9375rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "0.9375rem",
+              color: "var(--color-text)",
+            }}
           >
             Complete your profile
           </Typography>
@@ -57,7 +61,7 @@ export default function ProfileCompletionScore({ user }) {
           sx={{
             height: 8,
             borderRadius: radii.full,
-            bgcolor: neutral[100],
+            bgcolor: "var(--color-surface-2)",
             mb: 2,
             "& .MuiLinearProgress-bar": {
               bgcolor: color,
@@ -73,8 +77,15 @@ export default function ProfileCompletionScore({ user }) {
                 key={item.key}
                 sx={{ display: "flex", alignItems: "center", gap: 1 }}
               >
-                <Circle size={6} fill={neutral[300]} stroke="none" />
-                <Typography variant="body2" sx={{ color: neutral[600] }}>
+                <Circle
+                  size={6}
+                  fill={"var(--color-border-strong)"}
+                  stroke="none"
+                />
+                <Typography
+                  variant="body2"
+                  sx={{ color: "var(--color-text-secondary)" }}
+                >
                   {item.label}
                 </Typography>
               </Box>
@@ -85,7 +96,10 @@ export default function ProfileCompletionScore({ user }) {
         {missing.length === 0 && (
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Check size={14} color={brand[600]} />
-            <Typography variant="body2" sx={{ color: neutral[600] }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "var(--color-text-secondary)" }}
+            >
               Almost there — just a few small details left.
             </Typography>
           </Box>

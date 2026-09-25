@@ -28,7 +28,11 @@ export default function HostedListingsSection({ listings, loading, isSelf }) {
           }}
         >
           <Typography
-            sx={{ fontWeight: 700, fontSize: "1.0625rem", color: neutral[800] }}
+            sx={{
+              fontWeight: 700,
+              fontSize: "1.0625rem",
+              color: "var(--color-text)",
+            }}
           >
             {isSelf ? "My Listings" : "Hosted Listings"}
           </Typography>

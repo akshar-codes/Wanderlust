@@ -68,8 +68,8 @@ export default function ProfileCoverBanner({
               py: 0.9,
               borderRadius: radii.full,
               border: "none",
-              bgcolor: "rgba(255,255,255,0.92)",
-              color: neutral[800],
+              bgcolor: "var(--color-surface)",
+              color: "var(--color-text)",
               fontWeight: 700,
               fontSize: "0.8125rem",
               cursor: "pointer",
@@ -98,7 +98,7 @@ export default function ProfileCoverBanner({
           sx={{
             border: "4px solid #fff",
             borderRadius: "50%",
-            bgcolor: "#fff",
+            bgcolor: "var(--color-surface)",
             boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
             flexShrink: 0,
           }}
@@ -146,16 +146,18 @@ export default function ProfileCoverBanner({
         <Box sx={{ pb: { xs: 0, sm: 1 }, minWidth: 0 }}>
           <Stack
             direction="row"
-            alignItems="center"
             spacing={1}
-            flexWrap="wrap"
-            justifyContent={{ xs: "center", sm: "flex-start" }}
+            sx={{
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: { xs: "center", sm: "flex-start" },
+            }}
           >
             <Typography
               sx={{
                 fontFamily: fonts.display,
                 fontSize: "1.5rem",
-                color: neutral[800],
+                color: "var(--color-text)",
                 lineHeight: 1.2,
               }}
             >
@@ -176,19 +178,27 @@ export default function ProfileCoverBanner({
               </Badge>
             )}
           </Stack>
-          <Typography variant="body2" sx={{ color: neutral[500], mt: 0.25 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: "var(--color-text-secondary)", mt: 0.25 }}
+          >
             @{user?.username}
           </Typography>
           {memberSince && (
             <Stack
               direction="row"
-              alignItems="center"
               spacing={0.5}
-              justifyContent={{ xs: "center", sm: "flex-start" }}
-              sx={{ mt: 0.75 }}
+              sx={{
+                mt: 0.75,
+                alignItems: "center",
+                justifyContent: { xs: "center", sm: "flex-start" },
+              }}
             >
-              <MapPin size={12} color={neutral[400]} />
-              <Typography variant="caption" sx={{ color: neutral[400] }}>
+              <MapPin size={12} color={"var(--color-text-muted)"} />
+              <Typography
+                variant="caption"
+                sx={{ color: "var(--color-text-muted)" }}
+              >
                 Member since {memberSince}
               </Typography>
             </Stack>

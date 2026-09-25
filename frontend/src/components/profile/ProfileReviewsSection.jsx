@@ -28,13 +28,16 @@ export default function ProfileReviewsSection({ username, profileUserId }) {
           sx={{
             fontWeight: 700,
             fontSize: "1.0625rem",
-            color: neutral[800],
+            color: "var(--color-text)",
             mb: 2.5,
           }}
         >
           Reviews
           {typeof pagination?.total === "number" && pagination.total > 0 && (
-            <Box component="span" sx={{ color: neutral[400], fontWeight: 500 }}>
+            <Box
+              component="span"
+              sx={{ color: "var(--color-text-muted)", fontWeight: 500 }}
+            >
               {" "}
               ({pagination.total})
             </Box>
@@ -53,7 +56,7 @@ export default function ProfileReviewsSection({ username, profileUserId }) {
               <Box
                 key={i}
                 sx={{
-                  border: `1px solid ${neutral[200]}`,
+                  border: `1px solid var(--color-border)`,
                   borderRadius: "20px",
                   p: 2.5,
                 }}
