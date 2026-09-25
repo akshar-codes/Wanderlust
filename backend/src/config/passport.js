@@ -46,6 +46,18 @@ async function oauthUpsert({
     });
 
     if (existingByProvider) {
+      // Never let an OAuth flow started from an authenticated session silently
+      // switch that session to a different account. This also prevents linking
+      // a provider that is already owned by another user.
+      if (
+        req.isAuthenticated?.() &&
+        String(existingByProvider._id) !== String(req.user._id)
+      ) {
+        return done(null, false, {
+          message: `This ${provider} account is already linked to another account.`,
+        });
+      }
+
       const updates = {};
       if (avatarUrl && !existingByProvider.avatar?.url) {
         updates["avatar.url"] = avatarUrl;
@@ -170,13 +182,11 @@ export default function configurePassport() {
           clientSecret: process.env.GOOGLE_CLIENT_SECRET,
           callbackURL: `${process.env.BASE_URL ?? "http://localhost:8080"}/api/auth/google/callback`,
           scope: ["profile", "email"],
+          state: true,
           passReqToCallback: true,
         },
         async (req, accessToken, refreshToken, profile, done) => {
-          const email =
-            profile.emails?.find((e) => e.verified)?.value ??
-            profile.emails?.[0]?.value ??
-            null;
+          const email = profile.emails?.find((e) => e.verified)?.value ?? null;
 
           await oauthUpsert({
             provider: "google",
@@ -206,12 +216,13 @@ export default function configurePassport() {
           clientSecret: process.env.GITHUB_CLIENT_SECRET,
           callbackURL: `${process.env.BASE_URL ?? "http://localhost:8080"}/api/auth/github/callback`,
           scope: ["user:email"],
+          state: true,
           passReqToCallback: true,
         },
         async (req, accessToken, refreshToken, profile, done) => {
           const email =
             profile.emails?.find((e) => e.primary && e.verified)?.value ??
-            profile.emails?.[0]?.value ??
+            profile.emails?.find((e) => e.verified)?.value ??
             null;
 
           await oauthUpsert({

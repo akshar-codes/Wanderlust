@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "@fluidjs/multer-cloudinary";
 import logger from "../utils/logger.js";
 
 if (
@@ -26,14 +25,47 @@ export const ALLOWED_MIME_TYPES = [
   "image/webp",
 ];
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "wanderlust_dev",
-    allowedFormats: ALLOWED_FORMATS,
-    transformation: [{ quality: "auto", fetch_format: "auto" }],
+const storage = {
+  _handleFile(_req, file, callback) {
+    let complete = false;
+    const finish = (...args) => {
+      if (complete) return;
+      complete = true;
+      clearTimeout(timeout);
+      callback(...args);
+    };
+    const upload = cloudinary.uploader.upload_stream(
+      {
+        folder: process.env.CLOUDINARY_UPLOAD_FOLDER ?? "wanderlust",
+        allowed_formats: ALLOWED_FORMATS,
+        transformation: [{ quality: "auto", fetch_format: "auto" }],
+      },
+      (error, result) => {
+        if (error) return finish(error);
+        if (!result)
+          return finish(new Error("Cloudinary returned no upload result"));
+        finish(null, {
+          path: result.secure_url,
+          filename: result.public_id,
+          size: result.bytes,
+        });
+      },
+    );
+    const timeout = setTimeout(() => {
+      upload.destroy(new Error("Cloudinary upload timed out"));
+    }, 20000);
+    upload.once("error", finish);
+    file.stream.pipe(upload);
   },
-  timeout: 20000,
-});
+
+  _removeFile(_req, file, callback) {
+    cloudinary.uploader.destroy(file.filename, (error, result) => {
+      if (error) return callback(error);
+      if (!result)
+        return callback(new Error("Cloudinary returned no deletion result"));
+      callback(null, result);
+    });
+  },
+};
 
 export { cloudinary, storage };
