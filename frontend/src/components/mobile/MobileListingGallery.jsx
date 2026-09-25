@@ -7,7 +7,11 @@ import { neutral } from "../../theme/tokens";
  * Supports drag-to-swipe plus left/right tap zones. Falls back to a
  * placeholder when the listing has no images.
  */
-export default function MobileListingGallery({ images = [], title, onImageTap }) {
+export default function MobileListingGallery({
+  images = [],
+  title,
+  onImageTap,
+}) {
   const [index, setIndex] = useState(0);
   const containerRef = useRef(null);
 
@@ -17,7 +21,7 @@ export default function MobileListingGallery({ images = [], title, onImageTap })
         style={{
           width: "100%",
           aspectRatio: "4/3",
-          background: neutral[100],
+          background: "var(--color-surface-2)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -44,7 +48,13 @@ export default function MobileListingGallery({ images = [], title, onImageTap })
       role="region"
       aria-roledescription="carousel"
       aria-label={`${title} images`}
-      style={{ position: "relative", width: "100%", aspectRatio: "4/3", overflow: "hidden", background: neutral[100] }}
+      style={{
+        position: "relative",
+        width: "100%",
+        aspectRatio: "4/3",
+        overflow: "hidden",
+        background: "var(--color-surface-2)",
+      }}
     >
       <AnimatePresence initial={false}>
         <motion.div
@@ -64,7 +74,13 @@ export default function MobileListingGallery({ images = [], title, onImageTap })
             src={images[index]?.url}
             alt={`${title} — photo ${index + 1}`}
             draggable={false}
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", pointerEvents: "none" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+              pointerEvents: "none",
+            }}
           />
         </motion.div>
       </AnimatePresence>
@@ -120,7 +136,16 @@ export default function MobileListingGallery({ images = [], title, onImageTap })
       )}
 
       {images.length > 1 && (
-        <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 5 }}>
+        <div
+          style={{
+            position: "absolute",
+            bottom: 12,
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: 5,
+          }}
+        >
           {images.map((_, i) => (
             <span
               key={i}
@@ -128,7 +153,10 @@ export default function MobileListingGallery({ images = [], title, onImageTap })
                 width: i === index ? 16 : 6,
                 height: 6,
                 borderRadius: 999,
-                background: i === index ? "#fff" : "rgba(255,255,255,0.55)",
+                background:
+                  i === index
+                    ? "var(--color-surface)"
+                    : "rgba(255,255,255,0.55)",
                 transition: "width 0.2s",
               }}
             />

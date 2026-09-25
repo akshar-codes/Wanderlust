@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Share2, Star, MapPin, Users, BedDouble, Bath, Check } from "lucide-react";
+import {
+  ArrowLeft,
+  Share2,
+  Star,
+  MapPin,
+  Users,
+  BedDouble,
+  Bath,
+  Check,
+} from "lucide-react";
 import { useListing } from "../../hooks/useListings";
 import Spinner from "../../components/common/Spinner";
 import WishlistHeartButton from "../../components/wishlist/WishlistHeartButton";
@@ -27,7 +36,14 @@ export default function MobileListingDetailPage() {
 
   if (isLoading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "60vh",
+        }}
+      >
         <Spinner size={36} />
       </div>
     );
@@ -36,7 +52,9 @@ export default function MobileListingDetailPage() {
   if (isError || !listing) {
     return (
       <div style={{ padding: 32, textAlign: "center" }}>
-        <p style={{ fontWeight: 700, color: neutral[800] }}>Listing not found</p>
+        <p style={{ fontWeight: 700, color: "var(--color-text)" }}>
+          Listing not found
+        </p>
       </div>
     );
   }
@@ -73,7 +91,7 @@ export default function MobileListingDetailPage() {
               height: 38,
               borderRadius: "50%",
               border: "none",
-              background: "rgba(255,255,255,0.92)",
+              background: "var(--color-surface)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -81,18 +99,22 @@ export default function MobileListingDetailPage() {
               boxShadow: "0 2px 8px rgba(0,0,0,0.18)",
             }}
           >
-            <ArrowLeft size={18} color={neutral[800]} />
+            <ArrowLeft size={18} color={"var(--color-text)"} />
           </button>
           <div style={{ display: "flex", gap: 8 }}>
             <button
-              onClick={() => navigator.share?.({ title: listing.title, url: window.location.href }).catch(() => {})}
+              onClick={() =>
+                navigator
+                  .share?.({ title: listing.title, url: window.location.href })
+                  .catch(() => {})
+              }
               aria-label="Share"
               style={{
                 width: 38,
                 height: 38,
                 borderRadius: "50%",
                 border: "none",
-                background: "rgba(255,255,255,0.92)",
+                background: "var(--color-surface)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -100,9 +122,13 @@ export default function MobileListingDetailPage() {
                 boxShadow: "0 2px 8px rgba(0,0,0,0.18)",
               }}
             >
-              <Share2 size={16} color={neutral[800]} />
+              <Share2 size={16} color={"var(--color-text)"} />
             </button>
-            <WishlistHeartButton listingId={listing._id} size={38} iconSize={16} />
+            <WishlistHeartButton
+              listingId={listing._id}
+              size={38}
+              iconSize={16}
+            />
           </div>
         </div>
       </div>
@@ -127,33 +153,72 @@ export default function MobileListingDetailPage() {
             fontFamily: "'DM Serif Display', Georgia, serif",
             fontSize: "1.5rem",
             lineHeight: 1.2,
-            color: neutral[800],
+            color: "var(--color-text)",
             margin: "10px 0 8px",
           }}
         >
           {listing.title}
         </h1>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
           {listing.averageRating > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <Star size={13} fill="#f59e0b" stroke="none" />
-              <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>{Number(listing.averageRating).toFixed(1)}</span>
-              <span style={{ fontSize: "0.875rem", color: neutral[500] }}>· {listing.reviewCount} reviews</span>
+              <span style={{ fontWeight: 700, fontSize: "0.875rem" }}>
+                {Number(listing.averageRating).toFixed(1)}
+              </span>
+              <span
+                style={{
+                  fontSize: "0.875rem",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
+                · {listing.reviewCount} reviews
+              </span>
             </div>
           )}
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <MapPin size={13} color={neutral[400]} />
-            <span style={{ fontSize: "0.875rem", color: neutral[600] }}>
+            <MapPin size={13} color={"var(--color-text-muted)"} />
+            <span
+              style={{
+                fontSize: "0.875rem",
+                color: "var(--color-text-secondary)",
+              }}
+            >
               {listing.location}, {listing.country}
             </span>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "18px 0", borderBottom: `1px solid ${neutral[200]}`, marginBottom: 24 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            overflowX: "auto",
+            padding: "18px 0",
+            borderBottom: `1px solid var(--color-border)`,
+            marginBottom: 24,
+          }}
+        >
           {[
-            { icon: <Users size={15} />, label: `${listing.maxGuests ?? 2} guests` },
-            { icon: <BedDouble size={15} />, label: `${listing.bedrooms ?? 1} bed${listing.bedrooms === 1 ? "" : "s"}` },
-            { icon: <Bath size={15} />, label: `${listing.bathrooms ?? 1} bath${listing.bathrooms === 1 ? "" : "s"}` },
+            {
+              icon: <Users size={15} />,
+              label: `${listing.maxGuests ?? 2} guests`,
+            },
+            {
+              icon: <BedDouble size={15} />,
+              label: `${listing.bedrooms ?? 1} bed${listing.bedrooms === 1 ? "" : "s"}`,
+            },
+            {
+              icon: <Bath size={15} />,
+              label: `${listing.bathrooms ?? 1} bath${listing.bathrooms === 1 ? "" : "s"}`,
+            },
           ].map(({ icon, label }) => (
             <div
               key={label}
@@ -162,12 +227,12 @@ export default function MobileListingDetailPage() {
                 alignItems: "center",
                 gap: 6,
                 padding: "7px 12px",
-                background: neutral[50],
-                border: `1px solid ${neutral[200]}`,
+                background: "var(--color-surface-2)",
+                border: `1px solid var(--color-border)`,
                 borderRadius: 10,
                 fontSize: "0.8125rem",
                 fontWeight: 600,
-                color: neutral[700],
+                color: "var(--color-text)",
                 flexShrink: 0,
               }}
             >
@@ -178,24 +243,60 @@ export default function MobileListingDetailPage() {
         </div>
 
         <section style={{ marginBottom: 28 }}>
-          <h2 style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: "1.2rem", color: neutral[800], marginBottom: 10 }}>
+          <h2
+            style={{
+              fontFamily: "'DM Serif Display', Georgia, serif",
+              fontSize: "1.2rem",
+              color: "var(--color-text)",
+              marginBottom: 10,
+            }}
+          >
             About this place
           </h2>
-          <p style={{ fontSize: "0.9375rem", lineHeight: 1.7, color: neutral[600], margin: 0 }}>{listing.description}</p>
+          <p
+            style={{
+              fontSize: "0.9375rem",
+              lineHeight: 1.7,
+              color: "var(--color-text-secondary)",
+              margin: 0,
+            }}
+          >
+            {listing.description}
+          </p>
         </section>
 
         {amenities.length > 0 && (
           <section style={{ marginBottom: 28 }}>
-            <h2 style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: "1.2rem", color: neutral[800], marginBottom: 14 }}>
+            <h2
+              style={{
+                fontFamily: "'DM Serif Display', Georgia, serif",
+                fontSize: "1.2rem",
+                color: "var(--color-text)",
+                marginBottom: 14,
+              }}
+            >
               What this place offers
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {(showAllAmenities ? amenities : amenities.slice(0, 6)).map((key) => (
-                <div key={key} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.875rem", color: neutral[700] }}>
-                  <Check size={16} color={neutral[500]} />
-                  {key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-                </div>
-              ))}
+              {(showAllAmenities ? amenities : amenities.slice(0, 6)).map(
+                (key) => (
+                  <div
+                    key={key}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      fontSize: "0.875rem",
+                      color: "var(--color-text)",
+                    }}
+                  >
+                    <Check size={16} color={"var(--color-text-secondary)"} />
+                    {key
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </div>
+                ),
+              )}
             </div>
             {amenities.length > 6 && (
               <button
@@ -203,31 +304,53 @@ export default function MobileListingDetailPage() {
                 style={{
                   marginTop: 14,
                   padding: "10px 20px",
-                  border: `1.5px solid ${neutral[300]}`,
+                  border: `1.5px solid var(--color-border-strong)`,
                   borderRadius: 999,
-                  background: "#fff",
+                  background: "var(--color-surface)",
                   fontSize: "0.8125rem",
                   fontWeight: 700,
-                  color: neutral[700],
+                  color: "var(--color-text)",
                   cursor: "pointer",
                 }}
               >
-                {showAllAmenities ? "Show less" : `Show all ${amenities.length} amenities`}
+                {showAllAmenities
+                  ? "Show less"
+                  : `Show all ${amenities.length} amenities`}
               </button>
             )}
           </section>
         )}
 
         <section style={{ marginBottom: 28 }}>
-          <h2 style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: "1.2rem", color: neutral[800], marginBottom: 10 }}>
+          <h2
+            style={{
+              fontFamily: "'DM Serif Display', Georgia, serif",
+              fontSize: "1.2rem",
+              color: "var(--color-text)",
+              marginBottom: 10,
+            }}
+          >
             Where you'll be
           </h2>
-          <div style={{ borderRadius: radii.xl, overflow: "hidden", border: `1px solid ${neutral[200]}`, height: 240 }}>
-            <ListingMap coordinates={listing.geometry?.coordinates} title={listing.title} />
+          <div
+            style={{
+              borderRadius: radii.xl,
+              overflow: "hidden",
+              border: `1px solid var(--color-border)`,
+              height: 240,
+            }}
+          >
+            <ListingMap
+              coordinates={listing.geometry?.coordinates}
+              title={listing.title}
+            />
           </div>
         </section>
 
-        <ReviewsSection listingId={listing._id} listingOwnerId={listing.owner?._id ?? listing.owner} />
+        <ReviewsSection
+          listingId={listing._id}
+          listingOwnerId={listing.owner?._id ?? listing.owner}
+        />
       </div>
 
       <div
@@ -242,16 +365,30 @@ export default function MobileListingDetailPage() {
           justifyContent: "space-between",
           gap: 12,
           padding: "12px 16px calc(env(safe-area-inset-bottom, 0px) + 12px)",
-          background: "rgba(255,255,255,0.97)",
+          background: "var(--color-dropdown-bg)",
           backdropFilter: "blur(16px)",
-          borderTop: `1px solid ${neutral[200]}`,
+          borderTop: `1px solid var(--color-border)`,
         }}
       >
         <div>
-          <span style={{ fontWeight: 700, fontSize: "1.05rem", color: neutral[800] }}>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: "1.05rem",
+              color: "var(--color-text)",
+            }}
+          >
             {formatPrice(nightlyPrice)}
           </span>
-          <span style={{ fontSize: "0.8125rem", color: neutral[500] }}> / night</span>
+          <span
+            style={{
+              fontSize: "0.8125rem",
+              color: "var(--color-text-secondary)",
+            }}
+          >
+            {" "}
+            / night
+          </span>
         </div>
         <button
           onClick={() => setBookingOpen(true)}
@@ -271,7 +408,11 @@ export default function MobileListingDetailPage() {
         </button>
       </div>
 
-      <MobileBookingFlow open={bookingOpen} onClose={() => setBookingOpen(false)} listing={listing} />
+      <MobileBookingFlow
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        listing={listing}
+      />
     </div>
   );
 }

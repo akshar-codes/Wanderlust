@@ -1,6 +1,11 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
 import { Heart, X, Star, MapPin, RotateCcw } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/auth.store";
@@ -30,9 +35,21 @@ function StackCard({ listing, index, isTop, onSwiped }) {
         rotate: isTop ? rotate : 0,
         zIndex: VISIBLE_STACK - index,
       }}
-      initial={{ scale: 1 - index * 0.04, y: index * 10, opacity: index < VISIBLE_STACK ? 1 : 0 }}
-      animate={{ scale: 1 - index * 0.04, y: index * 10, opacity: index < VISIBLE_STACK ? 1 : 0 }}
-      exit={{ x: x.get() > 0 ? 400 : -400, opacity: 0, transition: { duration: 0.3 } }}
+      initial={{
+        scale: 1 - index * 0.04,
+        y: index * 10,
+        opacity: index < VISIBLE_STACK ? 1 : 0,
+      }}
+      animate={{
+        scale: 1 - index * 0.04,
+        y: index * 10,
+        opacity: index < VISIBLE_STACK ? 1 : 0,
+      }}
+      exit={{
+        x: x.get() > 0 ? 400 : -400,
+        opacity: 0,
+        transition: { duration: 0.3 },
+      }}
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
@@ -43,7 +60,9 @@ function StackCard({ listing, index, isTop, onSwiped }) {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <div
-        onClick={() => isTop && Math.abs(x.get()) < 4 && navigate(`/listings/${listing._id}`)}
+        onClick={() =>
+          isTop && Math.abs(x.get()) < 4 && navigate(`/listings/${listing._id}`)
+        }
         style={{
           position: "relative",
           width: "100%",
@@ -162,8 +181,18 @@ export default function SwipeableListingStack({ listings = [] }) {
         }}
       >
         <div style={{ fontSize: "2.5rem" }}>🎉</div>
-        <p style={{ fontWeight: 700, color: neutral[800], margin: 0 }}>You've seen them all</p>
-        <p style={{ fontSize: "0.875rem", color: neutral[500], margin: 0 }}>Check back later for more stays.</p>
+        <p style={{ fontWeight: 700, color: "var(--color-text)", margin: 0 }}>
+          You've seen them all
+        </p>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--color-text-secondary)",
+            margin: 0,
+          }}
+        >
+          Check back later for more stays.
+        </p>
         <button
           onClick={() => setCursor(0)}
           style={{
@@ -172,11 +201,11 @@ export default function SwipeableListingStack({ listings = [] }) {
             gap: 6,
             padding: "10px 20px",
             borderRadius: 999,
-            border: `1.5px solid ${neutral[300]}`,
-            background: "#fff",
+            border: `1.5px solid var(--color-border-strong)`,
+            background: "var(--color-surface)",
             fontWeight: 600,
             fontSize: "0.875rem",
-            color: neutral[700],
+            color: "var(--color-text)",
             cursor: "pointer",
           }}
         >
@@ -187,11 +216,31 @@ export default function SwipeableListingStack({ listings = [] }) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-      <div style={{ position: "relative", width: "100%", maxWidth: 380, height: 520 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 20,
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: 380,
+          height: 520,
+        }}
+      >
         <AnimatePresence>
           {remaining.slice(0, VISIBLE_STACK).map((listing, i) => (
-            <StackCard key={listing._id} listing={listing} index={i} isTop={i === 0} onSwiped={handleSwiped} />
+            <StackCard
+              key={listing._id}
+              listing={listing}
+              index={i}
+              isTop={i === 0}
+              onSwiped={handleSwiped}
+            />
           ))}
         </AnimatePresence>
       </div>
@@ -205,8 +254,8 @@ export default function SwipeableListingStack({ listings = [] }) {
             width: 56,
             height: 56,
             borderRadius: "50%",
-            border: `1.5px solid ${neutral[200]}`,
-            background: "#fff",
+            border: `1.5px solid var(--color-border)`,
+            background: "var(--color-surface)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
