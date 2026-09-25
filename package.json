@@ -1,0 +1,15 @@
+{
+  "name": "wander-lust-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "e2e": "node run-e2e.mjs",
+    "e2e:ui": "playwright test --ui",
+    "e2e:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "mongodb": "^7.6.0",
+    "mongodb-memory-server": "^11.3.0"
+  }
+}
