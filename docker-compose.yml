@@ -1,13 +1,17 @@
 services:
   mongodb:
     image: mongo:7
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     networks:
       - data
     volumes:
       - mongodb_data:/data/db
     healthcheck:
       test:
-        ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --eval \"try { rs.status().ok } catch (e) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongodb:27017' }] }).ok }\"",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -18,7 +22,7 @@ services:
       - web
       - data
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/wanderlust
+      - MONGO_URL=mongodb://mongodb:27017/wanderlust?replicaSet=rs0
       - NODE_ENV=production
       - HOST=0.0.0.0
       - TRUST_PROXY_HOPS=1

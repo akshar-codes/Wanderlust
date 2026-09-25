@@ -7,13 +7,8 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongo:7
-        ports:
-          - 27017:27017
     env:
-      MONGO_URL: mongodb://localhost:27017/wanderlust_test
+      MONGO_URL: mongodb://localhost:27017/wanderlust_test?replicaSet=rs0
       SESSION_SECRET: dummy_secret_for_tests_32_chars_long
       MAP_TOKEN: dummy_map_token
       NODE_ENV: test
@@ -22,6 +17,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24.16.0
+      - name: Start MongoDB replica set
+        run: |
+          docker run -d --name mongodb -p 27017:27017 mongo:7 --replSet rs0 --bind_ip_all
+          for attempt in {1..30}; do
+            if docker exec mongodb mongosh --quiet --eval "db.adminCommand({ ping: 1 }).ok"; then
+              break
+            fi
+            sleep 2
+          done
+          docker exec mongodb mongosh --quiet --eval "rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] })"
+          for attempt in {1..30}; do
+            if docker exec mongodb mongosh --quiet --eval "db.hello().isWritablePrimary" | grep -q true; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MongoDB replica set did not become primary"
+          exit 1
       - name: Cache backend modules
         uses: actions/cache@v3
         with:
@@ -40,11 +53,7 @@ jobs:
         working-directory: ./
       - run: npm run lint
         working-directory: ./frontend
-      - run: npm run test:unit
-        working-directory: ./backend
-      - run: npm run test:integration
-        working-directory: ./backend
-      - run: npm run test:security
+      - run: npm run test:all
         working-directory: ./backend
       - run: npm test
         working-directory: ./frontend
