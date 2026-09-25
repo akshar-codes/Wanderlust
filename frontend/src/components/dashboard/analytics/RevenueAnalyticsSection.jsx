@@ -13,13 +13,12 @@ import {
   TrendingDown,
   IndianRupee,
   Receipt,
-  ArrowUpRight,
 } from "lucide-react";
 import { StatsCard } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
 import { useRevenueAnalytics } from "../../../hooks/useAnalytics";
 import { useCurrency } from "../../../hooks/useCurrency";
-import { brand, neutral, radii } from "../../../theme/tokens";
+import { brand, radii } from "../../../theme/tokens";
 import { formatPrice } from "../../../utils/currency";
 
 function formatDateLabel(dateStr) {

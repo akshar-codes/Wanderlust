@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { Select } from "../../ui/Input";
 import { useUserListings } from "../../../hooks/useUser";
 import { useCurrentUser } from "../../../hooks/useCurrentUser";
-import { neutral, radii } from "../../../theme/tokens";
+import { radii } from "../../../theme/tokens";
 
 const RANGE_OPTIONS = [
   { value: "7d", label: "Last 7 days" },

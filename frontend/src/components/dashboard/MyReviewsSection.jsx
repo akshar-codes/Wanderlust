@@ -9,7 +9,7 @@ import { Skeleton } from "../ui/Skeleton";
 import { ConfirmModal } from "../ui/Modal";
 import StarRating from "../common/StarRating";
 import { useMyReviews, useDeleteMyReview } from "../../hooks/useReviews";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 
 const PAGE_LIMIT = 10;
 

@@ -22,7 +22,7 @@ import {
   useDeclineBooking,
   useCompleteBooking,
 } from "../../hooks/useBookings";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 import { BOOKING_STATUS_COLORS as STATUS_STYLES } from "../../utils/statusColors";
 
@@ -91,9 +91,10 @@ function DeclineModal({ open, onClose, onConfirm, loading }) {
 function BookingRow({ booking, onDecline }) {
   const { listing, guest } = booking;
   const statusStyle = STATUS_STYLES[booking.status] ?? STATUS_STYLES.pending;
-  const confirmMutation = useConfirmBooking();
-  const declineMutation = useDeclineBooking();
-  const completeMutation = useCompleteBooking();
+  const { mutate: confirmBooking, isPending: confirming } =
+    useConfirmBooking();
+  const { mutate: completeBooking, isPending: completing } =
+    useCompleteBooking();
 
   const canComplete =
     booking.status === "confirmed" && new Date(booking.checkOut) <= new Date();

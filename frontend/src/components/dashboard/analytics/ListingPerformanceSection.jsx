@@ -2,7 +2,7 @@ import { Box, Typography, Chip, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Table } from "../../ui/Table";
 import { useListingPerformance } from "../../../hooks/useAnalytics";
-import { neutral, brand, radii } from "../../../theme/tokens";
+import { brand, radii } from "../../../theme/tokens";
 import { formatPrice } from "../../../utils/currency";
 import { STATUS_CHIP } from "../../../utils/statusColors";
 

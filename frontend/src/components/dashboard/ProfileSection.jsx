@@ -18,7 +18,6 @@ import {
   useUpdateAvatar,
   useRemoveAvatar,
 } from "../../hooks/useUser";
-import { neutral } from "../../theme/tokens";
 
 export default function ProfileSection() {
   const authUser = useCurrentUser();

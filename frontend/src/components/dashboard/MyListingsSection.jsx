@@ -14,7 +14,6 @@ import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useUserListings, USER_LISTINGS_KEY } from "../../hooks/useUser";
 import { useDeleteListing, LISTINGS_KEY } from "../../hooks/useListings";
 import listingsService from "../../services/listings.service";
-import { neutral } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 import { STATUS_CHIP } from "../../utils/statusColors";
 
@@ -62,9 +61,8 @@ function useSetListingPublished() {
 export default function MyListingsSection() {
   const navigate = useNavigate();
   const user = useCurrentUser();
-  const [page, setPage] = useState(1);
-  const [deleteId, setDeleteId] = useState(null);
-  const { data, isLoading, isError } = useMyListings(user?.username, { page });
+  const { data, isLoading } = useUserListings(user?.username);
+  const listings = data ?? [];
 
   const deleteMutation = useDeleteListing();
   const deleteListing = deleteMutation.mutate;

@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { Box, Typography, Stack, CircularProgress } from "@mui/material";
 import { Camera, Trash2 } from "lucide-react";
-import { neutral, brand } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB

@@ -8,7 +8,7 @@ import {
   Settings,
   Heart,
 } from "lucide-react";
-import { brand, neutral, radii, shadows } from "../../../theme/tokens";
+import { brand, radii, shadows } from "../../../theme/tokens";
 
 const ACTIONS = [
   {

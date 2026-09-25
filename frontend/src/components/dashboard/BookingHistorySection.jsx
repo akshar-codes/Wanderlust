@@ -9,7 +9,7 @@ import { EmptyState } from "../ui/EmptyState";
 import { Skeleton } from "../ui/Skeleton";
 import { ConfirmModal } from "../ui/Modal";
 import { useMyBookings, useCancelBooking } from "../../hooks/useBookings";
-import { neutral, brand, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 import { BOOKING_STATUS_COLORS as STATUS_STYLES } from "../../utils/statusColors";
 
@@ -226,13 +226,12 @@ function BookingCard({ booking, onCancel }) {
 export default function BookingHistorySection() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState(undefined);
-  const { data, isLoading, isError } = useMyBookings({
+  const { data, isLoading } = useMyBookings({
     page,
     limit: PAGE_LIMIT,
     status,
   });
 
-  const cancelMutation = useCancelBooking();
   const { mutate: cancelBooking, isPending: cancelling } = useCancelBooking();
   const [pendingCancel, setPendingCancel] = useState(null);
 

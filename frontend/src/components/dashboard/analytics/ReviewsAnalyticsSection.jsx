@@ -14,7 +14,7 @@ import { Star, MessageSquare } from "lucide-react";
 import { StatsCard } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
 import { useReviewsAnalytics } from "../../../hooks/useAnalytics";
-import { brand, neutral, radii, semantic } from "../../../theme/tokens";
+import { brand, radii, semantic } from "../../../theme/tokens";
 
 const CATEGORY_LABELS = {
   cleanliness: "Cleanliness",

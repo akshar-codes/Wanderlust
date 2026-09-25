@@ -6,7 +6,6 @@ import { EmptyState } from "../ui/EmptyState";
 import { Skeleton } from "../ui/Skeleton";
 import { Button, IconButton } from "../ui/Button";
 import { useWishlist, useRemoveFromWishlist } from "../../hooks/useWishlist";
-import { neutral } from "../../theme/tokens";
 
 const PREVIEW_LIMIT = 8;
 

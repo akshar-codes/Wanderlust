@@ -13,7 +13,7 @@ import { ClipboardList } from "lucide-react";
 import { StatsCard } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
 import { useBookingTrends } from "../../../hooks/useAnalytics";
-import { semantic, neutral, radii } from "../../../theme/tokens";
+import { semantic, radii } from "../../../theme/tokens";
 
 function formatDateLabel(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-IN", {

@@ -12,7 +12,7 @@ import { BedDouble, CalendarCheck } from "lucide-react";
 import { StatsCard } from "../../ui/Card";
 import { Skeleton } from "../../ui/Skeleton";
 import { useOccupancyAnalytics } from "../../../hooks/useAnalytics";
-import { teal, brand, neutral, radii } from "../../../theme/tokens";
+import { teal, brand, radii } from "../../../theme/tokens";
 
 function formatDateLabel(dateStr) {
   return new Date(dateStr).toLocaleDateString("en-IN", {
