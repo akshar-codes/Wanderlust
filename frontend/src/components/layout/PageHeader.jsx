@@ -1,6 +1,6 @@
 import { Box, Typography, Stack } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { brand, neutral, fonts } from "../../theme/tokens";
+import { brand, fonts } from "../../theme/tokens";
 
 function Breadcrumbs({ items }) {
   return (

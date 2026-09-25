@@ -17,7 +17,7 @@ import MobileListingGallery from "../../components/mobile/MobileListingGallery";
 import MobileBookingFlow from "../../components/mobile/MobileBookingFlow";
 import ListingMap from "../../components/map/ListingMap";
 import ReviewsSection from "../../components/reviews/ReviewsSection";
-import { brand, neutral, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 
 /**

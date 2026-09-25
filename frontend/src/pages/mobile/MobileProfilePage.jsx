@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useCurrentUser, useIsHost } from "../../hooks/useCurrentUser";
 import { useLogout } from "../../hooks/useAuth";
-import { brand, neutral, radii, semantic } from "../../theme/tokens";
+import { brand, radii, semantic } from "../../theme/tokens";
 
 function Row({ icon: Icon, label, to, onClick, danger }) {
   const content = (

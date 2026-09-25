@@ -6,11 +6,11 @@ import {
   useTransform,
   AnimatePresence,
 } from "framer-motion";
-import { Heart, X, Star, MapPin, RotateCcw } from "lucide-react";
+import { Heart, X, RotateCcw } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../../store/auth.store";
 import { useToggleWishlist } from "../../hooks/useWishlist";
-import { brand, neutral, radii, shadows } from "../../theme/tokens";
+import { brand, radii, shadows } from "../../theme/tokens";
 import ListingCard from "../listings/ListingCard";
 
 const SWIPE_THRESHOLD = 120;
@@ -22,9 +22,6 @@ function StackCard({ listing, index, isTop, onSwiped }) {
   const rotate = useTransform(x, [-220, 220], [-14, 14]);
   const likeOpacity = useTransform(x, [20, 120], [0, 1]);
   const nopeOpacity = useTransform(x, [-120, -20], [1, 0]);
-
-  const seed = listing._id ? parseInt(listing._id.slice(-4), 16) : index;
-  const rating = listing.averageRating || (4.2 + (seed % 8) * 0.1).toFixed(1);
 
   return (
     <motion.div

@@ -9,12 +9,12 @@ import {
 } from "../../hooks/useWishlist";
 import Spinner from "../../components/common/Spinner";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { neutral, radii } from "../../theme/tokens";
+import { radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 
 const REVEAL_WIDTH = 84;
 
-function SwipeableRow({ item, collectionId, onRemove }) {
+function SwipeableRow({ item, onRemove }) {
   const listing = item.listing;
   if (!listing) return null;
 
@@ -240,7 +240,6 @@ export default function MobileWishlistPage() {
             >
               <SwipeableRow
                 item={item}
-                collectionId={collection?._id}
                 onRemove={(listingId) =>
                   removeFromWishlist({
                     listingId,

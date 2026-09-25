@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Search as SearchIcon, ArrowLeft } from "lucide-react";
 import { useAutocomplete } from "../../hooks/useSearch";
 import { Counter } from "../ui/Counter";
-import { brand, neutral, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const CATEGORIES = [

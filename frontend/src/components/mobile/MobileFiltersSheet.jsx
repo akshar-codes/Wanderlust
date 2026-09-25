@@ -17,7 +17,7 @@ import {
 import PriceRangeSlider from "../search/PriceRangeSlider";
 import { Counter } from "../ui/Counter";
 import { usePriceHistogram } from "../../hooks/useSearch";
-import { brand, neutral } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const AMENITIES_OPTIONS = [

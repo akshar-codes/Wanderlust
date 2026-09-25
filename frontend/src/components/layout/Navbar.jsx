@@ -18,11 +18,11 @@ import {
   Sparkles,
   MessageSquare,
 } from "lucide-react";
-import { Badge, Avatar, Tooltip, Drawer, Divider } from "@mui/material";
+import { Avatar, Tooltip, Drawer } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "../../store/auth.store";
 import { useLogout } from "../../hooks/useAuth";
-import { useColorModeContext } from "../../hooks/useColorMode";
+import { useColorModeContext } from "../../hooks/colorModeContext";
 import {
   useNotifications,
   useUnreadCount,

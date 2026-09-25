@@ -13,7 +13,7 @@ import SwipeableListingStack from "../../components/mobile/SwipeableListingStack
 import WishlistHeartButton from "../../components/wishlist/WishlistHeartButton";
 import Spinner from "../../components/common/Spinner";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { brand, neutral, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 
 const CATEGORIES = [

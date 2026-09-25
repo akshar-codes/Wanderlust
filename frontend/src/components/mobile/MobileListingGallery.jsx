@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { neutral } from "../../theme/tokens";
 
 /**
  * Swipeable, snap-to-image gallery for the mobile listing detail page.

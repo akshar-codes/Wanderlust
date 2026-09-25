@@ -9,7 +9,7 @@ import { Textarea } from "../ui/Input";
 import { useAuthStore } from "../../store/auth.store";
 import { useIsOwner } from "../../hooks/useCurrentUser";
 import { useCreateBooking } from "../../hooks/useBookings";
-import { brand, neutral, radii } from "../../theme/tokens";
+import { brand, radii } from "../../theme/tokens";
 import { formatPrice } from "../../utils/currency";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 

@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Compass, Heart, CalendarCheck, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuthStore } from "../../store/auth.store";
-import { brand, neutral } from "../../theme/tokens";
+import { brand } from "../../theme/tokens";
 
 const TABS = [
   {

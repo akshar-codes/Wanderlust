@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { brand, neutral, semantic } from "../../theme/tokens";
+import { brand, semantic } from "../../theme/tokens";
 import { motion } from "framer-motion";
-import { useLocation } from "react-router-dom";
 import { useCurrency } from "../../hooks/useCurrency";
-import { useColorModeContext } from "../../hooks/useColorMode";
-import { formatPrice } from "../../utils/currency";
+import { useColorModeContext } from "../../hooks/colorModeContext";
 import { useAuthStore } from "../../store/auth.store";
 import { translateFooter } from "../../i18n/footer";
 import {
@@ -20,15 +18,6 @@ import {
   Shield,
   Heart,
 } from "lucide-react";
-
-const footerVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-  },
-};
 
 const columns = [
   {
