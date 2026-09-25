@@ -26,6 +26,7 @@ import { buildAvailabilityCalendar } from "../../seeder/generators/generateAvail
 import { buildWishlistsForUsers } from "../../seeder/generators/generateWishlists.js";
 import { buildSeedConversations } from "../../seeder/generators/generateConversations.js";
 import { batches, randomInt, pickRange } from "../../seeder/utils/random.js";
+import { ensureWishlistShareTokenIndex } from "../utils/ensureWishlistShareTokenIndex.js";
 
 // ── Config ───────────────────────────────────────────────────────────────
 
@@ -125,8 +126,9 @@ async function seedHosts() {
   const TRAVELER_COUNT = 80;
   const travelerDescriptors = buildHostDescriptors(TRAVELER_COUNT).map((d) => ({
     ...d,
+    username: `traveler_${d.username}`,
     role: "user",
-    email: d.email.replace("hosts", "travelers"),
+    email: `traveler_${d.username}@wanderlust-travelers.com`,
   }));
   const travelerRecords = await registerHosts(User, travelerDescriptors);
   console.log(`✅  ${travelerRecords.length} traveler accounts registered`);
@@ -563,6 +565,10 @@ async function run() {
 
   await mongoose.connect(MONGO_URL);
   console.log("✅  MongoDB connected");
+
+  await ensureWishlistShareTokenIndex(
+    mongoose.connection.db.collection("wishlistcollections"),
+  );
 
   if (CLEAR_EXISTING) {
     await clearSeedData();
