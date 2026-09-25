@@ -148,7 +148,7 @@ function Section({ title, children }) {
       <Typography
         variant="overline"
         sx={{
-          color: colors.brand[500],
+          color: colors.primary[500],
           fontWeight: 700,
           letterSpacing: "0.12em",
           mb: 1,
@@ -204,7 +204,7 @@ export default function DesignSystemPage() {
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <Box sx={{ mb: 10 }}>
         <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
-          <Compass size={32} style={{ color: colors.brand[500] }} />
+          <Compass size={32} style={{ color: colors.primary[500] }} />
           <Typography variant="h1" sx={{ fontSize: "2.5rem" }}>
             Wanderlust Design System
           </Typography>
@@ -224,7 +224,7 @@ export default function DesignSystemPage() {
               Brand
             </Typography>
             <Stack direction="row" flexWrap="wrap" gap={1}>
-              {Object.entries(colors.brand).map(([shade, hex]) => (
+              {Object.entries(colors.primary).map(([shade, hex]) => (
                 <Tooltip key={shade} title={`brand.${shade} — ${hex}`} arrow>
                   <Box
                     sx={{
@@ -234,7 +234,7 @@ export default function DesignSystemPage() {
                       bgcolor: hex,
                       border:
                         shade === "0"
-                          ? `1px solid ${colors.neutral[200]}`
+                          ? "1px solid var(--color-border)"
                           : "none",
                       cursor: "default",
                       transition: "transform 140ms",
@@ -259,7 +259,7 @@ export default function DesignSystemPage() {
                       height: 56,
                       borderRadius: "10px",
                       bgcolor: hex,
-                      border: `1px solid ${colors.neutral[200]}`,
+                      border: "1px solid var(--color-border)",
                       cursor: "default",
                       transition: "transform 140ms",
                       "&:hover": { transform: "scale(1.1)" },
@@ -294,7 +294,7 @@ export default function DesignSystemPage() {
                           height: 40,
                           borderRadius: "8px",
                           bgcolor: c[k],
-                          border: `1px solid ${colors.neutral[200]}`,
+                          border: "1px solid var(--color-border)",
                         }}
                       />
                     </Tooltip>
@@ -445,7 +445,10 @@ export default function DesignSystemPage() {
               onChange={(e) => setInputVal(e.target.value)}
               hint="Enter a city or region"
               startAdornment={
-                <MapPin size={16} style={{ color: colors.neutral[400] }} />
+                <MapPin
+                  size={16}
+                  style={{ color: "var(--color-text-muted)" }}
+                />
               }
             />
           </Grid>
@@ -733,9 +736,9 @@ export default function DesignSystemPage() {
         </Typography>
         <Stack direction="row" gap={2} alignItems="center" mb={4}>
           <Avatar>AK</Avatar>
-          <Avatar sx={{ bgcolor: colors.brand[500] }}>WL</Avatar>
+          <Avatar sx={{ bgcolor: colors.primary[500] }}>WL</Avatar>
           <Badge badgeContent={4} color="primary">
-            <Avatar sx={{ bgcolor: colors.neutral[700] }}>JS</Avatar>
+            <Avatar sx={{ bgcolor: "var(--color-text)" }}>JS</Avatar>
           </Badge>
           <Badge variant="dot" color="success">
             <Avatar>MN</Avatar>
@@ -752,7 +755,7 @@ export default function DesignSystemPage() {
                 sx={{
                   width: s * 4,
                   height: s * 4,
-                  bgcolor: colors.brand[200],
+                  bgcolor: colors.primary[200],
                   borderRadius: "4px",
                   cursor: "default",
                 }}
@@ -785,8 +788,8 @@ export default function DesignSystemPage() {
                 sx={{
                   width: 72,
                   height: 72,
-                  bgcolor: colors.brand[100],
-                  border: `2px solid ${colors.brand[300]}`,
+                  bgcolor: colors.primary[100],
+                  border: `2px solid ${colors.primary[300]}`,
                   borderRadius: r,
                   display: "flex",
                   alignItems: "center",
@@ -797,7 +800,7 @@ export default function DesignSystemPage() {
                 <Typography
                   variant="caption"
                   fontWeight={600}
-                  color={colors.brand[700]}
+                  color={colors.primary[700]}
                 >
                   {name}
                 </Typography>
