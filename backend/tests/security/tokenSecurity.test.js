@@ -44,7 +44,7 @@ describe("Token Security Tests", () => {
           token: _devToken,
           newPassword: "AnotherPassword123!",
         }),
-      ).rejects.toThrow(/Invalid or expired token/);
+      ).rejects.toThrow(/Reset token is invalid or has expired/);
     });
 
     it("prevents use of an expired token", async () => {
@@ -64,7 +64,7 @@ describe("Token Security Tests", () => {
           token: _devToken,
           newPassword: "NewPassword123!",
         }),
-      ).rejects.toThrow(/Invalid or expired token/);
+      ).rejects.toThrow(/Reset token is invalid or has expired/);
     });
 
     it("rejects invalid/tampered tokens", async () => {
@@ -73,31 +73,29 @@ describe("Token Security Tests", () => {
           token: "invalid-token",
           newPassword: "NewPassword123!",
         }),
-      ).rejects.toThrow(/Invalid or expired token/);
+      ).rejects.toThrow(/Reset token is invalid or has expired/);
     });
   });
 
   describe("Email Verification Tokens", () => {
     it("prevents reuse of a verification token", async () => {
       const user = await makeUser({ emailVerified: false });
-      const { _devToken } = await verificationService.initiateVerification({
-        user,
-      });
+      const { _devToken } =
+        await verificationService.sendVerificationEmail(user);
 
       // First use succeeds
-      await verificationService.consumeVerificationToken({ token: _devToken });
+      await verificationService.verifyEmail({ token: _devToken });
 
       // Second use throws
       await expect(
-        verificationService.consumeVerificationToken({ token: _devToken }),
-      ).rejects.toThrow(/Invalid or expired verification link/);
+        verificationService.verifyEmail({ token: _devToken }),
+      ).rejects.toThrow(/Verification link is invalid or has expired/);
     });
 
     it("prevents use of an expired verification token", async () => {
       const user = await makeUser({ emailVerified: false });
-      const { _devToken } = await verificationService.initiateVerification({
-        user,
-      });
+      const { _devToken } =
+        await verificationService.sendVerificationEmail(user);
 
       // Manually backdate the token
       await EmailVerificationToken.updateOne(
@@ -106,8 +104,8 @@ describe("Token Security Tests", () => {
       );
 
       await expect(
-        verificationService.consumeVerificationToken({ token: _devToken }),
-      ).rejects.toThrow(/Invalid or expired verification link/);
+        verificationService.verifyEmail({ token: _devToken }),
+      ).rejects.toThrow(/Verification link is invalid or has expired/);
     });
   });
 });

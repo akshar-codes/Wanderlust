@@ -8,23 +8,17 @@ import {
 } from "../helpers/db.js";
 import { makeUser, makeListing } from "../helpers/factories.js";
 import session from "express-session";
-import { csrfCookie } from "../../src/middlewares/csrf.js";
+import configurePassport from "../../src/config/passport.js";
+
+configurePassport();
 
 const app = createApp(
   session({ secret: "test", resave: false, saveUninitialized: true }),
 );
-// Disable CSRF for this specific test suite to focus purely on privilege escalation,
-// since handling the token across all varied requests makes the tests messy.
-// Actually, our app uses CSRF strictly on non-GET endpoints. We can bypass it for tests by mocking the middleware
-// or just getting the token from a GET request.
-app.use((req, res, next) => {
-  req.csrfToken = () => "mock-token";
-  next();
-});
-
 describe("Privilege Escalation Tests", () => {
   let userCookies;
   let hostCookies;
+  let csrfToken;
 
   beforeAll(async () => {
     await connectTestDB();
@@ -49,17 +43,25 @@ describe("Privilege Escalation Tests", () => {
       password: "Password1!",
     });
 
+    const csrfResponse = await request(app).get("/api/health");
+    const csrfCookie = csrfResponse.headers["set-cookie"]
+      ?.find((cookie) => cookie.startsWith("csrf_token="))
+      ?.split(";")[0];
+    csrfToken = csrfCookie?.slice("csrf_token=".length);
+
     // Login to get session cookies
     const userLogin = await request(app)
       .post("/api/auth/login")
-      .send({ username: "normaluser", password: "Password1!" })
-      .set("X-CSRF-Token", "mock-token");
+      .set("Cookie", csrfCookie ?? "")
+      .set("X-CSRF-Token", csrfToken ?? "")
+      .send({ username: "normaluser", password: "Password1!" });
     userCookies = userLogin.headers["set-cookie"];
 
     const hostLogin = await request(app)
       .post("/api/auth/login")
-      .send({ username: "hostuser", password: "Password1!" })
-      .set("X-CSRF-Token", "mock-token");
+      .set("Cookie", csrfCookie ?? "")
+      .set("X-CSRF-Token", csrfToken ?? "")
+      .send({ username: "hostuser", password: "Password1!" });
     hostCookies = hostLogin.headers["set-cookie"];
   });
 
@@ -67,14 +69,14 @@ describe("Privilege Escalation Tests", () => {
     const res = await request(app)
       .patch("/api/users/normaluser")
       .set("Cookie", userCookies)
-      .set("X-CSRF-Token", "mock-token")
+      .set("X-CSRF-Token", csrfToken)
       .send({ role: "admin" });
 
     // Should not allow role modification, should be stripped or ignored
     const meRes = await request(app)
       .get("/api/auth/me")
       .set("Cookie", userCookies);
-    expect(meRes.body.role).toBe("user");
+    expect(meRes.body.data.user.role).toBe("user");
   });
 
   it("User cannot access admin endpoints", async () => {
@@ -99,7 +101,7 @@ describe("Privilege Escalation Tests", () => {
     const res = await request(app)
       .patch(`/api/listings/${listing._id}/publish`)
       .set("Cookie", hostCookies)
-      .set("X-CSRF-Token", "mock-token");
+      .set("X-CSRF-Token", csrfToken);
 
     expect(res.status).toBe(403);
   });
@@ -108,8 +110,8 @@ describe("Privilege Escalation Tests", () => {
     const res = await request(app)
       .get("/api/auth/me")
       .set("Cookie", userCookies);
-    expect(res.body).not.toHaveProperty("hash");
-    expect(res.body).not.toHaveProperty("salt");
-    expect(res.body).not.toHaveProperty("twoFactorSecret");
+    expect(res.body.data.user).not.toHaveProperty("hash");
+    expect(res.body.data.user).not.toHaveProperty("salt");
+    expect(res.body.data.user).not.toHaveProperty("twoFactorSecret");
   });
 });

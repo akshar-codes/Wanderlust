@@ -40,7 +40,10 @@ export const csrfProtect = (req, res, next) => {
   const cookieToken = req.cookies.csrf_token;
 
   if (!headerToken || !cookieToken) {
-    logger.warn(`CSRF Missing: header=${headerToken}, cookie=${cookieToken}`);
+    logger.warn("CSRF token missing", {
+      hasHeaderToken: Boolean(headerToken),
+      hasCookieToken: Boolean(cookieToken),
+    });
     return next(
       new AppError(403, "CSRF token missing", {
         code: "CSRF_VALIDATION_FAILED",
@@ -56,9 +59,7 @@ export const csrfProtect = (req, res, next) => {
       headerBuffer.length !== cookieBuffer.length ||
       !crypto.timingSafeEqual(headerBuffer, cookieBuffer)
     ) {
-      logger.warn(
-        `CSRF Mismatch: header=${headerToken}, cookie=${cookieToken}`,
-      );
+      logger.warn("CSRF token mismatch");
       throw new Error("Mismatch");
     }
 
