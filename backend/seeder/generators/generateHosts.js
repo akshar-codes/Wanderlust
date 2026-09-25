@@ -1,12 +1,4 @@
-import {
-  randomInt,
-  randomFloat,
-  pick,
-  pickRange,
-  chance,
-  randomPastDate,
-  slugify,
-} from "../utils/random.js";
+import { pick, pickRange, randomPastDate } from "../utils/random.js";
 import { FIRST_NAMES, LAST_NAMES, LANGUAGE_OPTIONS } from "../data/names.js";
 
 const HOST_COUNT = 150;
@@ -42,21 +34,12 @@ export function buildHostDescriptors(count = HOST_COUNT) {
     const email = `${username}@wanderlust-hosts.com`;
 
     const joinedAt = randomPastDate(365 * 6, 30); // 30 days - 6 years ago
-    const isSuperhost = chance(0.35);
-    const responseRate = isSuperhost ? randomInt(95, 100) : randomInt(70, 99);
-    const responseTimeOptions = isSuperhost
-      ? ["within an hour", "within a few hours"]
-      : ["within a few hours", "within a day"];
-    const responseTime = pick(responseTimeOptions);
     const languages = pickRange(LANGUAGE_OPTIONS, 1, 4);
     if (!languages.includes("English")) languages.unshift("English");
 
     const bioParts = [
       `Hosting on Wanderlust since ${joinedAt.getFullYear()}.`,
-      isSuperhost
-        ? "Proud Superhost known for fast responses and spotless stays."
-        : "Passionate about giving guests a comfortable, memorable stay.",
-      `Usually responds ${responseTime}.`,
+      "Passionate about giving guests a comfortable, memorable stay.",
       languages.length > 1
         ? `Speaks ${languages.join(", ")}.`
         : "Speaks English.",
@@ -72,14 +55,6 @@ export function buildHostDescriptors(count = HOST_COUNT) {
       provider: "local",
       emailVerified: true,
       avatarUrl: avatarUrl(username),
-      hostMeta: {
-        joinedAt,
-        isSuperhost,
-        responseRate,
-        responseTime,
-        languages,
-        verified: chance(0.85),
-      },
     });
   }
 
@@ -105,7 +80,7 @@ export async function registerHosts(UserModel, descriptors) {
     });
 
     const registered = await UserModel.register(userDoc, SEED_PASSWORD);
-    created.push({ user: registered, hostMeta: d.hostMeta });
+    created.push({ user: registered });
   }
 
   return created;

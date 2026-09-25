@@ -1,9 +1,8 @@
 import { randomInt, pick, addDays } from "../utils/random.js";
 
 /**
- * Builds a realistic availability calendar: a handful of upcoming "booked"
- * windows (simulating real reservations) plus occasional host-managed
- * "blocked"/"maintenance" windows, spread across the next 12 months.
+ * Builds a realistic availability calendar with host-managed "blocked" and
+ * "maintenance" windows. Actual booked windows are added from seeded bookings.
  *
  * Returns an array compatible with the Listing.availabilityCalendar
  * sub-schema: [{ startDate, endDate, reason }]
@@ -27,7 +26,7 @@ export function buildAvailabilityCalendar({
     calendar.push({
       startDate: start,
       endDate: end,
-      reason: pick(["booked", "booked", "booked", "blocked", "maintenance"]),
+      reason: pick(["blocked", "blocked", "maintenance"]),
     });
 
     // Move cursor past this block plus a gap, so future bookings remain

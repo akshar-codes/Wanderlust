@@ -305,7 +305,7 @@ export function buildListing({ city, ownerId }) {
     owner: ownerId,
     averageRating,
     reviewCount,
-    bookingCount: randomInt(0, Math.round(reviewCount * 1.5)),
+    bookingCount: 0, // backfilled from generated Booking documents by the seeder
     wishlistCount: randomInt(0, reviewCount * 5 + 20),
     status: chance(0.97) ? "active" : pick(["inactive", "suspended"]),
     draft: chance(0.03),
