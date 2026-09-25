@@ -87,7 +87,7 @@ export default function WishlistCollectionPage() {
   const pagination = data?.pagination;
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8 }}>
+    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 4 }, pb: 8 }}>
       <Box sx={{ mb: 1 }}>
         <Button
           variant="ghost"
@@ -193,7 +193,7 @@ export default function WishlistCollectionPage() {
                         });
                       }}
                       sx={{
-                        bgcolor: "rgba(255,255,255,0.92)",
+                        bgcolor: "var(--color-surface)",
                         backdropFilter: "blur(8px)",
                         "&:hover": { bgcolor: "#fee2e2" },
                       }}

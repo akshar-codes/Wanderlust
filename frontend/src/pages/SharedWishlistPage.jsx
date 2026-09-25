@@ -16,13 +16,13 @@ export default function SharedWishlistPage() {
 
   return (
     <Box
-      sx={{ maxWidth: 1100, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8, pt: 4 }}
+      sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, md: 4 }, pb: 8, pt: 4 }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
         <Compass size={20} color={brand[500]} />
         <Typography
           variant="caption"
-          sx={{ color: neutral[500], fontWeight: 600 }}
+          sx={{ color: "var(--color-text-secondary)", fontWeight: 600 }}
         >
           Shared Wanderlust wishlist
         </Typography>
@@ -43,7 +43,7 @@ export default function SharedWishlistPage() {
             sx={{
               fontFamily: fonts.display,
               fontSize: "2rem",
-              color: neutral[800],
+              color: "var(--color-text)",
               mb: 0.5,
             }}
           >
@@ -52,14 +52,18 @@ export default function SharedWishlistPage() {
           {collection.description && (
             <Typography
               variant="body2"
-              sx={{ color: neutral[500], mb: 3, maxWidth: 560 }}
+              sx={{
+                color: "var(--color-text-secondary)",
+                mb: 3,
+                maxWidth: 560,
+              }}
             >
               {collection.description}
             </Typography>
           )}
           <Typography
             variant="caption"
-            sx={{ color: neutral[400], display: "block", mb: 3 }}
+            sx={{ color: "var(--color-text-muted)", display: "block", mb: 3 }}
           >
             {collection.itemCount ?? 0}{" "}
             {collection.itemCount === 1 ? "saved stay" : "saved stays"}

@@ -19,7 +19,7 @@ export default function CollectionCard({ collection, onClick }) {
           borderRadius: radii["2xl"],
           overflow: "hidden",
           aspectRatio: "4/3",
-          bgcolor: neutral[100],
+          bgcolor: "var(--color-surface-2)",
           boxShadow: shadows.card,
         }}
       >
@@ -91,9 +91,9 @@ export default function CollectionCard({ collection, onClick }) {
           }}
         >
           {visibility === "shared" ? (
-            <Globe size={14} color={neutral[700]} />
+            <Globe size={14} color={"var(--color-text)"} />
           ) : (
-            <Lock size={13} color={neutral[700]} />
+            <Lock size={13} color={"var(--color-text)"} />
           )}
         </Box>
 

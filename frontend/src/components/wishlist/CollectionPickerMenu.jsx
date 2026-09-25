@@ -22,7 +22,12 @@ import { neutral, brand, radii } from "../../theme/tokens";
  * wishlist. Mirrors Airbnb's "Save to..." panel rather than a single
  * implicit save target, since users may have several named wishlists.
  */
-export default function CollectionPickerMenu({ anchorEl, open, onClose, listingId }) {
+export default function CollectionPickerMenu({
+  anchorEl,
+  open,
+  onClose,
+  listingId,
+}) {
   const { data: collections = [], isLoading: collectionsLoading } =
     useWishlistCollections({ enabled: open });
   const { data: status } = useWishlistStatus(listingId, { enabled: open });
@@ -61,11 +66,18 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "right" }}
       onClick={(e) => e.stopPropagation()}
-      slotProps={{ paper: { sx: { borderRadius: radii.xl, width: 300, mt: 1 } } }}
+      slotProps={{
+        paper: { sx: { borderRadius: radii.xl, width: 300, mt: 1 } },
+      }}
     >
       <Box sx={{ p: 2 }}>
         <Typography
-          sx={{ fontWeight: 700, fontSize: "0.9375rem", color: "text.primary", mb: 1.5 }}
+          sx={{
+            fontWeight: 700,
+            fontSize: "0.9375rem",
+            color: "text.primary",
+            mb: 1.5,
+          }}
         >
           Save to wishlist
         </Typography>
@@ -108,7 +120,10 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
                   checked={savedIds.has(c._id)}
                   disabled={toggling}
                   size="small"
-                  sx={{ color: "action.active", "&.Mui-checked": { color: "primary.main" } }}
+                  sx={{
+                    color: "action.active",
+                    "&.Mui-checked": { color: "primary.main" },
+                  }}
                 />
                 {c.coverImage ? (
                   <Box
@@ -152,7 +167,10 @@ export default function CollectionPickerMenu({ anchorEl, open, onClose, listingI
                   >
                     {c.name}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: neutral[400] }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "var(--color-text-muted)" }}
+                  >
                     {c.itemCount ?? 0} saved
                   </Typography>
                 </Box>

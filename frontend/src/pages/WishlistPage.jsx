@@ -16,7 +16,14 @@ export default function WishlistPage() {
   const [createOpen, setCreateOpen] = useState(false);
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8 }}>
+    <Box
+      sx={{
+        maxWidth: 1200,
+        mx: "auto",
+        px: { xs: 2, md: 4 },
+        pb: { xs: 4, md: 6 },
+      }}
+    >
       <PageHeader
         eyebrow="Saved"
         title="Wishlists"

@@ -68,12 +68,15 @@ export default function ShareCollectionModal({ open, onClose, collection }) {
               sx={{
                 fontWeight: 700,
                 fontSize: "0.9375rem",
-                color: neutral[800],
+                color: "var(--color-text)",
               }}
             >
               Public link
             </Typography>
-            <Typography variant="caption" sx={{ color: neutral[500] }}>
+            <Typography
+              variant="caption"
+              sx={{ color: "var(--color-text-secondary)" }}
+            >
               Anyone with the link can view this wishlist
             </Typography>
           </Box>
@@ -92,18 +95,22 @@ export default function ShareCollectionModal({ open, onClose, collection }) {
               alignItems: "center",
               gap: 1,
               p: 1.25,
-              border: `1.5px solid ${neutral[200]}`,
+              border: `1.5px solid var(--color-border)`,
               borderRadius: radii.lg,
-              bgcolor: neutral[50],
+              bgcolor: "var(--color-surface-2)",
             }}
           >
-            <Link2 size={15} color={neutral[400]} style={{ flexShrink: 0 }} />
+            <Link2
+              size={15}
+              color={"var(--color-text-muted)"}
+              style={{ flexShrink: 0 }}
+            />
             <Typography
               variant="body2"
               sx={{
                 flex: 1,
                 minWidth: 0,
-                color: neutral[600],
+                color: "var(--color-text-secondary)",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
