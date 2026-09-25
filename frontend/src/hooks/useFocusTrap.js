@@ -11,6 +11,7 @@ export function useFocusTrap(
 
     // Save previous focus when trap activates
     previousFocusRef.current = document.activeElement;
+    const returnNode = returnFocusRef?.current || previousFocusRef.current;
 
     const container = containerRef.current;
     if (!container) return;
@@ -78,7 +79,6 @@ export function useFocusTrap(
       document.removeEventListener("keydown", handleKeyDown);
 
       // Restore focus on close
-      const returnNode = returnFocusRef?.current || previousFocusRef.current;
       if (returnNode && typeof returnNode.focus === "function") {
         // Small timeout to ensure element exists in DOM before focusing
         setTimeout(() => {

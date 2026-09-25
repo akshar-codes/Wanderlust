@@ -13,7 +13,7 @@ import {
 
 import { PageHeader } from "../components/layout/PageHeader";
 import { useCurrentUser, useIsHost } from "../hooks/useCurrentUser";
-import { neutral, brand, radii } from "../theme/tokens";
+import { brand, radii } from "../theme/tokens";
 
 import ProfileSection from "../components/dashboard/ProfileSection";
 import MyListingsSection from "../components/dashboard/MyListingsSection";

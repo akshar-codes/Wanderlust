@@ -3,13 +3,10 @@ import {
   useEffect,
   useMemo,
   useCallback,
-  createContext,
-  useContext,
 } from "react";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 import { getWanderlustTheme, injectCSSVariables } from "../theme";
-
-const ColorModeContext = createContext(null);
+import { ColorModeContext } from "./colorModeContext";
 
 export function ColorModeProvider({ children }) {
   const [mode, setMode] = useState(
@@ -23,8 +20,6 @@ export function ColorModeProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    let activeMode = mode;
-
     const updateSystemMode = (e) => {
       if (mode === "system") {
         const isDark = e
@@ -80,14 +75,4 @@ export function ColorModeProvider({ children }) {
       <MuiThemeProvider theme={muiTheme}>{children}</MuiThemeProvider>
     </ColorModeContext.Provider>
   );
-}
-
-export function useColorModeContext() {
-  const context = useContext(ColorModeContext);
-  if (!context) {
-    throw new Error(
-      "useColorModeContext must be used within a ColorModeProvider",
-    );
-  }
-  return context;
 }

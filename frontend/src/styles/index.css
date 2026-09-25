@@ -931,9 +931,10 @@
     &:hover {
       transform: scale(1.15);
     }
-    &--active {
-      color: var(--color-primary-500);
-    }
+  }
+
+  .listing-card__wishlist--active {
+    color: var(--color-primary-500);
   }
 
   .listing-card__body {

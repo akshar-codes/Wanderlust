@@ -1,13 +1,7 @@
 import { createTheme, alpha } from "@mui/material/styles";
 import {
   colors,
-  brand,
-  teal,
-  neutral,
-  semantic,
-  dark,
   fonts,
-  fontSizes,
   spacing,
   radii,
   shadows,
@@ -458,7 +452,7 @@ export function getWanderlustTheme(mode = "light") {
           disableRipple: false,
         },
         styleOverrides: {
-          root: ({ ownerState }) => ({
+          root: () => ({
             borderRadius: radii.pill ?? radii.full,
             fontFamily: typography.fonts.body,
             fontWeight: typography.weights.semibold,

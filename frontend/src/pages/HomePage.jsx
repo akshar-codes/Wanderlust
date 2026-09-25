@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Search, Compass, LogOut, ArrowRight, Star, Heart } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   motion,
@@ -8,21 +7,16 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useAuthStore } from "../store/auth.store";
 import {
   brand,
-  neutral,
   fonts,
-  shadows,
-  teal,
   semantic,
 } from "../theme/tokens";
 import { CATEGORIES } from "../constants/categories";
 import { useListings } from "../hooks/useListings";
-import { useIsMobile } from "../hooks/useIsMobile";
 import ListingCard from "../components/listings/ListingCard";
 import { formatPrice } from "../utils/currency";
-import { useColorModeContext } from "../hooks/useColorMode";
+import { useColorModeContext } from "../hooks/colorModeContext";
 
 // ─── Inline styles injected once ─────────────────────────────────────────────
 const GLOBAL_CSS = `
@@ -780,18 +774,13 @@ function TestimonialCard({ t, index }) {
 }
 
 // ─── Main Hero Search ─────────────────────────────────────────────────────────
-function HeroSearch({ listings }) {
+function HeroSearch() {
   const navigate = useNavigate();
   const [where, setWhere] = useState("");
   const [category, setCategory] = useState("");
   const [focused, setFocused] = useState(null); // "where" | "when" | "guests"
   const [when, setWhen] = useState("");
   const [guests, setGuests] = useState("1 guest");
-
-  const countries = useMemo(
-    () => [...new Set(listings.map((l) => l.country))].sort().filter(Boolean),
-    [listings],
-  );
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -1062,7 +1051,7 @@ function HeroSearch({ listings }) {
 }
 
 // ─── SECTION 1: Hero ──────────────────────────────────────────────────────────
-function HeroSection({ listings }) {
+function HeroSection() {
   const { resolvedMode } = useColorModeContext();
   const bgImage =
     resolvedMode === "dark"
@@ -1263,7 +1252,7 @@ function HeroSection({ listings }) {
           transition={{ duration: 0.65, delay: 0.45 }}
           style={{ width: "100%", maxWidth: 860 }}
         >
-          <HeroSearch listings={listings} />
+          <HeroSearch />
         </motion.div>
 
         {/* Stats */}
@@ -1320,11 +1309,6 @@ function HeroSection({ listings }) {
 // ─── SECTION 2: Categories ────────────────────────────────────────────────────
 function CategoriesSection({ activeCategory, setActiveCategory }) {
   const scrollRef = useRef(null);
-
-  const scroll = (dir) => {
-    if (scrollRef.current)
-      scrollRef.current.scrollBy({ left: dir * 240, behavior: "smooth" });
-  };
 
   return (
     <Reveal>
@@ -2308,14 +2292,10 @@ export default function HomePage() {
     }
   }, []);
 
-  // Prefetch listings for hero visual
-  const { data: allData } = useListings({});
-  const listings = allData?.listings ?? [];
-
   return (
     <div className="hp-root">
       {/* ── 1. Hero ── */}
-      <HeroSection listings={listings} />
+      <HeroSection />
 
       {/* ── Ticker ── */}
       <Ticker />

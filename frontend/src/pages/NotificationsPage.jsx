@@ -8,8 +8,8 @@ import {
 } from "../hooks/useNotifications";
 import { PageHeader } from "../components/layout/PageHeader";
 import { Button } from "../components/ui/Button";
-import { brand, neutral } from "../theme/tokens";
-import { Link, useNavigate } from "react-router-dom";
+import { brand } from "../theme/tokens";
+import { useNavigate } from "react-router-dom";
 
 export default function NotificationsPage() {
   const [tab, setTab] = useState("all");

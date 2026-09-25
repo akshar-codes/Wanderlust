@@ -17,14 +17,14 @@ const parseEndpoints = (spec) => {
   let path = null;
   let current = null;
   for (const line of spec.split(/\r?\n/)) {
-    const pathMatch = line.match(/^  (\/[^:]+):\s*$/);
+    const pathMatch = line.match(/^ {2}(\/[^:]+):\s*$/);
     if (pathMatch) {
       path = pathMatch[1];
       current = null;
       continue;
     }
     const methodMatch = line.match(
-      /^    (get|post|put|patch|delete|options|head):\s*$/i,
+      /^ {4}(get|post|put|patch|delete|options|head):\s*$/i,
     );
     if (methodMatch && path) {
       current = {
@@ -37,12 +37,12 @@ const parseEndpoints = (spec) => {
       continue;
     }
     if (!current) continue;
-    const summaryMatch = line.match(/^      summary:\s*(.*)$/);
+    const summaryMatch = line.match(/^ {6}summary:\s*(.*)$/);
     if (summaryMatch)
       current.summary = summaryMatch[1].replace(/^['"]|['"]$/g, "");
-    if (/^      tags:\s*$/.test(line)) current._readTag = true;
+    if (/^ {6}tags:\s*$/.test(line)) current._readTag = true;
     else if (current._readTag) {
-      const tagMatch = line.match(/^        -\s*(.+)$/);
+      const tagMatch = line.match(/^ {8}-\s*(.+)$/);
       if (tagMatch) current.tag = tagMatch[1].replace(/^['"]|['"]$/g, "");
       current._readTag = false;
     }

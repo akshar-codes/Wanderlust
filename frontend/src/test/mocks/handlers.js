@@ -21,7 +21,7 @@ export const handlers = [
   }),
 
   // Wishlist API
-  http.get("/api/wishlist/status/:listingId", ({ params }) => {
+  http.get("/api/wishlist/status/:listingId", () => {
     return HttpResponse.json({ wishlisted: false, collectionIds: [] });
   }),
   http.post("/api/wishlist/toggle", () => {
