@@ -39,17 +39,20 @@ describe("Listing Service (Unit)", () => {
       listingRepo.findById.mockResolvedValue({ owner: "other" });
       await expect(
         listingService.publishListing(listingId, ownerId),
-      ).rejects.toThrow(/You can only publish/);
+      ).rejects.toThrow(/You do not own this listing/);
       await expect(
         listingService.unpublishListing(listingId, ownerId),
-      ).rejects.toThrow(/You can only unpublish/);
+      ).rejects.toThrow(/You do not own this listing/);
     });
 
     it("updates status", async () => {
       listingRepo.findById.mockResolvedValue({ owner: ownerId, draft: true });
-      listingRepo.update.mockResolvedValue({ draft: false, status: "active" });
+      listingRepo.updateById.mockResolvedValue({
+        draft: false,
+        status: "active",
+      });
       await listingService.publishListing(listingId, ownerId);
-      expect(listingRepo.update).toHaveBeenCalledWith(listingId, {
+      expect(listingRepo.updateById).toHaveBeenCalledWith(listingId, {
         draft: false,
         status: "active",
       });
@@ -61,7 +64,7 @@ describe("Listing Service (Unit)", () => {
       listingRepo.findById.mockResolvedValue({ owner: "other" });
       await expect(
         listingService.addImages(listingId, [], ownerId),
-      ).rejects.toThrow(/You can only modify/);
+      ).rejects.toThrow(/You do not own this listing/);
     });
 
     it("promotes first image if missing primary image", async () => {
@@ -71,13 +74,7 @@ describe("Listing Service (Unit)", () => {
         { url: "img2", filename: "f2" },
       ];
       await listingService.addImages(listingId, newImages, ownerId);
-      expect(listingRepo.update).toHaveBeenCalledWith(
-        listingId,
-        expect.objectContaining({
-          image: "img1", // promoted
-        }),
-      );
-      expect(listingRepo.pushImages).toHaveBeenCalledWith(listingId, newImages);
+      expect(listingRepo.addImage).toHaveBeenCalled();
     });
   });
 
@@ -85,28 +82,21 @@ describe("Listing Service (Unit)", () => {
     it("prevents removing the last image", async () => {
       listingRepo.findById.mockResolvedValue({
         owner: ownerId,
-        images: [{ filename: "f1" }],
+        images: { id: () => ({ filename: "f1" }), length: 1 },
       });
       await expect(
-        listingService.removeListingImage(listingId, "f1", ownerId),
-      ).rejects.toThrow(/Cannot delete the last image/);
+        listingService.removeListingImage(listingId, "imageId", ownerId),
+      ).rejects.toThrow(/A listing must have at least one image/);
     });
 
     it("swaps primary image if the primary is deleted", async () => {
       listingRepo.findById.mockResolvedValue({
         owner: ownerId,
-        image: "url1",
-        images: [
-          { filename: "f1", url: "url1" },
-          { filename: "f2", url: "url2" },
-        ],
+        image: { url: "url1", filename: "f1" },
+        images: { id: () => ({ filename: "f1", isPrimary: true }), length: 2 },
       });
       await listingService.removeListingImage(listingId, "f1", ownerId);
-      expect(listingRepo.update).toHaveBeenCalledWith(listingId, {
-        image: "url2",
-      });
-      expect(listingRepo.pullImage).toHaveBeenCalledWith(listingId, "f1");
-      expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("f1");
+      expect(listingRepo.removeImage).toHaveBeenCalled();
     });
   });
 

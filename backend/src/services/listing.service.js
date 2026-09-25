@@ -63,7 +63,9 @@ async function safeCloudinaryDelete(filename) {
   try {
     await cloudinary.uploader.destroy(filename);
   } catch (err) {
-    logger.warn("[ListingService] Cloudinary delete failed:", { message: err.message });
+    logger.warn("[ListingService] Cloudinary delete failed:", {
+      message: err.message,
+    });
   }
 }
 
@@ -279,7 +281,7 @@ export const deleteListing = async (id) => {
 export const publishListing = async (id, ownerId) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
-  if (!listing.owner.equals(ownerId))
+  if (String(listing.owner) !== String(ownerId))
     throw AppError.forbidden("You do not own this listing");
   return listingRepo.updateById(id, { draft: false, status: "active" });
 };
@@ -287,7 +289,7 @@ export const publishListing = async (id, ownerId) => {
 export const unpublishListing = async (id, ownerId) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
-  if (!listing.owner.equals(ownerId))
+  if (String(listing.owner) !== String(ownerId))
     throw AppError.forbidden("You do not own this listing");
   return listingRepo.updateById(id, { draft: true });
 };
@@ -303,7 +305,7 @@ export const setFeatured = async (id, featured) => {
 export const addImages = async (id, files, ownerId) => {
   const listing = await listingRepo.findById(id);
   if (!listing) throw AppError.notFound("Listing not found");
-  if (!listing.owner.equals(ownerId))
+  if (String(listing.owner) !== String(ownerId))
     throw AppError.forbidden("You do not own this listing");
   if (!files?.length) throw AppError.badRequest("No images provided");
 
@@ -322,7 +324,7 @@ export const addImages = async (id, files, ownerId) => {
 export const removeListingImage = async (listingId, imageId, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
-  if (!listing.owner.equals(ownerId))
+  if (String(listing.owner) !== String(ownerId))
     throw AppError.forbidden("You do not own this listing");
 
   const imageDoc = listing.images.id(imageId);
@@ -340,7 +342,7 @@ export const removeListingImage = async (listingId, imageId, ownerId) => {
 export const setPrimaryImage = async (listingId, imageId, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
-  if (!listing.owner.equals(ownerId))
+  if (String(listing.owner) !== String(ownerId))
     throw AppError.forbidden("You do not own this listing");
   return listingRepo.setPrimaryImage(listingId, imageId);
 };
@@ -350,7 +352,7 @@ export const setPrimaryImage = async (listingId, imageId, ownerId) => {
 export const addBlockedDate = async (listingId, blockedDate, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
-  if (!listing.owner.equals(ownerId))
+  if (String(listing.owner) !== String(ownerId))
     throw AppError.forbidden("You do not own this listing");
 
   if (new Date(blockedDate.startDate) >= new Date(blockedDate.endDate)) {
@@ -363,7 +365,7 @@ export const addBlockedDate = async (listingId, blockedDate, ownerId) => {
 export const removeBlockedDate = async (listingId, blockedDateId, ownerId) => {
   const listing = await listingRepo.findById(listingId);
   if (!listing) throw AppError.notFound("Listing not found");
-  if (!listing.owner.equals(ownerId))
+  if (String(listing.owner) !== String(ownerId))
     throw AppError.forbidden("You do not own this listing");
   return listingRepo.removeBlockedDate(listingId, blockedDateId);
 };
