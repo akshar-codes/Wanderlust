@@ -1,5 +1,8 @@
-export const sendSuccess = (res, data, status = 200) =>
-  res.status(status).json({ success: true, data });
+export const sendSuccess = (res, data, status = 200, meta = null) => {
+  const response = { success: true, data };
+  if (meta) response.meta = meta;
+  return res.status(status).json(response);
+};
 
 export const sendError = (
   res,
