@@ -33,20 +33,24 @@ try {
   );
 } catch (e) {}
 
-router.get("/health", (_req, res) =>
-  res.json({
-    success: true,
-    data: {
-      status: "ok",
-      db: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+router.get("/health", (_req, res) => {
+  const data = {
+    status: "ok",
+    db: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+  };
+
+  if (process.env.NODE_ENV !== "production") {
+    Object.assign(data, {
       uptime: process.uptime(),
       version: pkg.version,
       nodeVersion: process.version,
       memoryUsage: process.memoryUsage().rss,
       ts: new Date().toISOString(),
-    },
-  }),
-);
+    });
+  }
+
+  return res.json({ success: true, data });
+});
 
 router.use("/admin", adminRoutes);
 router.use("/analytics", analyticsRoutes);

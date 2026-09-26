@@ -10,10 +10,33 @@ import {
   requirePermission,
   requireOwnerOrAdmin,
 } from "../middlewares/rbac.js";
+import AppError from "../utils/AppError.js";
 
 const router = express.Router({ mergeParams: true });
 
-const fetchReview = (req) => reviewRepo.findById(req.params.reviewId);
+const fetchReview = async (req) => {
+  const review = await reviewRepo.findById(req.params.reviewId);
+  if (
+    review &&
+    String(review.listing?._id ?? review.listing) !==
+      String(req.params.listingId)
+  ) {
+    return null;
+  }
+  return review;
+};
+
+const requireReviewAuthor = asyncHandler(async (req, _res, next) => {
+  const review = await fetchReview(req);
+  if (!review) throw AppError.notFound("Review not found");
+
+  const authorId = review.author?._id ?? review.author;
+  if (String(authorId) !== String(req.user._id)) {
+    throw AppError.forbidden("You can only add photos to your own reviews");
+  }
+
+  next();
+});
 
 // ── Collection ────────────────────────────────────────────────────────────────
 router
@@ -65,6 +88,7 @@ router.post(
 router.post(
   "/:reviewId/photos",
   requireAuth(),
+  requireReviewAuthor,
   listingImageUpload.array("photos", 5),
   validateFileType,
   asyncHandler(reviewCtrl.addPhotos),
