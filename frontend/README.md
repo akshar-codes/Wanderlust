@@ -1,16 +1,30 @@
-# React + Vite
+# Wanderlust frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The frontend is a React 18 single-page application built with Vite. It uses React Router for navigation, TanStack Query for API data, and Material UI for its component system.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Install dependencies from the repository root with `npm --prefix frontend install`, then start the Vite server:
 
-## React Compiler
+```bash
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The application is available at <http://127.0.0.1:5173>. Vite forwards `/api` requests to `http://127.0.0.1:8080` by default. Set `VITE_API_URL` in `frontend/.env` to change that proxy target.
 
-## Expanding the ESLint configuration
+Set `VITE_MAPBOX_TOKEN` in `frontend/.env` to enable map views. These `VITE_` values are embedded in the browser build, so do not put server-side secrets in them.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Commands
+
+Run these from `frontend/`:
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Create a production build in `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | Lint application source |
+| `npm test` | Run Vitest tests |
+| `npm run test:coverage` | Run tests with coverage |
+
+The root [README](../README.md) covers API setup, environment variables, Docker Compose, and end-to-end tests. API details are in [`docs/openapi.yaml`](../docs/openapi.yaml).
