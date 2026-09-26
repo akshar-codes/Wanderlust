@@ -23,6 +23,7 @@ if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
 
 process.on("unhandledRejection", (reason) => {
   logger.error("Unhandled Promise Rejection", { reason });
+  process.exit(1);
 });
 
 process.on("uncaughtException", (err) => {

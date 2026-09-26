@@ -4,6 +4,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev && mkdir -p logs && chown node:node logs
 COPY --chown=node:node . .
 ENV NODE_ENV=production
+ENV HOST=0.0.0.0
 EXPOSE 8080
 USER node
 CMD ["npm", "start"]
