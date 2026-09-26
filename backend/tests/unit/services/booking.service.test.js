@@ -261,7 +261,26 @@ describe("Booking Service (Unit)", () => {
         expect.objectContaining({
           cancellationReason: "Changed plans",
         }),
+        "pending",
       );
+    });
+
+    it("does not release dates when its status transition loses a race", async () => {
+      const futureDate = new Date(Date.now() + 86400000).toISOString();
+      bookingRepo.findById.mockResolvedValue({
+        _id: bookingId,
+        guest: guestId,
+        status: "pending",
+        checkIn: futureDate,
+        listing: listingId,
+        blockedDateId: "block1",
+      });
+      bookingRepo.updateStatus.mockResolvedValue(null);
+
+      await expect(
+        bookingService.cancelBooking(bookingId, guestId),
+      ).rejects.toThrow(/changed while you were updating it/);
+      expect(listingRepo.removeBlockedDate).not.toHaveBeenCalled();
     });
   });
 
@@ -300,6 +319,12 @@ describe("Booking Service (Unit)", () => {
       });
 
       await bookingService.declineBooking(bookingId, hostId);
+      expect(bookingRepo.updateStatus).toHaveBeenCalledWith(
+        bookingId,
+        "cancelled",
+        expect.any(Object),
+        "pending",
+      );
       expect(listingRepo.removeBlockedDate).toHaveBeenCalledWith(
         listingId,
         "block1",
@@ -317,6 +342,69 @@ describe("Booking Service (Unit)", () => {
       await expect(
         bookingService.completeBooking(bookingId, hostId),
       ).rejects.toThrow(/cannot be completed before its check-out/);
+    });
+  });
+
+  describe("adminUpdateBookingStatus", () => {
+    const cancelledBooking = {
+      _id: bookingId,
+      status: "cancelled",
+      listing: listingId,
+      checkIn: new Date(Date.now() + 86400000 * 5),
+      checkOut: new Date(Date.now() + 86400000 * 7),
+      blockedDateId: "block1",
+    };
+
+    it("reserves dates before reactivating a cancelled booking", async () => {
+      bookingRepo.findById.mockResolvedValue(cancelledBooking);
+      listingRepo.addBlockedDateAtomic.mockResolvedValue({ _id: listingId });
+      bookingRepo.updateStatus.mockResolvedValue({
+        _id: bookingId,
+        status: "confirmed",
+      });
+
+      await bookingService.adminUpdateBookingStatus(
+        bookingId,
+        "confirmed",
+        undefined,
+        hostId,
+      );
+
+      expect(listingRepo.addBlockedDateAtomic).toHaveBeenCalledWith(
+        listingId,
+        expect.any(Date),
+        expect.any(Date),
+        expect.objectContaining({ _id: "block1", reason: "booked" }),
+      );
+      expect(listingRepo.addBlockedDateAtomic.mock.invocationCallOrder[0]).toBeLessThan(
+        bookingRepo.updateStatus.mock.invocationCallOrder[0],
+      );
+      expect(bookingRepo.updateStatus).toHaveBeenCalledWith(
+        bookingId,
+        "confirmed",
+        expect.objectContaining({
+          blockedDateId: "block1",
+          cancelledAt: null,
+          cancelledBy: null,
+          cancellationReason: null,
+        }),
+        "cancelled",
+      );
+    });
+
+    it("does not reactivate when the dates are already taken", async () => {
+      bookingRepo.findById.mockResolvedValue(cancelledBooking);
+      listingRepo.addBlockedDateAtomic.mockResolvedValue(null);
+
+      await expect(
+        bookingService.adminUpdateBookingStatus(
+          bookingId,
+          "pending",
+          undefined,
+          hostId,
+        ),
+      ).rejects.toThrow(/dates are no longer available/);
+      expect(bookingRepo.updateStatus).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,22 +1,23 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 export async function connectTestDB() {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(
-      process.env.MONGO_URL || "mongodb://127.0.0.1:27017/wanderlust_test",
-    );
+    const uri =
+      process.env.TEST_MONGO_URL || "mongodb://127.0.0.1:27017/wanderlust_test";
+    const databaseName = new URL(uri).pathname
+      .replace(/^\/+/, "")
+      .split("/")[0];
+    if (!/(?:^|[_-])test$/i.test(databaseName)) {
+      throw new Error(
+        "TEST_MONGO_URL must point to a database whose name ends with _test",
+      );
+    }
+    await mongoose.connect(uri);
   }
 }
 
 export async function disconnectTestDB() {
-  await mongoose.disconnect();
+  if (mongoose.connection.readyState !== 0) await mongoose.disconnect();
 }
 
 export async function clearCollections() {

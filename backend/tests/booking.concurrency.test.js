@@ -5,6 +5,7 @@ import * as bookingService from "../src/services/booking.service.js";
 import User from "../src/models/user.js";
 import Listing from "../src/models/listing.js";
 import Booking from "../src/models/booking.js";
+import * as bookingRepo from "../src/repositories/booking.repository.js";
 import { connectTestDB, disconnectTestDB } from "./helpers/db.js";
 
 describe("Booking Concurrency Tests", () => {
@@ -193,5 +194,41 @@ describe("Booking Concurrency Tests", () => {
     const updatedListing = await Listing.findById(listing._id);
     expect(updatedListing.availabilityCalendar.length).toBe(2);
     expect(updatedListing.bookingCount).toBe(2);
+  });
+
+  it("allows only one concurrent transition from the same booking status", async () => {
+    await setupTestData();
+
+    const checkIn = new Date();
+    checkIn.setDate(checkIn.getDate() + 5);
+    const checkOut = new Date(checkIn);
+    checkOut.setDate(checkOut.getDate() + 2);
+    const booking = await Booking.create({
+      listing: listing._id,
+      guest: guest1._id,
+      host: host._id,
+      checkIn,
+      checkOut,
+      nights: 2,
+      guestsCount: 1,
+      pricing: {
+        nightlyPrice: 100,
+        cleaningFee: 0,
+        serviceFee: 0,
+        taxes: 36,
+        subtotal: 200,
+        total: 236,
+      },
+      status: "pending",
+    });
+
+    const results = await Promise.all([
+      bookingRepo.updateStatus(booking._id, "confirmed", {}, "pending"),
+      bookingRepo.updateStatus(booking._id, "cancelled", {}, "pending"),
+    ]);
+
+    expect(results.filter(Boolean)).toHaveLength(1);
+    const updated = await Booking.findById(booking._id);
+    expect(["confirmed", "cancelled"]).toContain(updated.status);
   });
 });

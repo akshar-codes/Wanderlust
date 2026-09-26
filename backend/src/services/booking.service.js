@@ -19,6 +19,21 @@ function startOfToday() {
   return d;
 }
 
+async function updateBookingStatus(bookingId, status, extra, expectedStatus) {
+  const updated = await bookingRepo.updateStatus(
+    bookingId,
+    status,
+    extra,
+    expectedStatus,
+  );
+  if (!updated) {
+    throw AppError.conflict(
+      "This booking changed while you were updating it. Please refresh and try again.",
+    );
+  }
+  return updated;
+}
+
 // ── Create ─────────────────────────────────────────────────────────────────────
 
 export const createBooking = async (guestId, payload) => {
@@ -218,14 +233,7 @@ export const cancelBooking = async (bookingId, userId, reason) => {
     throw AppError.badRequest("This booking can no longer be cancelled");
   }
 
-  if (booking.blockedDateId) {
-    await listingRepo.removeBlockedDate(
-      booking.listing._id ?? booking.listing,
-      booking.blockedDateId,
-    );
-  }
-
-  const updatedBooking = await bookingRepo.updateStatus(
+  const updatedBooking = await updateBookingStatus(
     bookingId,
     "cancelled",
     {
@@ -233,7 +241,15 @@ export const cancelBooking = async (bookingId, userId, reason) => {
       cancelledBy: userId,
       cancellationReason: reason?.trim() || null,
     },
+    booking.status,
   );
+
+  if (booking.blockedDateId) {
+    await listingRepo.removeBlockedDate(
+      booking.listing._id ?? booking.listing,
+      booking.blockedDateId,
+    );
+  }
 
   const actor = await userRepo.findById(userId);
   await notificationService.createBookingNotification(
@@ -264,7 +280,12 @@ export const confirmBooking = async (bookingId, hostId) => {
   }
 
   logger.info("Booking confirmed by host", { bookingId, hostId });
-  const updatedBooking = await bookingRepo.updateStatus(bookingId, "confirmed");
+  const updatedBooking = await updateBookingStatus(
+    bookingId,
+    "confirmed",
+    {},
+    "pending",
+  );
 
   const actor = await userRepo.findById(hostId);
   await notificationService.createBookingNotification(
@@ -292,16 +313,9 @@ export const declineBooking = async (bookingId, hostId, reason) => {
     );
   }
 
-  if (booking.blockedDateId) {
-    await listingRepo.removeBlockedDate(
-      booking.listing._id ?? booking.listing,
-      booking.blockedDateId,
-    );
-  }
-
   logger.info("Booking declined by host", { bookingId, hostId, reason });
 
-  const updatedBooking = await bookingRepo.updateStatus(
+  const updatedBooking = await updateBookingStatus(
     bookingId,
     "cancelled",
     {
@@ -309,7 +323,15 @@ export const declineBooking = async (bookingId, hostId, reason) => {
       cancelledBy: hostId,
       cancellationReason: reason?.trim() || "Declined by host",
     },
+    "pending",
   );
+
+  if (booking.blockedDateId) {
+    await listingRepo.removeBlockedDate(
+      booking.listing._id ?? booking.listing,
+      booking.blockedDateId,
+    );
+  }
 
   const actor = await userRepo.findById(hostId);
   await notificationService.createBookingNotification(
@@ -342,7 +364,12 @@ export const completeBooking = async (bookingId, hostId) => {
     );
   }
 
-  const updatedBooking = await bookingRepo.updateStatus(bookingId, "completed");
+  const updatedBooking = await updateBookingStatus(
+    bookingId,
+    "completed",
+    {},
+    "confirmed",
+  );
 
   const actor = await userRepo.findById(hostId);
   await notificationService.createBookingNotification(
@@ -369,18 +396,45 @@ export const adminUpdateBookingStatus = async (
   if (!booking) throw AppError.notFound("Booking not found");
 
   const extra = {};
+  let restoredBlockedDateId;
 
   if (status === "cancelled" && booking.status !== "cancelled") {
     extra.cancelledAt = new Date();
     extra.cancelledBy = adminId;
     extra.cancellationReason = reason?.trim() || "Cancelled by administrator";
+  }
 
-    if (booking.blockedDateId) {
-      await listingRepo.removeBlockedDate(
-        booking.listing._id ?? booking.listing,
-        booking.blockedDateId,
+  if (
+    booking.status === "cancelled" &&
+    (status === "pending" || status === "confirmed")
+  ) {
+    restoredBlockedDateId =
+      booking.blockedDateId ?? new mongoose.Types.ObjectId();
+    const listingId = booking.listing._id ?? booking.listing;
+    const checkIn = new Date(booking.checkIn);
+    const checkOut = new Date(booking.checkOut);
+    const reservedListing = await listingRepo.addBlockedDateAtomic(
+      listingId,
+      checkIn,
+      checkOut,
+      {
+        _id: restoredBlockedDateId,
+        startDate: checkIn,
+        endDate: checkOut,
+        reason: "booked",
+      },
+    );
+
+    if (!reservedListing) {
+      throw AppError.conflict(
+        "These dates are no longer available, so this booking cannot be reactivated.",
       );
     }
+
+    extra.blockedDateId = restoredBlockedDateId;
+    extra.cancelledAt = null;
+    extra.cancelledBy = null;
+    extra.cancellationReason = null;
   }
 
   logger.info("Booking status overridden by admin", {
@@ -390,5 +444,34 @@ export const adminUpdateBookingStatus = async (
     toStatus: status,
   });
 
-  return bookingRepo.updateStatus(bookingId, status, extra);
+  let updatedBooking;
+  try {
+    updatedBooking = await updateBookingStatus(
+      bookingId,
+      status,
+      extra,
+      booking.status,
+    );
+  } catch (error) {
+    if (restoredBlockedDateId) {
+      await listingRepo.removeBlockedDate(
+        booking.listing._id ?? booking.listing,
+        restoredBlockedDateId,
+      );
+    }
+    throw error;
+  }
+
+  if (
+    status === "cancelled" &&
+    booking.status !== "cancelled" &&
+    booking.blockedDateId
+  ) {
+    await listingRepo.removeBlockedDate(
+      booking.listing._id ?? booking.listing,
+      booking.blockedDateId,
+    );
+  }
+
+  return updatedBooking;
 };
