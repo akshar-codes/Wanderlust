@@ -5,6 +5,15 @@ import * as notificationService from "./notification.service.js";
 import { cloudinary } from "../config/cloudConfig.js";
 import AppError from "../utils/AppError.js";
 
+const belongsToListing = (review, listingId) =>
+  String(review.listing?._id ?? review.listing) === String(listingId);
+
+const assertReviewBelongsToListing = (review, listingId) => {
+  if (!belongsToListing(review, listingId)) {
+    throw AppError.notFound("Review not found");
+  }
+};
+
 // ── Create ────────────────────────────────────────────────────────────────────
 
 export const createReview = async (listingId, reviewData, authorId) => {
@@ -34,7 +43,11 @@ export const createReview = async (listingId, reviewData, authorId) => {
 // ── Delete ────────────────────────────────────────────────────────────────────
 
 export const deleteReview = async (listingId, reviewId, authorId) => {
-  const review = await reviewRepo.deleteByIdAndAuthor(reviewId, authorId);
+  const review = await reviewRepo.deleteByIdAndAuthor(
+    reviewId,
+    authorId,
+    listingId,
+  );
   if (!review)
     throw AppError.forbidden("Review not found or you are not its author");
 
@@ -89,6 +102,7 @@ export const upsertHostReply = async (listingId, reviewId, text, hostId) => {
 
   const review = await reviewRepo.findById(reviewId);
   if (!review) throw AppError.notFound("Review not found");
+  assertReviewBelongsToListing(review, listing._id);
 
   const isEdit = !!review.hostReply?.text;
   const updated = isEdit
@@ -114,22 +128,28 @@ export const removeHostReply = async (listingId, reviewId, hostId) => {
     throw AppError.forbidden("Only the listing owner can remove a reply");
   }
 
+  const review = await reviewRepo.findById(reviewId);
+  if (!review) throw AppError.notFound("Review not found");
+  assertReviewBelongsToListing(review, listing._id);
+
   return reviewRepo.deleteHostReply(reviewId);
 };
 
 // ── Helpfulness vote ──────────────────────────────────────────────────────────
 
-export const toggleHelpfulVote = async (reviewId, userId) => {
+export const toggleHelpfulVote = async (listingId, reviewId, userId) => {
   const review = await reviewRepo.findById(reviewId);
   if (!review) throw AppError.notFound("Review not found");
+  assertReviewBelongsToListing(review, listingId);
   return reviewRepo.voteHelpful(reviewId, userId);
 };
 
 // ── Photos ────────────────────────────────────────────────────────────────────
 
-export const addReviewPhotos = async (reviewId, authorId, files) => {
+export const addReviewPhotos = async (listingId, reviewId, authorId, files) => {
   const review = await reviewRepo.findById(reviewId);
   if (!review) throw AppError.notFound("Review not found");
+  assertReviewBelongsToListing(review, listingId);
   if (!review.author._id.equals(authorId)) {
     throw AppError.forbidden("You can only add photos to your own reviews");
   }
@@ -146,9 +166,15 @@ export const addReviewPhotos = async (reviewId, authorId, files) => {
   return reviewRepo.addPhotos(reviewId, photos);
 };
 
-export const deleteReviewPhoto = async (reviewId, photoId, authorId) => {
+export const deleteReviewPhoto = async (
+  listingId,
+  reviewId,
+  photoId,
+  authorId,
+) => {
   const review = await reviewRepo.findById(reviewId);
   if (!review) throw AppError.notFound("Review not found");
+  assertReviewBelongsToListing(review, listingId);
   if (!review.author._id.equals(authorId)) {
     throw AppError.forbidden(
       "You can only delete photos from your own reviews",

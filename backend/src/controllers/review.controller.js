@@ -75,6 +75,12 @@ export const stats = async (req, res) => {
 export const show = async (req, res, next) => {
   const review = await reviewRepo.findById(req.params.reviewId);
   if (!review) return next(AppError.notFound("Review not found"));
+  if (
+    String(review.listing?._id ?? review.listing) !==
+    String(req.params.listingId)
+  ) {
+    return next(AppError.notFound("Review not found"));
+  }
   return sendSuccess(res, { review });
 };
 
@@ -153,6 +159,7 @@ export const deleteReply = async (req, res) => {
 
 export const toggleHelpful = async (req, res) => {
   const updated = await reviewService.toggleHelpfulVote(
+    req.params.listingId,
     req.params.reviewId,
     req.user._id,
   );
@@ -169,6 +176,7 @@ export const addPhotos = async (req, res, next) => {
     return next(AppError.badRequest("No photos provided"));
   }
   const updated = await reviewService.addReviewPhotos(
+    req.params.listingId,
     req.params.reviewId,
     req.user._id,
     req.files,
@@ -180,6 +188,7 @@ export const addPhotos = async (req, res, next) => {
 
 export const deletePhoto = async (req, res) => {
   const updated = await reviewService.deleteReviewPhoto(
+    req.params.listingId,
     req.params.reviewId,
     req.params.photoId,
     req.user._id,

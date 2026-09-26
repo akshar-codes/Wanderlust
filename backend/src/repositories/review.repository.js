@@ -9,8 +9,12 @@ export const findById = (id) =>
 
 export const create = (data) => Review.create(data);
 
-export const deleteByIdAndAuthor = (reviewId, authorId) =>
-  Review.findOneAndDelete({ _id: reviewId, author: authorId });
+export const deleteByIdAndAuthor = (reviewId, authorId, listingId) =>
+  Review.findOneAndDelete({
+    _id: reviewId,
+    author: authorId,
+    listing: listingId,
+  });
 
 /**
  * Admin-only hard delete, bypassing author ownership. Used by review

@@ -60,6 +60,11 @@ describe("Review Service (Unit)", () => {
     it("deletes and recalculates rating", async () => {
       reviewRepo.deleteByIdAndAuthor.mockResolvedValue({ _id: reviewId });
       await reviewService.deleteReview(listingId, reviewId, authorId);
+      expect(reviewRepo.deleteByIdAndAuthor).toHaveBeenCalledWith(
+        reviewId,
+        authorId,
+        listingId,
+      );
       expect(reviewRepo.removeReviewFromListing).toHaveBeenCalledWith(
         listingId,
         reviewId,
@@ -81,33 +86,88 @@ describe("Review Service (Unit)", () => {
     });
 
     it("branches to edit if reply exists, set if not", async () => {
-      listingRepo.findById.mockResolvedValue({ owner: { equals: () => true } });
+      listingRepo.findById.mockResolvedValue({
+        _id: listingId,
+        owner: { equals: () => true },
+      });
       userRepo.findById.mockResolvedValue({ _id: hostId });
 
       // Create new
-      reviewRepo.findById.mockResolvedValue({ _id: reviewId, hostReply: null });
+      reviewRepo.findById.mockResolvedValue({
+        _id: reviewId,
+        listing: listingId,
+        hostReply: null,
+      });
       await reviewService.upsertHostReply(listingId, reviewId, "text", hostId);
       expect(reviewRepo.setHostReply).toHaveBeenCalled();
 
       // Edit existing
       reviewRepo.findById.mockResolvedValue({
         _id: reviewId,
+        listing: listingId,
         hostReply: { text: "old" },
       });
       await reviewService.upsertHostReply(listingId, reviewId, "text", hostId);
       expect(reviewRepo.editHostReply).toHaveBeenCalled();
+    });
+
+    it("does not let a listing owner reply to another listing's review", async () => {
+      listingRepo.findById.mockResolvedValue({
+        _id: listingId,
+        owner: { equals: () => true },
+      });
+      reviewRepo.findById.mockResolvedValue({
+        _id: reviewId,
+        listing: new mongoose.Types.ObjectId().toString(),
+        hostReply: null,
+      });
+
+      await expect(
+        reviewService.upsertHostReply(listingId, reviewId, "text", hostId),
+      ).rejects.toThrow(/Review not found/);
+      expect(reviewRepo.setHostReply).not.toHaveBeenCalled();
+    });
+
+    it("does not let a listing owner remove another listing's reply", async () => {
+      listingRepo.findById.mockResolvedValue({
+        _id: listingId,
+        owner: { equals: () => true },
+      });
+      reviewRepo.findById.mockResolvedValue({
+        _id: reviewId,
+        listing: new mongoose.Types.ObjectId().toString(),
+      });
+
+      await expect(
+        reviewService.removeHostReply(listingId, reviewId, hostId),
+      ).rejects.toThrow(/Review not found/);
+      expect(reviewRepo.deleteHostReply).not.toHaveBeenCalled();
     });
   });
 
   describe("addReviewPhotos", () => {
     it("throws if > 5 photos limit", async () => {
       reviewRepo.findById.mockResolvedValue({
+        listing: listingId,
         author: { _id: { equals: () => true } },
         photos: [1, 2, 3],
       });
       await expect(
-        reviewService.addReviewPhotos(reviewId, authorId, [1, 2, 3]),
+        reviewService.addReviewPhotos(listingId, reviewId, authorId, [1, 2, 3]),
       ).rejects.toThrow(/at most 5 photos/);
+    });
+
+    it("rejects a photo upload for a review under another listing", async () => {
+      reviewRepo.findById.mockResolvedValue({
+        listing: new mongoose.Types.ObjectId().toString(),
+        author: { _id: { equals: () => true } },
+        photos: [],
+      });
+
+      await expect(
+        reviewService.addReviewPhotos(listingId, reviewId, authorId, [{}]),
+      ).rejects.toThrow(/Review not found/);
+      expect(reviewRepo.addPhotos).not.toHaveBeenCalled();
     });
   });
 });
