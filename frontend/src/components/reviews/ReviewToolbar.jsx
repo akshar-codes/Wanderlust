@@ -109,7 +109,7 @@ export default function ReviewToolbar({
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                border: "1.5px solid #d6d0ca",
+                border: "1.5px solid var(--color-border)",
                 borderRadius: 999,
                 padding: "7px 12px",
                 overflow: "hidden",
@@ -128,7 +128,7 @@ export default function ReviewToolbar({
                   fontSize: "0.8125rem",
                   fontFamily: "inherit",
                   width: "100%",
-                  color: "#3d3630",
+                  color: "var(--color-text)",
                 }}
               />
               <button
@@ -156,7 +156,7 @@ export default function ReviewToolbar({
                 width: 34,
                 height: 34,
                 borderRadius: "50%",
-                border: "1.5px solid #d6d0ca",
+                border: "1.5px solid var(--color-border)",
                 background: "var(--color-surface)",
                 display: "flex",
                 alignItems: "center",
@@ -182,12 +182,12 @@ export default function ReviewToolbar({
             alignItems: "center",
             gap: 7,
             padding: "8px 14px",
-            border: "1.5px solid #d6d0ca",
+            border: "1.5px solid var(--color-border)",
             borderRadius: 999,
             background: "var(--color-surface)",
             fontSize: "0.8125rem",
             fontWeight: 600,
-            color: "#3d3630",
+            color: "var(--color-text)",
             cursor: "pointer",
             fontFamily: "inherit",
           }}
@@ -242,7 +242,7 @@ export default function ReviewToolbar({
                       sort === opt.value
                         ? "rgba(255,90,95,0.06)"
                         : "transparent",
-                    color: sort === opt.value ? "#ff5a5f" : "#3d3630",
+                    color: sort === opt.value ? "#ff5a5f" : "var(--color-text)",
                     fontSize: "0.8125rem",
                     fontWeight: sort === opt.value ? 700 : 500,
                     cursor: "pointer",

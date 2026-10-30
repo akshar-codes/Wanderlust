@@ -187,7 +187,7 @@ export default function MapBoundsFilter({
       >
         <Map size={32} strokeWidth={1.5} />
         <div style={{ textAlign: "center" }}>
-          <p style={{ fontWeight: 600, color: "#3d3630", marginBottom: 4 }}>
+          <p style={{ fontWeight: 600, color: "var(--color-text)", marginBottom: 4 }}>
             Map unavailable
           </p>
           <p style={{ fontSize: "0.8125rem" }}>

@@ -54,7 +54,7 @@ function DistributionRow({ star, count, pct, active, onClick }) {
         style={{
           fontSize: "0.8125rem",
           fontWeight: 600,
-          color: "#3d3630",
+          color: "var(--color-text)",
           width: 10,
           flexShrink: 0,
           textAlign: "right",
@@ -85,7 +85,7 @@ function DistributionRow({ star, count, pct, active, onClick }) {
             background:
               active === star
                 ? "linear-gradient(90deg, #ff5a5f, #e84040)"
-                : "#3d3630",
+                : "var(--color-text)",
             borderRadius: 999,
           }}
         />

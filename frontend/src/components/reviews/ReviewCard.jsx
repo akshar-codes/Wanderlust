@@ -256,7 +256,7 @@ function HostReplyBlock({ reply, reviewId, listingId, isHost }) {
             background: "transparent",
             fontFamily: "inherit",
             fontSize: "0.875rem",
-            color: "#3d3630",
+            color: "var(--color-text)",
             resize: "vertical",
             outline: "none",
           }}
@@ -398,7 +398,7 @@ function HostReplyBlock({ reply, reviewId, listingId, isHost }) {
         style={{
           fontSize: "0.9rem",
           lineHeight: 1.65,
-          color: "#3d3630",
+          color: "var(--color-text)",
           margin: 0,
         }}
       >
@@ -634,7 +634,7 @@ export default function ReviewCard({ review, listingId, listingOwnerId }) {
             style={{
               fontSize: "0.9375rem",
               lineHeight: 1.7,
-              color: "#3d3630",
+              color: "var(--color-text)",
               margin: 0,
             }}
           >

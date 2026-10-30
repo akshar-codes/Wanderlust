@@ -248,7 +248,7 @@ export default function SearchBar({
             outline: "none",
             background: "transparent",
             fontSize: s.fontSize,
-            color: "#3d3630",
+            color: "var(--color-text)",
             fontFamily: "inherit",
             minWidth: 0,
           }}

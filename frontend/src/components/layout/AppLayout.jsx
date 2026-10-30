@@ -153,7 +153,7 @@ export default function AppLayout() {
             border: "1.5px solid var(--color-nav-border)",
             boxShadow:
               "0 12px 40px rgba(61,43,26,0.14), 0 2px 8px rgba(61,43,26,0.06)",
-            color: "#3d3630",
+            color: "var(--color-text)",
             maxWidth: 360,
           },
           success: {

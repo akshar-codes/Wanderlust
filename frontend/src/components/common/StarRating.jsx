@@ -69,7 +69,7 @@ export function CategoryStarPicker({ label, icon, value, onChange }) {
           gap: 8,
           fontSize: "0.875rem",
           fontWeight: 600,
-          color: "#3d3630",
+          color: "var(--color-text)",
         }}
       >
         {icon && <span style={{ fontSize: "1rem" }}>{icon}</span>}

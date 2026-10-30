@@ -1257,7 +1257,7 @@ export default function ListingsPage() {
                   style={{ display: "flex", flexDirection: "column", gap: 12 }}
                 >
                   {listings.map((listing, i) => (
-                    <ListingCardGrid
+                    <ListingCard
                       key={listing._id}
                       listing={listing}
                       index={i}

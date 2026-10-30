@@ -97,11 +97,11 @@ export default class ErrorBoundary extends Component {
                 style={{
                   padding: "10px 22px",
                   background: "var(--color-surface)",
-                  border: "1.5px solid #d6d0ca",
+                  border: "1.5px solid var(--color-border)",
                   borderRadius: 999,
                   fontWeight: 600,
                   fontSize: "0.875rem",
-                  color: "#3d3630",
+                  color: "var(--color-text)",
                   cursor: "pointer",
                   fontFamily: "inherit",
                 }}
