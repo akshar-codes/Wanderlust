@@ -1,7 +1,8 @@
-node_modules
-dist
-logs
-coverage
-.env
+**/.git
+**/node_modules
+**/dist
+**/logs
+**/coverage
+**/.env
 playwright-report
 test-results

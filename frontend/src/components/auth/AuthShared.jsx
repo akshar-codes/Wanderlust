@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Compass, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
 
 // ─── AuthCard ─────────────────────────────────────────────────────────────────
 export function AuthCard({ children, maxWidth = 440 }) {
@@ -101,7 +101,7 @@ export function AuthBrand() {
         marginBottom: 10,
       }}
     >
-      <Compass size={24} color="#ff5a5f" />
+      <img src="/favicon.svg" width="24" height="24" alt="" />
       <span
         style={{
           fontFamily: "'DM Serif Display', Georgia, serif",

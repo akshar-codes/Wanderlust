@@ -7,7 +7,6 @@ import { useColorModeContext } from "../../hooks/colorModeContext";
 import { useAuthStore } from "../../store/auth.store";
 import { translateFooter } from "../../i18n/footer";
 import {
-  Compass,
   Twitter,
   Instagram,
   Facebook,
@@ -296,7 +295,7 @@ export default function Footer() {
                 marginBottom: 16,
               }}
             >
-              <Compass size={24} color={brand[500]} />
+              <img src="/favicon.svg" width="24" height="24" alt="" />
               <span
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",

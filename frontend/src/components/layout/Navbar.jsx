@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { brand, neutral, semantic, shadows } from "../../theme/tokens";
 import {
   Search,
-  Compass,
   Menu,
   X,
   LogOut,
@@ -787,7 +786,7 @@ function MobileDrawer({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Compass size={22} color={brand[500]} />
+            <img src="/favicon.svg" width="22" height="22" alt="" />
             <span
               style={{
                 fontFamily: "'DM Serif Display', Georgia, serif",
@@ -1127,7 +1126,7 @@ export default function Navbar({ searchMode = "hidden" }) {
                 whileHover={{ rotate: [0, -10, 10, 0] }}
                 transition={{ duration: 0.5 }}
               >
-                <Compass size={26} color={brand[500]} />
+                <img src="/favicon.svg" width="26" height="26" alt="" />
               </motion.div>
               <span
                 style={{
