@@ -33,23 +33,75 @@ try {
   );
 } catch (e) {}
 
-router.get("/health", (_req, res) => {
-  const data = {
-    status: "ok",
-    db: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+const canReach = async (url) => {
+  if (!url) return "unknown";
+  try {
+    // Any HTTP response proves the host is reachable; endpoint status is
+    // intentionally not used because the configured URL may serve a SPA or 404.
+    await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(3000) });
+    return "up";
+  } catch {
+    return "down";
+  }
+};
+
+router.get("/health", async (_req, res) => {
+  const startTime = Date.now();
+  const frontendUrl = process.env.FRONTEND_URL;
+  const backendUrl = process.env.BACKEND_URL;
+
+  const [frontendStatus, backendStatus] = await Promise.all([
+    canReach(frontendUrl),
+    canReach(backendUrl),
+  ]);
+
+  let databaseStatus = "down";
+  try {
+    if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
+      await mongoose.connection.db.admin().ping();
+      databaseStatus = "up";
+    } else if (mongoose.connection.readyState === 2) {
+      databaseStatus = "degraded";
+    }
+  } catch {
+    databaseStatus = "down";
+  }
+
+  const healthy =
+    (frontendStatus === "up" || !frontendUrl || frontendStatus === "down") &&
+    backendStatus === "up" &&
+    databaseStatus === "up";
+  const response = {
+    success: true,
+    status: healthy ? "ok" : "degraded",
+    data: {
+      status: healthy ? "ok" : "degraded",
+      db: databaseStatus === "up" ? "connected" : "disconnected",
+    },
+    services: {
+      frontend: frontendStatus,
+      backend: backendStatus,
+      database: databaseStatus,
+    },
+    details: {
+      frontendUrl: frontendUrl ?? null,
+      backendUrl: backendUrl ?? null,
+      databaseUrlConfigured: Boolean(process.env.MONGO_URL),
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      responseTimeMs: Date.now() - startTime,
+    },
   };
 
   if (process.env.NODE_ENV !== "production") {
-    Object.assign(data, {
-      uptime: process.uptime(),
+    Object.assign(response.details, {
       version: pkg.version,
       nodeVersion: process.version,
       memoryUsage: process.memoryUsage().rss,
-      ts: new Date().toISOString(),
     });
   }
 
-  return res.json({ success: true, data });
+  return res.status(healthy ? 200 : 503).json(response);
 });
 
 router.use("/admin", adminRoutes);

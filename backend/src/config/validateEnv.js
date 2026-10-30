@@ -31,6 +31,7 @@ const prodSchema = baseSchema
       .refine((value) => new URL(value).protocol === "https:", {
         message: "FRONTEND_URL must use HTTPS in production",
       }),
+    BACKEND_URL: optionalUrl,
     SMTP_HOST: z.string().min(1, "SMTP_HOST is required in production"),
     SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
     SMTP_SECURE: z.enum(["true", "false"]).default("false"),
