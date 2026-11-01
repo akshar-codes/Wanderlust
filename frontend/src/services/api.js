@@ -2,8 +2,16 @@ import axios from "axios";
 import { useAuthStore } from "../store/auth.store";
 import { useBackendStatusStore } from "../store/backendStatus.store";
 
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim().replace(
+  /\/+$/,
+  "",
+);
+export const API_BASE_URL = configuredApiUrl
+  ? `${configuredApiUrl}/api`
+  : "/api";
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

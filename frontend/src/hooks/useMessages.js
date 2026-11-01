@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { messageService } from "../services/message.service";
+import { API_BASE_URL } from "../services/api";
 
 export const CONVERSATIONS_KEY = ["message-conversations"];
 export const messagesKey = (bookingId) => ["booking-messages", bookingId];
@@ -24,7 +25,9 @@ export function useBookingMessages(bookingId) {
 export function useMessageEvents() {
   const queryClient = useQueryClient();
   useEffect(() => {
-    const events = new EventSource("/api/messages/events");
+    const events = new EventSource(`${API_BASE_URL}/messages/events`, {
+      withCredentials: true,
+    });
     const onMessage = (event) => {
       let payload;
       try {

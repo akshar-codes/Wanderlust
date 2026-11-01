@@ -9,6 +9,7 @@ import { Badge } from "../ui/Badge";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useUnlinkProvider } from "../../hooks/useAuth";
 import { radii, semantic } from "../../theme/tokens";
+import { API_BASE_URL } from "../../services/api";
 
 function GoogleIcon() {
   return (
@@ -51,13 +52,13 @@ const PROVIDERS = [
     key: "google",
     label: "Google",
     Icon: GoogleIcon,
-    connectHref: "/api/auth/link/google",
+    connectHref: `${API_BASE_URL}/auth/link/google`,
   },
   {
     key: "github",
     label: "GitHub",
     Icon: GithubIcon,
-    connectHref: "/api/auth/link/github",
+    connectHref: `${API_BASE_URL}/auth/link/github`,
   },
 ];
 

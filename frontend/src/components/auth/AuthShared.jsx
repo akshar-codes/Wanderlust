@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
+import { API_BASE_URL } from "../../services/api";
 
 // ─── AuthCard ─────────────────────────────────────────────────────────────────
 export function AuthCard({ children, maxWidth = 440 }) {
@@ -396,7 +397,7 @@ export function SubmitButton({ isPending, label, loadingLabel }) {
 export function GoogleButton({ label = "Continue with Google" }) {
   return (
     <motion.a
-      href="/api/auth/google"
+      href={`${API_BASE_URL}/auth/google`}
       whileHover={{ scale: 1.01, background: "var(--color-surface-2)" }}
       whileTap={{ scale: 0.98 }}
       style={{
