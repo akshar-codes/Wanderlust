@@ -36,7 +36,7 @@ const storage = {
     };
     const upload = cloudinary.uploader.upload_stream(
       {
-        folder: process.env.CLOUDINARY_UPLOAD_FOLDER ?? "wanderlust",
+        folder: process.env.CLOUDINARY_UPLOAD_FOLDER ?? "airnook",
         allowed_formats: ALLOWED_FORMATS,
         transformation: [{ quality: "auto", fetch_format: "auto" }],
       },

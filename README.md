@@ -1,6 +1,6 @@
-# Wanderlust 🌍
+# AirNook 🌍
 
-Wanderlust is a production-style full-stack web application that allows users to explore travel listings, upload images, post reviews, and manage content securely using authentication and authorization.
+AirNook is a production-style full-stack web application that allows users to explore travel listings, upload images, post reviews, and manage content securely using authentication and authorization.
 
 ---
 

@@ -26,9 +26,9 @@ export default function AboutPage() {
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, md: 4 }, pb: 8 }}>
       <PageHeader
-        eyebrow="About Wanderlust"
+        eyebrow="About AirNook"
         title="A better way to find your next stay"
-        subtitle="Wanderlust brings guests and hosts together to discover places, plan trips, and share meaningful stays."
+        subtitle="AirNook brings guests and hosts together to discover places, plan trips, and share meaningful stays."
       />
       <Card
         variant="raised"
@@ -52,7 +52,7 @@ export default function AboutPage() {
             <Typography
               sx={{ color: "var(--color-text-secondary)", lineHeight: 1.8 }}
             >
-              Wanderlust is a stay discovery and hosting platform. Guests can
+              AirNook is a stay discovery and hosting platform. Guests can
               browse listings, save favorites, and manage bookings. Hosts can
               publish spaces, manage their listings, and connect with guests. We
               bring those tools together in one place so planning and hosting

@@ -5,7 +5,7 @@ const state = (redirectTo) =>
   Buffer.from(JSON.stringify({ redirectTo })).toString("base64");
 
 describe("OAuth frontend redirect", () => {
-  const baseUrl = "https://wanderlust.example";
+  const baseUrl = "https://airnook.example";
 
   it("allows return paths on the configured frontend origin", () => {
     expect(
@@ -13,7 +13,7 @@ describe("OAuth frontend redirect", () => {
         baseUrl,
         stateParam: state("/messages?source=oauth"),
       }),
-    ).toBe("https://wanderlust.example/messages?source=oauth");
+    ).toBe("https://airnook.example/messages?source=oauth");
   });
 
   it.each([

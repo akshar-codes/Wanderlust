@@ -794,7 +794,7 @@ function MobileDrawer({
                 color: "var(--color-text)",
               }}
             >
-              Wanderlust
+              AirNook
             </span>
           </div>
           <motion.button
@@ -1136,7 +1136,7 @@ export default function Navbar({ searchMode = "hidden" }) {
                   letterSpacing: "-0.01em",
                 }}
               >
-                Wanderlust
+                AirNook
               </span>
             </Link>
           </motion.div>

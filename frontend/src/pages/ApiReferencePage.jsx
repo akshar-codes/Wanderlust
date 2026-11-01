@@ -77,7 +77,7 @@ export default function ApiReferencePage() {
     const href = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = href;
-    anchor.download = "wanderlust-openapi.yaml";
+    anchor.download = "airnook-openapi.yaml";
     anchor.click();
     URL.revokeObjectURL(href);
   };
@@ -86,7 +86,7 @@ export default function ApiReferencePage() {
     <Box sx={{ maxWidth: 1120, mx: "auto", px: { xs: 0, sm: 1 }, pb: 8 }}>
       <PageHeader
         eyebrow="Developers"
-        title="Wanderlust API"
+        title="AirNook API"
         subtitle="Browse the documented REST endpoints or download the OpenAPI specification."
       />
       <Card

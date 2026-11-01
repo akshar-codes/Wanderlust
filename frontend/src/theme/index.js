@@ -80,7 +80,7 @@ export function injectCSSVariables() {
 
 // ─── Theme Factory ────────────────────────────────────────────────────────────
 
-export function getWanderlustTheme(mode = "light") {
+export function getAirNookTheme(mode = "light") {
   const isDark = mode === "dark";
 
   // Dark mode color overrides
@@ -1224,6 +1224,6 @@ export function getWanderlustTheme(mode = "light") {
 }
 
 // Default light theme export
-export const wanderlustTheme = getWanderlustTheme("light");
+export const airNookTheme = getAirNookTheme("light");
 
-export default wanderlustTheme;
+export default airNookTheme;

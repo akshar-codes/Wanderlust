@@ -18,20 +18,20 @@ jobs:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
       - name: Build Backend Docker Image
-        run: docker build --pull -t wanderlust-backend:latest ./backend
+        run: docker build --pull -t airnook-backend:latest ./backend
       - name: Build Frontend Assets
         working-directory: ./frontend
         run: |
           npm ci
           npm run build
       - name: Build Frontend Docker Image
-        run: docker build --pull -f frontend/Dockerfile.release -t wanderlust-frontend:latest ./frontend
+        run: docker build --pull -f frontend/Dockerfile.release -t airnook-frontend:latest ./frontend
       - name: Tag and Push Docker Images
         env:
           GHCR_OWNER: ${{ github.repository_owner }}
         run: |
           IMAGE_OWNER="$(printf '%s' "$GHCR_OWNER" | tr '[:upper:]' '[:lower:]')"
-          docker tag wanderlust-backend:latest "ghcr.io/$IMAGE_OWNER/wanderlust-backend:latest"
-          docker tag wanderlust-frontend:latest "ghcr.io/$IMAGE_OWNER/wanderlust-frontend:latest"
-          docker push "ghcr.io/$IMAGE_OWNER/wanderlust-backend:latest"
-          docker push "ghcr.io/$IMAGE_OWNER/wanderlust-frontend:latest"
+          docker tag airnook-backend:latest "ghcr.io/$IMAGE_OWNER/airnook-backend:latest"
+          docker tag airnook-frontend:latest "ghcr.io/$IMAGE_OWNER/airnook-frontend:latest"
+          docker push "ghcr.io/$IMAGE_OWNER/airnook-backend:latest"
+          docker push "ghcr.io/$IMAGE_OWNER/airnook-frontend:latest"

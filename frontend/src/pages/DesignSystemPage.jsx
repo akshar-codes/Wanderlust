@@ -206,7 +206,7 @@ export default function DesignSystemPage() {
         <Stack direction="row" alignItems="center" gap={1.5} mb={1}>
           <Compass size={32} style={{ color: colors.primary[500] }} />
           <Typography variant="h1" sx={{ fontSize: "2.5rem" }}>
-            Wanderlust Design System
+            AirNook Design System
           </Typography>
         </Stack>
         <Typography variant="subtitle1" sx={{ maxWidth: 520 }}>

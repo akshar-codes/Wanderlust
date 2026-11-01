@@ -78,7 +78,7 @@ export default function AdminLayout() {
       <PageHeader
         eyebrow="Admin"
         title="Platform Administration"
-        subtitle="Manage users, listings, reviews, bookings, and content moderation across Wanderlust."
+        subtitle="Manage users, listings, reviews, bookings, and content moderation across AirNook."
       />
 
       <Box

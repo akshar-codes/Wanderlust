@@ -7,11 +7,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import {
-  brand,
-  fonts,
-  semantic,
-} from "../theme/tokens";
+import { brand, fonts, semantic } from "../theme/tokens";
 import { CATEGORIES } from "../constants/categories";
 import { useListings } from "../hooks/useListings";
 import ListingCard from "../components/listings/ListingCard";
@@ -175,7 +171,7 @@ const TESTIMONIALS = [
     location: "Mumbai, India",
     avatar: "P",
     avatarColor: "#7C3AED",
-    text: "We booked a cliffside villa in Santorini through Wanderlust and it exceeded every expectation. The host was exceptional, the property was stunning, and the whole experience felt effortless.",
+    text: "We booked a cliffside villa in Santorini through AirNook and it exceeded every expectation. The host was exceptional, the property was stunning, and the whole experience felt effortless.",
     property: "Cliffside Villa · Santorini",
     rating: 5,
     date: "March 2025",
@@ -185,7 +181,7 @@ const TESTIMONIALS = [
     location: "London, UK",
     avatar: "J",
     avatarColor: "#0369A1",
-    text: "I've used every major booking platform and Wanderlust is categorically different. The curation is impeccable — no filler properties, just places with genuine character.",
+    text: "I've used every major booking platform and AirNook is categorically different. The curation is impeccable — no filler properties, just places with genuine character.",
     property: "Kyoto Machiya · Japan",
     rating: 5,
     date: "January 2025",
@@ -1836,7 +1832,7 @@ function HostCTASection() {
                   marginBottom: 14,
                 }}
               >
-                Earn with Wanderlust
+                Earn with AirNook
               </p>
               <h2
                 style={{

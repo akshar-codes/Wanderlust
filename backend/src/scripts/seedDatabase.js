@@ -78,7 +78,7 @@ async function clearSeedData() {
     Report.deleteMany({}),
     User.deleteMany({
       email: {
-        $regex: /@wanderlust-(hosts|travelers)\.com$/,
+        $regex: /@airnook-(hosts|travelers)\.com$/,
       },
     }),
   ]);
@@ -105,8 +105,8 @@ async function seedHosts() {
     if (!existingAdmin) {
       const adminDoc = new User({
         username: "AdminUser",
-        email: "admin.user@wanderlust.com",
-        firstName: "Wanderlust",
+        email: "admin.user@airnook.com",
+        firstName: "AirNook",
         lastName: "Admin",
         bio: "Platform administrator account.",
         role: "admin",
@@ -128,7 +128,7 @@ async function seedHosts() {
     ...d,
     username: `traveler_${d.username}`,
     role: "user",
-    email: `traveler_${d.username}@wanderlust-travelers.com`,
+    email: `traveler_${d.username}@airnook-travelers.com`,
   }));
   const travelerRecords = await registerHosts(User, travelerDescriptors);
   console.log(`✅  ${travelerRecords.length} traveler accounts registered`);
@@ -372,7 +372,7 @@ async function seedConversations(insertedListings, travelerRecords) {
         bookingId: booking._id,
         listingId: booking.listing,
         listingTitle: listing?.title ?? "Stay",
-        actorName: "Wanderlust guest",
+        actorName: "AirNook guest",
       },
       createdAt: booking.createdAt,
       updatedAt: booking.createdAt,

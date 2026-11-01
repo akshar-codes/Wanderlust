@@ -55,7 +55,7 @@ const columns = [
   {
     heading: "Company",
     links: [
-      { label: "About Wanderlust", to: "/about" },
+      { label: "About AirNook", to: "/about" },
       { label: "Newsroom", to: "/company/newsroom" },
       { label: "Careers", to: "/company/careers" },
       { label: "Investors", to: "/company/investors" },
@@ -303,7 +303,7 @@ export default function Footer() {
                   color: "var(--color-text)",
                 }}
               >
-                Wanderlust
+                AirNook
               </span>
             </Link>
             <p
@@ -537,7 +537,7 @@ export default function Footer() {
           }}
         >
           <p style={{ fontSize: "0.8rem", color: "var(--color-text-muted)" }}>
-            © {new Date().getFullYear()} WanderLust Private Limited · All rights
+            © {new Date().getFullYear()} AirNook Private Limited · All rights
             reserved.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>

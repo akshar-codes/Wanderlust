@@ -49,7 +49,7 @@ export default function ReportConcernPage() {
       <PageHeader
         eyebrow="Support"
         title="Report a concern"
-        subtitle="Send a listing, review, or user report to the Wanderlust moderation queue."
+        subtitle="Send a listing, review, or user report to the AirNook moderation queue."
       />
       <Box component="form" onSubmit={submit} sx={{ display: "grid", gap: 2 }}>
         <Alert severity="info">

@@ -13,7 +13,7 @@ const ERROR_MESSAGES = {
   email_already_exists:
     "An account with this email already exists. Please log in instead.",
   provider_already_linked:
-    "This provider account is already linked to a different Wanderlust account.",
+    "This provider account is already linked to a different AirNook account.",
   default: "Something went wrong during sign-in. Please try again.",
 };
 

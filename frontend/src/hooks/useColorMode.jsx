@@ -1,11 +1,6 @@
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
-import { getWanderlustTheme, injectCSSVariables } from "../theme";
+import { getAirNookTheme, injectCSSVariables } from "../theme";
 import { ColorModeContext } from "./colorModeContext";
 
 export function ColorModeProvider({ children }) {
@@ -60,10 +55,7 @@ export function ColorModeProvider({ children }) {
     });
   }, [resolvedMode]);
 
-  const muiTheme = useMemo(
-    () => getWanderlustTheme(resolvedMode),
-    [resolvedMode],
-  );
+  const muiTheme = useMemo(() => getAirNookTheme(resolvedMode), [resolvedMode]);
 
   const value = useMemo(
     () => ({ mode, setMode, toggle, resolvedMode, muiTheme }),

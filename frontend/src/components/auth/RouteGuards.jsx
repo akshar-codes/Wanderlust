@@ -24,7 +24,7 @@ function SplashLoader() {
           fontWeight: 500,
         }}
       >
-        Loading Wanderlust…
+        Loading AirNook…
       </p>
     </div>
   );

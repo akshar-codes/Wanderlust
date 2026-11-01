@@ -32,7 +32,7 @@ const GROUPS = [
       {
         key: "promotions",
         label: "Promotions",
-        hint: "Deals and offers from Wanderlust",
+        hint: "Deals and offers from AirNook",
       },
       {
         key: "newsletter",

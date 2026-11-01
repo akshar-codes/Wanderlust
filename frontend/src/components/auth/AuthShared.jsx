@@ -109,7 +109,7 @@ export function AuthBrand() {
           color: "var(--color-text)",
         }}
       >
-        Wanderlust
+        AirNook
       </span>
     </Link>
   );

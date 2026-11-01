@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Wanderlust API
+  title: AirNook API
   description: |
-    REST API for the Wanderlust travel-listing platform.
+    REST API for the AirNook travel-listing platform.
 
     ## Authentication
     All write operations (create, update, delete) require an active session.
@@ -254,7 +254,7 @@ components:
           example: https://res.cloudinary.com/demo/image/upload/sample.jpg
         filename:
           type: string
-          example: wanderlust_DEV/xkcd1234
+          example: airnook_DEV/xkcd1234
     ListingImage:
       type: object
       description: Entry in the listing's images[] array
@@ -267,7 +267,7 @@ components:
           example: https://res.cloudinary.com/demo/image/upload/sample.jpg
         filename:
           type: string
-          example: wanderlust_DEV/xkcd1234
+          example: airnook_DEV/xkcd1234
         caption:
           type: string
           nullable: true
@@ -383,7 +383,7 @@ components:
         filename:
           type: string
           nullable: true
-          example: wanderlust_DEV/avatars/abc123
+          example: airnook_DEV/avatars/abc123
     NotificationPreferences:
       type: object
       properties:

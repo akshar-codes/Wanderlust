@@ -8,7 +8,7 @@ const playwrightCli = require.resolve("@playwright/test/cli");
 async function runE2E() {
   const uri =
     process.env.E2E_MONGO_URL ||
-    "mongodb://127.0.0.1:27017/wanderlust_test_e2e_run?replicaSet=rs0";
+    "mongodb://127.0.0.1:27017/airnook_test_e2e_run?replicaSet=rs0";
   const client = new MongoClient(uri);
 
   try {

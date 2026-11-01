@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export async function connectTestDB() {
   if (mongoose.connection.readyState === 0) {
     const uri =
-      process.env.TEST_MONGO_URL || "mongodb://127.0.0.1:27017/wanderlust_test";
+      process.env.TEST_MONGO_URL || "mongodb://127.0.0.1:27017/airnook_test";
     const databaseName = new URL(uri).pathname
       .replace(/^\/+/, "")
       .split("/")[0];

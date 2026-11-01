@@ -24,7 +24,7 @@ import {
 const displayName = (person) =>
   [person?.firstName, person?.lastName].filter(Boolean).join(" ") ||
   person?.username ||
-  "Wanderlust member";
+  "AirNook member";
 const messageTime = (value) =>
   new Intl.DateTimeFormat(undefined, {
     dateStyle: "medium",

@@ -24,7 +24,7 @@ export default function SharedWishlistPage() {
           variant="caption"
           sx={{ color: "var(--color-text-secondary)", fontWeight: 600 }}
         >
-          Shared Wanderlust wishlist
+          Shared AirNook wishlist
         </Typography>
       </Box>
 

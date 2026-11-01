@@ -38,7 +38,7 @@ export default function setupSwagger(app) {
 
   // ── Swagger UI options ────────────────────────────────────────────────────
   const uiOptions = {
-    customSiteTitle: "Wanderlust API Docs",
+    customSiteTitle: "AirNook API Docs",
     swaggerOptions: {
       persistAuthorization: true,
       withCredentials: true,

@@ -1,8 +1,8 @@
 {
-  "name": "wanderlust-react",
+  "name": "airnook-react",
   "version": "2.0.0",
   "type": "module",
-  "description": "Wanderlust React frontend (Vite)",
+  "description": "AirNook React frontend (Vite)",
   "private": true,
   "scripts": {
     "dev": "vite --host 127.0.0.1",

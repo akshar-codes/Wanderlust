@@ -51,7 +51,7 @@ const GROUPS = [
   {
     title: "Company",
     links: [
-      ["About Wanderlust", "/about"],
+      ["About AirNook", "/about"],
       ["Newsroom", "/company/newsroom"],
       ["Careers", "/company/careers"],
       ["Investors", "/company/investors"],
@@ -106,9 +106,9 @@ export default function SitemapPage() {
   return (
     <Box sx={{ maxWidth: 1100, mx: "auto", px: { xs: 2, md: 4 }, pb: 8 }}>
       <PageHeader
-        eyebrow="Wanderlust"
+        eyebrow="AirNook"
         title="Sitemap"
-        subtitle="Browse the main areas and pages of Wanderlust."
+        subtitle="Browse the main areas and pages of AirNook."
       />
       <Box
         sx={{

@@ -33,20 +33,20 @@ export function PrivacyPage() {
       <PageHeader
         eyebrow="Legal"
         title="Privacy Policy"
-        subtitle="How Wanderlust handles information when you use the platform."
+        subtitle="How AirNook handles information when you use the platform."
       />
       <Typography className="legal-page__date">
         Last updated: {UPDATED}
       </Typography>
       <LegalSection title="Information you provide">
-        When you create an account or use Wanderlust, you may provide contact
-        and profile details, listing information, booking details, messages,
+        When you create an account or use AirNook, you may provide contact and
+        profile details, listing information, booking details, messages,
         reviews, photos, and account preferences. Please avoid putting sensitive
         personal information in public profile fields, listing descriptions, or
         reviews.
       </LegalSection>
       <LegalSection title="Information created through use">
-        Wanderlust processes information needed to operate accounts, listings,
+        AirNook processes information needed to operate accounts, listings,
         wishlists, bookings, reviews, notifications, and host dashboards. The
         service also receives basic technical information with requests, such as
         the information required to keep a session secure and prevent abuse.
@@ -78,8 +78,8 @@ export function PrivacyPage() {
         retained where required for legitimate operational or legal reasons.
       </LegalSection>
       <LegalSection title="Cookies and similar storage">
-        Wanderlust uses browser storage and cookies required for sign-in,
-        session continuity, and request security. See{" "}
+        AirNook uses browser storage and cookies required for sign-in, session
+        continuity, and request security. See{" "}
         <Link to="/cookies">Cookie Settings</Link> for details about the
         controls available in this app.
       </LegalSection>
@@ -98,13 +98,13 @@ export function TermsPage() {
       <PageHeader
         eyebrow="Legal"
         title="Terms of Service"
-        subtitle="The basic rules for using the Wanderlust marketplace."
+        subtitle="The basic rules for using the AirNook marketplace."
       />
       <Typography className="legal-page__date">
         Last updated: {UPDATED}
       </Typography>
-      <LegalSection title="Using Wanderlust">
-        Wanderlust provides tools for discovering stays, publishing listings,
+      <LegalSection title="Using AirNook">
+        AirNook provides tools for discovering stays, publishing listings,
         managing bookings, saving places, and sharing reviews. You must use the
         service lawfully, provide accurate information, and keep your account
         credentials secure.
@@ -131,8 +131,8 @@ export function TermsPage() {
       <LegalSection title="Reviews and content">
         Only share content you have the right to use. Reviews should describe
         genuine experiences and must not be abusive, deceptive, discriminatory,
-        or unlawful. You retain ownership of your content and allow Wanderlust
-        to display it as needed to operate the service.
+        or unlawful. You retain ownership of your content and allow AirNook to
+        display it as needed to operate the service.
       </LegalSection>
       <LegalSection title="Prohibited use">
         Do not misuse the service, interfere with its security, submit false or
@@ -142,7 +142,7 @@ export function TermsPage() {
       <LegalSection title="Availability and changes">
         We may update or suspend features to maintain or improve the service. We
         aim to keep information accurate, but listings and availability are
-        provided by users and may change. Wanderlust does not own or operate the
+        provided by users and may change. AirNook does not own or operate the
         stays listed by hosts.
       </LegalSection>
       <LegalSection title="Limitation and applicable requirements">

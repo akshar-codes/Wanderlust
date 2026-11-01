@@ -22,7 +22,7 @@ services:
       - web
       - data
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/wanderlust?replicaSet=rs0
+      - MONGO_URL=mongodb://mongodb:27017/airnook?replicaSet=rs0
       - NODE_ENV=development
       - HOST=0.0.0.0
       - TRUST_PROXY_HOPS=1

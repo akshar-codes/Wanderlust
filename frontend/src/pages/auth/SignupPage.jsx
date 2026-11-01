@@ -139,7 +139,7 @@ export default function SignupPage() {
           marginBottom: 16,
         }}
       >
-        Start your journey with Wanderlust today.
+        Start your journey with AirNook today.
       </p>
 
       <SignupForm />

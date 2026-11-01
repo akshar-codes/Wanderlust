@@ -60,7 +60,7 @@ export const generateSecret = async (user) => {
   const secret = generateTOTPSecret();
   const otpauthUrl = generateURI({
     label: user.email,
-    issuer: "Wanderlust",
+    issuer: "AirNook",
     secret,
   });
   const qrCodeUrl = await qrcode.toDataURL(otpauthUrl);

@@ -51,7 +51,7 @@ function buildEvents({
       key: "joined",
       type: "joined",
       date: joinedAt,
-      title: `${displayName} joined Wanderlust`,
+      title: `${displayName} joined AirNook`,
     });
   }
 

@@ -2,7 +2,7 @@ import { pick, pickRange, randomPastDate } from "../utils/random.js";
 import { FIRST_NAMES, LAST_NAMES, LANGUAGE_OPTIONS } from "../data/names.js";
 
 const HOST_COUNT = 150;
-const SEED_PASSWORD = "Wanderlust@2025";
+const SEED_PASSWORD = "AirNook@2025";
 
 let usedUsernames = new Set();
 
@@ -31,14 +31,14 @@ export function buildHostDescriptors(count = HOST_COUNT) {
     const firstName = pick(FIRST_NAMES);
     const lastName = pick(LAST_NAMES);
     const username = uniqueUsername(firstName, lastName);
-    const email = `${username}@wanderlust-hosts.com`;
+    const email = `${username}@airnook-hosts.com`;
 
     const joinedAt = randomPastDate(365 * 6, 30); // 30 days - 6 years ago
     const languages = pickRange(LANGUAGE_OPTIONS, 1, 4);
     if (!languages.includes("English")) languages.unshift("English");
 
     const bioParts = [
-      `Hosting on Wanderlust since ${joinedAt.getFullYear()}.`,
+      `Hosting on AirNook since ${joinedAt.getFullYear()}.`,
       "Passionate about giving guests a comfortable, memorable stay.",
       languages.length > 1
         ? `Speaks ${languages.join(", ")}.`

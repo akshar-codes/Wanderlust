@@ -58,8 +58,7 @@ async function getTransporter() {
 
 // ── Sender helper ─────────────────────────────────────────────────────────────
 
-const DEFAULT_FROM =
-  process.env.EMAIL_FROM ?? "Wanderlust <no-reply@wanderlust.com>";
+const DEFAULT_FROM = process.env.EMAIL_FROM ?? "AirNook <no-reply@airnook.com>";
 
 export async function sendMail({
   to,
@@ -108,7 +107,7 @@ export async function sendPasswordResetEmail({
 }) {
   const frontendBase = process.env.FRONTEND_URL ?? "http://localhost:5173";
   const resetUrl = `${frontendBase}/reset-password?token=${encodeURIComponent(resetToken)}&email=${encodeURIComponent(to)}`;
-  const subject = "Reset your Wanderlust password";
+  const subject = "Reset your AirNook password";
 
   const html = `
 <!DOCTYPE html>
@@ -137,10 +136,10 @@ export async function sendPasswordResetEmail({
 </head>
 <body>
   <div class="wrapper">
-    <div class="header"><h1>🌍 Wanderlust</h1><p>Your travel companion</p></div>
+    <div class="header"><h1>🌍 AirNook</h1><p>Your travel companion</p></div>
     <div class="body">
       <p class="greeting">Hi ${escapeHtml(username)},</p>
-      <p>We received a request to reset the password for your Wanderlust account. Click the button below to choose a new password.</p>
+      <p>We received a request to reset the password for your AirNook account. Click the button below to choose a new password.</p>
       <div class="cta-wrapper"><a href="${resetUrl}" class="cta">Reset my password</a></div>
       <p>This link will expire in <strong>${expiresInMinutes} minutes</strong>. If you did not request a password reset, you can safely ignore this email.</p>
       <hr class="divider" />
@@ -148,7 +147,7 @@ export async function sendPasswordResetEmail({
       <div class="fallback"><code>${resetUrl}</code></div>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} Wanderlust. All rights reserved.<br />
+      <p>© ${new Date().getFullYear()} AirNook. All rights reserved.<br />
       This email was sent to ${escapeHtml(to)} because a password reset was requested.</p>
     </div>
   </div>
@@ -157,10 +156,10 @@ export async function sendPasswordResetEmail({
 
   const text =
     `Hi ${username},\n\n` +
-    `We received a request to reset your Wanderlust password.\n\n` +
+    `We received a request to reset your AirNook password.\n\n` +
     `Reset link (expires in ${expiresInMinutes} minutes):\n${resetUrl}\n\n` +
     `If you did not request this, you can ignore this email.\n\n` +
-    `— The Wanderlust Team`;
+    `— The AirNook Team`;
 
   return sendMail({ to, subject, html, text });
 }
@@ -175,7 +174,7 @@ export async function sendEmailVerificationEmail({
 }) {
   const frontendBase = process.env.FRONTEND_URL ?? "http://localhost:5173";
   const verifyUrl = `${frontendBase}/verify-email?token=${encodeURIComponent(verificationToken)}&email=${encodeURIComponent(to)}`;
-  const subject = "Verify your Wanderlust email address";
+  const subject = "Verify your AirNook email address";
 
   const html = `
 <!DOCTYPE html>
@@ -204,18 +203,18 @@ export async function sendEmailVerificationEmail({
 </head>
 <body>
   <div class="wrapper">
-    <div class="header"><h1>🌍 Wanderlust</h1><p>Your travel companion</p></div>
+    <div class="header"><h1>🌍 AirNook</h1><p>Your travel companion</p></div>
     <div class="body">
       <p class="greeting">Hi ${escapeHtml(username)},</p>
-      <p>Thanks for joining Wanderlust! Please verify your email address to unlock all features.</p>
+      <p>Thanks for joining AirNook! Please verify your email address to unlock all features.</p>
       <div class="cta-wrapper"><a href="${verifyUrl}" class="cta">Verify my email</a></div>
-      <p>This link will expire in <strong>${expiresInHours} hours</strong>. If you did not create a Wanderlust account, you can safely ignore this email.</p>
+      <p>This link will expire in <strong>${expiresInHours} hours</strong>. If you did not create a AirNook account, you can safely ignore this email.</p>
       <hr class="divider" />
       <p style="font-size:13px;color:#7a6f68;">If the button above doesn't work, copy and paste this URL into your browser:</p>
       <div class="fallback"><code>${verifyUrl}</code></div>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} Wanderlust. All rights reserved.<br />
+      <p>© ${new Date().getFullYear()} AirNook. All rights reserved.<br />
       This email was sent to ${escapeHtml(to)} because an account was created with this address.</p>
     </div>
   </div>
@@ -224,11 +223,11 @@ export async function sendEmailVerificationEmail({
 
   const text =
     `Hi ${username},\n\n` +
-    `Thanks for joining Wanderlust! Please verify your email address:\n\n` +
+    `Thanks for joining AirNook! Please verify your email address:\n\n` +
     `${verifyUrl}\n\n` +
     `This link expires in ${expiresInHours} hours.\n\n` +
     `If you didn't create this account, you can ignore this email.\n\n` +
-    `— The Wanderlust Team`;
+    `— The AirNook Team`;
 
   return sendMail({ to, subject, html, text });
 }

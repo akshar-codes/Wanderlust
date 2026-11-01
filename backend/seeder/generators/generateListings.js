@@ -145,7 +145,7 @@ function buildImages(vibe) {
   return ids.map((photoId, i) => ({
     url: `https://images.unsplash.com/photo-${photoId}?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=70`,
     // `filename` doubles as the would-be Cloudinary public_id once migrated
-    filename: `wanderlust_DEV/${theme}-${photoId}-${i}`,
+    filename: `airnook_DEV/${theme}-${photoId}-${i}`,
     caption: pick(IMAGE_CAPTIONS),
     isPrimary: i === 0,
   }));
