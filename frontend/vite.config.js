@@ -31,11 +31,20 @@ export default defineConfig(({ mode }) => {
       sourcemap: false,
       rollupOptions: {
         output: {
-          manualChunks: {
-            react: ["react", "react-dom"],
-            router: ["react-router-dom"],
-            query: ["@tanstack/react-query"],
-            map: ["mapbox-gl"],
+          manualChunks(id) {
+            const normalizedId = id.replaceAll("\\", "/");
+            if (/\/node_modules\/(react|react-dom)\//.test(normalizedId)) {
+              return "react";
+            }
+            if (normalizedId.includes("/node_modules/react-router-dom/")) {
+              return "router";
+            }
+            if (normalizedId.includes("/node_modules/@tanstack/react-query/")) {
+              return "query";
+            }
+            if (normalizedId.includes("/node_modules/mapbox-gl/")) {
+              return "map";
+            }
           },
         },
       },

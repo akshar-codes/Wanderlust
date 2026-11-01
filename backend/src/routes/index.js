@@ -49,11 +49,11 @@ router.get("/health", async (_req, res) => {
   const startTime = Date.now();
   const frontendUrl = process.env.FRONTEND_URL;
   const backendUrl = process.env.BACKEND_URL;
-
-  const [frontendStatus, backendStatus] = await Promise.all([
-    canReach(frontendUrl),
-    canReach(backendUrl),
-  ]);
+  const frontendStatus = await canReach(frontendUrl);
+  // Reaching this handler confirms the backend is responding. Probing a
+  // configured public URL from inside the backend can fail in local/dev and
+  // incorrectly mark a healthy process as unavailable.
+  const backendStatus = "up";
 
   let databaseStatus = "down";
   try {
@@ -67,10 +67,7 @@ router.get("/health", async (_req, res) => {
     databaseStatus = "down";
   }
 
-  const healthy =
-    (frontendStatus === "up" || !frontendUrl || frontendStatus === "down") &&
-    backendStatus === "up" &&
-    databaseStatus === "up";
+  const healthy = databaseStatus === "up";
   const response = {
     success: true,
     status: healthy ? "ok" : "degraded",
